@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: counterstrike;
+  src: url('../font/agency.ttf');
+}
+
+@keyframes battle-border-animation {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+.battle-button-border {
+  animation: battle-border-animation 1s infinite;
+}
+
+* {
+  font-family: counterstrike;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #393939;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #ffffff;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(131, 131, 131);
+}
+
+* {
+  -webkit-user-select: none;
+  /* Safari */
+  -ms-user-select: none;
+  /* IE 10 and IE 11 */
+  user-select: none;
+  /* Standard syntax */
+}
+
+:where(.css-dev-only-do-not-override-1qhpsh8).ant-modal .ant-modal-content,
+:where(.css-dev-only-do-not-override-1qhpsh8).ant-modal .ant-modal-header {
+  background-color: black;
+  border-radius: 0;
+  color: white;
+}
+
+:where(.css-dev-only-do-not-override-1qhpsh8).ant-modal .ant-modal-title {
+  color: white;
+  font-size: 20px;
+}
