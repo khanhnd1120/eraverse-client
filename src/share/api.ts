@@ -18,7 +18,7 @@ async function post(url: string, body: any): Promise<any> {
 }
 
 async function auth(eragonToken: string, pool_id: number): Promise<any> {
-  let res = await post("/auth", { eragon_token: eragonToken, pool_id });
+  let res = await post("/customer/auth", { eragon_token: eragonToken, pool_id });
   return res;
 }
 
@@ -31,12 +31,12 @@ function setToken(newToken: string) {
 }
 
 async function refreshAccessToken() {
-  let rs = await post("/refresh-access-token", {});
+  let rs = await post("/customer/refresh-access-token", {});
   return rs;
 }
 
 async function getMaterial(): Promise<string> {
-  let res = await post("/get-material", {});
+  let res = await post("/config/get-material", {});
   return res;
 }
 const api = {

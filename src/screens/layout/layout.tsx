@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
+import Game from "screens/game/game";
 import LoadingAsset from "screens/loading-assets/loading-assets";
 import Menu from "screens/menu/menu";
 import api from "share/api";
@@ -13,6 +14,10 @@ const router = createMemoryRouter([
   {
     path: "/menu",
     element: <Menu />,
+  },
+  {
+    path: "/game",
+    element: <Game />,
   },
 ]);
 

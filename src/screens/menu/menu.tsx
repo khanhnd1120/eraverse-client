@@ -1,14 +1,18 @@
 import Character from "ui/component/character";
 import AvatarPanel from "./avatar-panel";
 import BattleButton from "ui/component/battle-button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useGlobalContext } from "ui/context";
 import Constants from "share/game-constant";
 import { twMerge } from "tailwind-merge";
 import { useState } from "react";
+import Setting from "share/setting";
+import { ConfigKey } from "share/game-interface";
+import G from "share/G";
 
 export default function Menu() {
   const { userInfo } = useGlobalContext();
+  const nav = useNavigate();
   const [activeCharacterCode, setActiveCharacterCode] = useState(
     Constants.CharacterCodes[0]
   );
@@ -24,9 +28,12 @@ export default function Menu() {
         <Character anim="idle" code={activeCharacterCode} />
       </div>
       <div className="absolute bottom-0 right-0 p-[50px]">
-        <Link to="/matchmaking">
-          <BattleButton onClick={() => {}} />
-        </Link>
+        <BattleButton
+          onClick={() => {
+            G.openGameScreen("lobby", Setting.getConfig(ConfigKey.LOBBY_ROOM), activeCharacterCode);
+            nav("/game")
+          }}
+        />
       </div>
       <div className="absolute w-full top-0 left-0" style={{ padding: 40 }}>
         <div className="w-full h-full flex justify-between">
