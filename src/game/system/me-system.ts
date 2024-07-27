@@ -166,6 +166,10 @@ function controls(entity: MeEntity, delta: number) {
   } else {
     vel.x = MathUtils.lerp(vel.x, 0, 0.1);
     vel.z = MathUtils.lerp(vel.z, 0, 0.1);
+    if (entity.player.state == PlayerState.Move) {
+      entity.player.state = PlayerState.Idle;
+      G.getCurrentRoom().send("state", { state: PlayerState.Idle });
+    }
   }
   entity.me.velocity.copy(vel);
 }

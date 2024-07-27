@@ -172,7 +172,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         serverObject: player,
       },
       model: {
-        name: "soldier",
+        name: "model_chibi_male_premium",
         scale: new Vector3(0.6, 0.6, 0.6),
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
@@ -190,7 +190,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       animator: {
         items: [
           {
-            model: "soldier_top",
+            model: "anim_chibi_male_premium_top",
             currentAnimation: "",
             nextAnimation: "idle",
             clips: [
@@ -224,7 +224,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             ],
           },
           {
-            model: "soldier_bottom",
+            model: "anim_chibi_male_premium_bottom",
             currentAnimation: "",
             nextAnimation: "idle",
             clips: [
@@ -274,7 +274,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       gameObject: playerObject,
       position: playerObject.position.clone(),
       model: {
-        name: "soldier",
+        name: "model_chibi_male_premium",
         scale: new Vector3(0.6, 0.6, 0.6),
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
@@ -298,7 +298,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       animator: {
         items: [
           {
-            model: "soldier_top",
+            model: "anim_chibi_male_premium_top",
             currentAnimation: "",
             nextAnimation: "idle",
             clips: [
@@ -332,7 +332,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             ],
           },
           {
-            model: "soldier_bottom",
+            model: "anim_chibi_male_premium_bottom",
             currentAnimation: "",
             nextAnimation: "idle",
             clips: [

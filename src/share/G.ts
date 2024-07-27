@@ -6,6 +6,7 @@ import {
   WebGLRenderer,
   AudioListener,
   Vector2,
+  Fog,
 } from "three";
 import {
   EffectComposer,
@@ -28,6 +29,8 @@ let audioListener: AudioListener = new AudioListener();
 let scene: Scene = new Scene();
 const light = new DirectionalLight(0xffffff, 1);
 const renderer: WebGLRenderer = new WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(window.innerWidth, window.innerHeight);
 let composer = new EffectComposer(renderer);
 let particleGroup = new Group();
 let physicalGroup = new Group();
@@ -42,6 +45,7 @@ function setupEnvironment() {
   window.addEventListener("resize", setupCamera);
   // setup lighting
   scene.add(light);
+  scene.fog = new Fog(0xcccccc, 1, 500);
 
   // setup group
   scene.add(particleGroup);
