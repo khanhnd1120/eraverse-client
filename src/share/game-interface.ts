@@ -78,6 +78,7 @@ export type SettingData = {
   PLAYER_VIEW: number;
   GRAVITY: number;
   CHARACTER_SPEED: number;
+  CHARACTER_ATTACK_SPEED: number;
   JUMP_FORCE: number;
 };
 export interface AnimatorItem {
@@ -92,4 +93,10 @@ export interface AnimationClipItem {
   loop?: AnimationActionLoopStyles;
   clip?: AnimationAction;
   timeScale?: number;
+}
+export interface PlayerWorldType {
+  serverObject: any;
+  stateTop: PlayerState;
+  stateBottom: PlayerState;
+  direction: Direction;
 }

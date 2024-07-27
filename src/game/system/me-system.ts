@@ -1,4 +1,5 @@
 import { With } from "miniplex";
+import addPlayerState from "share/add-player-state";
 import G, { world } from "share/G";
 import { Direction, PlayerState } from "share/game-interface";
 import myState from "share/my-state";
@@ -66,8 +67,14 @@ function updatePlayerRigidBodyStep(entity: MeEntity, deltaTime: number) {
     entity.me.collider.translate(result.normal.multiplyScalar(result.depth));
   }
   let camPosition = entity.me.followCamera.getWorldPosition(new Vector3());
-  G.camera.position.set(camPosition.x, camPosition.y, camPosition.z);
   let viewPointPosition = entity.me.viewPoint.getWorldPosition(new Vector3());
+  if (entity.me.keyStates["RIGHTMOUSE"]) {
+    camPosition = entity.me.secondaryCamera.getWorldPosition(new Vector3());
+    viewPointPosition = entity.me.secondaryObject.getWorldPosition(
+      new Vector3()
+    );
+  }
+  G.camera.position.set(camPosition.x, camPosition.y, camPosition.z);
   entity.model.object.lookAt(
     new Vector3(
       viewPointPosition.x,
@@ -159,16 +166,18 @@ function controls(entity: MeEntity, delta: number) {
     }
   }
   if (checkMove) {
-    if (!(entity.player.state == PlayerState.Move)) {
-      entity.player.state = PlayerState.Move;
-      G.getCurrentRoom().send("state", { state: PlayerState.Move });
-    }
+    entity.player = addPlayerState(PlayerState.Move, entity.player);
   } else {
+    // case not move
     vel.x = MathUtils.lerp(vel.x, 0, 0.1);
     vel.z = MathUtils.lerp(vel.z, 0, 0.1);
-    if (entity.player.state == PlayerState.Move) {
-      entity.player.state = PlayerState.Idle;
-      G.getCurrentRoom().send("state", { state: PlayerState.Idle });
+    if (entity.player.stateBottom == PlayerState.Move) {
+      entity.player.stateBottom = PlayerState.Idle;
+      G.getCurrentRoom().send("state", { stateBottom: PlayerState.Idle });
+    }
+    if (entity.player.stateTop == PlayerState.Move) {
+      entity.player.stateTop = PlayerState.Idle;
+      G.getCurrentRoom().send("state", { stateTop: PlayerState.Idle });
     }
   }
   entity.me.velocity.copy(vel);
@@ -189,16 +198,27 @@ async function onEntityAdded(entity: MeEntity) {
       const movementY =
         event.movementY || event.mozMovementY || event.webkitMovementY || 0;
       let _euler = new Euler(0, 0, 0, "YXZ");
-      _euler.setFromQuaternion(entity.me.mainObject.quaternion);
+      if (entity.me.keyStates["RIGHTMOUSE"]) {
+        _euler.setFromQuaternion(entity.me.secondaryObject.quaternion);
+      } else {
+        _euler.setFromQuaternion(entity.me.mainObject.quaternion);
+      }
 
       _euler.y -= movementX * 0.002;
       _euler.x += movementY * 0.002;
 
       _euler.x = Math.max(-_PI_2 / 6, Math.min(_PI_2 / 2, _euler.x));
-      entity.me.mainObject.quaternion.setFromEuler(_euler);
+      if (entity.me.keyStates["RIGHTMOUSE"]) {
+        entity.me.secondaryObject.quaternion.setFromEuler(_euler);
+      } else {
+        entity.me.mainObject.quaternion.setFromEuler(_euler);
+      }
       myState.cameraRotation$.next(_euler);
 
       let camPosition = entity.me.followCamera.getWorldPosition(new Vector3());
+      if (entity.me.keyStates["RIGHTMOUSE"]) {
+        camPosition = entity.me.secondaryCamera.getWorldPosition(new Vector3());
+      }
       G.camera.position.set(camPosition.x, camPosition.y, camPosition.z);
       let viewPointPosition = entity.me.viewPoint.getWorldPosition(
         new Vector3()
@@ -252,8 +272,10 @@ async function onEntityAdded(entity: MeEntity) {
     }
     switch (evt.button) {
       case 0: //left mouse
+        entity.me.keyStates["LEFTMOUSE"] = true;
         break;
       case 2:
+        entity.me.keyStates["RIGHTMOUSE"] = true;
         break;
     }
   };
@@ -263,8 +285,13 @@ async function onEntityAdded(entity: MeEntity) {
     }
     switch (evt.button) {
       case 0: //left mouse
+        entity.me.keyStates["LEFTMOUSE"] = false;
         break;
       case 2:
+        entity.me.keyStates["RIGHTMOUSE"] = false;
+        entity.me.secondaryObject.quaternion.copy(
+          entity.me.mainObject.quaternion
+        );
         break;
     }
   };

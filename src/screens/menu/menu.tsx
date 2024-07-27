@@ -9,6 +9,7 @@ import { useState } from "react";
 import Setting from "share/setting";
 import { ConfigKey } from "share/game-interface";
 import G from "share/G";
+import Chat from "screens/game/chat";
 
 export default function Menu() {
   const { userInfo } = useGlobalContext();
@@ -30,8 +31,12 @@ export default function Menu() {
       <div className="absolute bottom-0 right-0 p-[50px]">
         <BattleButton
           onClick={() => {
-            G.openGameScreen("lobby", Setting.getConfig(ConfigKey.LOBBY_ROOM), activeCharacterCode);
-            nav("/game")
+            G.openGameScreen(
+              "lobby",
+              Setting.getConfig(ConfigKey.LOBBY_ROOM),
+              activeCharacterCode
+            );
+            nav("/game");
           }}
         />
       </div>
@@ -82,6 +87,7 @@ export default function Menu() {
           </div>
         </div>
       )}
+      <Chat />
     </div>
   );
 }

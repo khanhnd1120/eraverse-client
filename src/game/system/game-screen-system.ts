@@ -110,29 +110,62 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       player.position.y,
       player.position.z
     );
-    let weaponObject = new Object3D<Object3DEventMap>();
     let mainObject = new Object3D();
+    let secondaryObject = new Object3D();
 
     meObject.add(mainObject);
+    meObject.add(secondaryObject);
+    secondaryObject.position.set(0, Setting.getSetting().PLAYER_VIEW + 0.2, 0);
     mainObject.position.set(0, Setting.getSetting().PLAYER_VIEW + 0.2, 0);
 
+    const followCameraPosition = new Vector3(0, 0.3, -4);
     let followCamera = new Object3D();
-    followCamera.position.set(-0.6, 0.5, -3);
+    followCamera.position.set(
+      followCameraPosition.x,
+      followCameraPosition.y,
+      followCameraPosition.z
+    );
     mainObject.add(followCamera);
 
     let defaultFollowCam = new Object3D();
-    defaultFollowCam.position.set(-0.6, 0.5, -3);
+    defaultFollowCam.position.set(
+      followCameraPosition.x,
+      followCameraPosition.y,
+      followCameraPosition.z
+    );
     mainObject.add(defaultFollowCam);
 
+    let secondaryCamera = new Object3D();
+    secondaryCamera.position.set(
+      followCameraPosition.x,
+      followCameraPosition.y,
+      followCameraPosition.z
+    );
+    secondaryObject.add(secondaryCamera);
+
+    const viewPointPosition = new Vector3(0, 0.3, 2);
     let viewPoint = new Object3D();
-    viewPoint.position.set(-1, 0.5, 2);
+    viewPoint.position.set(
+      viewPointPosition.x,
+      viewPointPosition.y,
+      viewPointPosition.z
+    );
     mainObject.add(viewPoint);
 
     let aimPoint = new Object3D();
-    aimPoint.position.set(-((2 + 3) * 0.6 + (1 - 0.6) * 3) / (2 + 3), 0.5, 0);
+    aimPoint.position.set(
+      -(
+        (viewPointPosition.z - followCameraPosition.z) *
+          -followCameraPosition.x +
+        (-viewPointPosition.x - followCameraPosition.x) *
+          -followCameraPosition.z
+      ) /
+        (viewPointPosition.z - followCameraPosition.z),
+      followCameraPosition.y,
+      0
+    );
     mainObject.add(aimPoint);
 
-    meObject.add(weaponObject);
     G.particleGroup.add(meObject);
     let e = world.add({
       gameObject: meObject,
@@ -144,9 +177,11 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         onMouseUp: () => {},
         onPointerLockChange: () => {},
         followCamera,
+        secondaryCamera,
         defaultFollowCam,
         aimPoint,
         mainObject,
+        secondaryObject,
         viewPoint,
         velocity: new Vector3(),
         collider: new Capsule(
@@ -166,8 +201,12 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         moveLeft: 0,
         moveRight: 0,
       },
+      weapon: {
+        attackTimer: 0,
+      },
       player: {
-        state: player.state,
+        stateTop: player.stateTop,
+        stateBottom: player.stateBottom,
         direction: player.direction,
         serverObject: player,
       },
@@ -219,7 +258,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
               { name: "run_forward" },
               { name: "run_left" },
               { name: "run_right" },
-              { name: "stabbing" },
+              { name: "stabbing", timeScale: 2 },
               { name: "use_bandage", clampWhenFinished: true, loop: LoopOnce },
             ],
           },
@@ -253,7 +292,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
               { name: "run_forward" },
               { name: "run_left" },
               { name: "run_right" },
-              { name: "stabbing" },
+              { name: "stabbing", timeScale: 2 },
               { name: "use_bandage", clampWhenFinished: true, loop: LoopOnce },
             ],
           },
@@ -290,8 +329,12 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         parent: playerObject,
         modelReady$: new BehaviorSubject<boolean>(false),
       },
+      weapon: {
+        attackTimer: 0,
+      },
       player: {
-        state: player.state,
+        stateTop: player.stateTop,
+        stateBottom: player.stateBottom,
         direction: player.direction,
         serverObject: player,
       },

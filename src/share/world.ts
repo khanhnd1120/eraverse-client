@@ -10,8 +10,7 @@ import {
 } from "three";
 import {
   AnimatorItem,
-  Direction,
-  PlayerState,
+  PlayerWorldType,
   ServerConfigItem,
 } from "./game-interface";
 import { Capsule } from "three/examples/jsm/Addons.js";
@@ -50,18 +49,19 @@ export type Entity = {
     collider: Capsule;
     isOnFloor: boolean;
     followCamera: Object3D;
+    secondaryCamera: Object3D;
     mainObject: Object3D;
+    secondaryObject: Object3D;
     viewPoint: Object3D;
     aimPoint: Object3D;
     defaultFollowCam: Object3D;
   };
+  weapon?: {
+    attackTimer?: number;
+  };
   gameObject?: Object3D<Object3DEventMap>;
   position?: Vector3;
-  player?: {
-    serverObject: any;
-    state: PlayerState;
-    direction: Direction;
-  };
+  player?: PlayerWorldType;
   gameScreen?: {
     map: string;
     room?: Colyseus.Room;
