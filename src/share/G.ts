@@ -21,6 +21,7 @@ import { ServerConfigItem } from "./game-interface";
 import * as Colyseus from "colyseus.js";
 import Environment from "environment";
 import Stats from "three/addons/libs/stats.module.js";
+import myState from "./my-state";
 
 export const world = new World<Entity>();
 
@@ -38,6 +39,7 @@ let worldOctree: Octree = new Octree();
 let client: Colyseus.Client = new Colyseus.Client(Environment.SERVER_SOCKET);
 let currentRoom: any;
 let stats = new Stats();
+let messages: any = [];
 
 function setupEnvironment() {
   // setup camera
@@ -122,6 +124,20 @@ function getCurrentRoom(): Colyseus.Room {
 }
 function setCurrentRoom(room: Colyseus.Room) {
   currentRoom = room;
+  if (room.state.globalChats) {
+    room.state.globalChats.onAdd((m: any) => {
+      messages.push({
+        id: m.id,
+        name: m.name,
+        content: m.content,
+      });
+      myState.chatMessages$.next(messages);
+    });
+    room.state.globalChats.onRemove((m: any) => {
+      messages = messages.filter((t: any) => t.id != m.id);
+      myState.chatMessages$.next(messages);
+    });
+  }
 }
 const G = {
   setCurrentRoom,
@@ -135,5 +151,6 @@ const G = {
   client,
   particleGroup,
   render,
+  messages,
 };
 export default G;

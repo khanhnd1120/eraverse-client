@@ -247,6 +247,10 @@ async function onEntityAdded(entity: MeEntity) {
           G.getCurrentRoom().send("crouch", { isCrouch: true });
         }
         break;
+      case "Enter":
+        console.log("enter")
+        myState.toggleChat$.next(!myState.toggleChat$.value);
+        break;
     }
     entity.me.keyStates[event.code] = true;
     return false;

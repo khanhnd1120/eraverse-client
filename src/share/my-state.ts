@@ -15,6 +15,8 @@ const position$ = new BehaviorSubject<Vector3 | null>(null);
 const direction$ = new BehaviorSubject<Direction | null>(null);
 const cameraRotation$ = new BehaviorSubject<Euler | null>(null);
 const pause$ = new BehaviorSubject<boolean>(false);
+const toggleChat$ = new BehaviorSubject<boolean>(false);
+const chatMessages$ = new BehaviorSubject<any>([]);
 
 const myState = {
   texture$,
@@ -24,5 +26,7 @@ const myState = {
   direction$,
   cameraRotation$,
   pause$,
+  toggleChat$,
+  chatMessages$,
 };
 export default myState;

@@ -9,7 +9,6 @@ import { useState } from "react";
 import Setting from "share/setting";
 import { ConfigKey } from "share/game-interface";
 import G from "share/G";
-import Chat from "screens/game/chat";
 
 export default function Menu() {
   const { userInfo } = useGlobalContext();
@@ -87,7 +86,6 @@ export default function Menu() {
           </div>
         </div>
       )}
-      <Chat />
     </div>
   );
 }
