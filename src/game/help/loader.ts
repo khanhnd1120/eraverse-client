@@ -12,9 +12,11 @@ import {
   GLTFLoader,
   TGALoader,
 } from "three/examples/jsm/Addons.js";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 const tgaLoader: TGALoader = new TGALoader();
 const textureLoader: TextureLoader = new TextureLoader();
 const gltfLoader: GLTFLoader = new GLTFLoader();
+gltfLoader.setMeshoptDecoder( MeshoptDecoder );
 // gltfLoader.setDRACOLoader(dracoLoader);
 
 export async function loadTexture(file: string): Promise<Texture> {

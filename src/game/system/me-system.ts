@@ -3,6 +3,7 @@ import addPlayerState from "share/add-player-state";
 import G, { world } from "share/G";
 import { Direction, PlayerState } from "share/game-interface";
 import myState from "share/my-state";
+import removePlayerState from "share/remove-player-state";
 import Setting from "share/setting";
 import { Entity } from "share/world";
 import { Euler, MathUtils, Raycaster, Vector3 } from "three";
@@ -171,14 +172,7 @@ function controls(entity: MeEntity, delta: number) {
     // case not move
     vel.x = MathUtils.lerp(vel.x, 0, 0.1);
     vel.z = MathUtils.lerp(vel.z, 0, 0.1);
-    if (entity.player.stateBottom == PlayerState.Move) {
-      entity.player.stateBottom = PlayerState.Idle;
-      G.getCurrentRoom().send("state", { stateBottom: PlayerState.Idle });
-    }
-    if (entity.player.stateTop == PlayerState.Move) {
-      entity.player.stateTop = PlayerState.Idle;
-      G.getCurrentRoom().send("state", { stateTop: PlayerState.Idle });
-    }
+    entity.player = removePlayerState(PlayerState.Move, entity.player);
   }
   entity.me.velocity.copy(vel);
 }
@@ -241,15 +235,12 @@ async function onEntityAdded(entity: MeEntity) {
     }
     switch (event.code) {
       case "Tab":
+        myState.showDance$.next(!myState.showDance$.value);
         break;
       case "KeyC":
-        if (!entity.me.keyStates[event.code]) {
-          G.getCurrentRoom().send("crouch", { isCrouch: true });
-        }
         break;
       case "Enter":
-        console.log("enter")
-        myState.toggleChat$.next(!myState.toggleChat$.value);
+        myState.showChat$.next(true);
         break;
     }
     entity.me.keyStates[event.code] = true;
@@ -263,9 +254,9 @@ async function onEntityAdded(entity: MeEntity) {
       case "Tab":
         break;
       case "KeyC":
-        if (entity.me.keyStates[event.code]) {
-          G.getCurrentRoom().send("crouch", { isCrouch: false });
-        }
+        break;
+      case "Enter":
+        myState.showChat$.next(true);
         break;
     }
     entity.me.keyStates[event.code] = false;
@@ -308,6 +299,15 @@ async function onEntityAdded(entity: MeEntity) {
       myState.pause$.next(false);
     }
   };
+  myState.showDance$.subscribe((val) => {
+    if (val) {
+      unbindInputEvent(entity);
+      entity.player = addPlayerState(PlayerState.Dance, entity.player);
+    } else {
+      bindInputEvent(entity);
+      entity.player = removePlayerState(PlayerState.Dance, entity.player);
+    }
+  });
   bindInputEvent(entity);
   document.body.requestPointerLock();
 }

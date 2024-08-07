@@ -27,32 +27,31 @@ const RunAnimationDirection = [
 ];
 
 function animationDirectionMove(entity: PlayerEntity) {
-  const soldier = entity.player;
+  const player = entity.player;
 
   entity.animator.items[1].nextAnimation = "idle";
   entity.animator.items[0].nextAnimation = "idle";
 
-  switch (soldier.stateTop) {
+  switch (player.stateTop) {
     case PlayerState.Move:
       entity.animator.items[0].nextAnimation =
-        RunAnimationDirection[soldier.direction][0];
+        RunAnimationDirection[player.direction][0];
       break;
     case PlayerState.Attack:
-      entity.animator.items[0].nextAnimation = "stabbing";
+      entity.animator.items[0].nextAnimation = "punch";
       break;
   }
-  switch (soldier.stateBottom) {
+  switch (player.stateBottom) {
     case PlayerState.Move:
       entity.animator.items[1].nextAnimation =
-        RunAnimationDirection[soldier.direction][1];
+        RunAnimationDirection[player.direction][1];
       break;
     case PlayerState.Attack:
-      entity.animator.items[1].nextAnimation = "stabbing";
+      entity.animator.items[1].nextAnimation = "punch";
       break;
   }
 }
 
 function animation(entity: PlayerEntity) {
-  const soldier = entity.player;
   animationDirectionMove(entity);
 }

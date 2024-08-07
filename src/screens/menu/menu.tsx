@@ -9,6 +9,7 @@ import { useState } from "react";
 import Setting from "share/setting";
 import { ConfigKey } from "share/game-interface";
 import G from "share/G";
+import Dance from "screens/game/dance";
 
 export default function Menu() {
   const { userInfo } = useGlobalContext();
@@ -25,7 +26,11 @@ export default function Menu() {
         className="absolute right-0 top-0"
         style={{ height: `100vh`, width: "90%" }}
       >
-        <Character anim="idle" code={activeCharacterCode} />
+        <Character
+          anim="idle"
+          secondAnim="ninja_idle"
+          code={activeCharacterCode}
+        />
       </div>
       <div className="absolute bottom-0 right-0 p-[50px]">
         <BattleButton
@@ -86,6 +91,9 @@ export default function Menu() {
           </div>
         </div>
       )}
+      <Dance
+       
+      />
     </div>
   );
 }

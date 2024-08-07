@@ -17,6 +17,9 @@ import myState from "share/my-state";
 import { asyncScheduler, BehaviorSubject, throttleTime } from "rxjs";
 import { Direction } from "share/game-interface";
 import Setting from "share/setting";
+import assets from "share/assets";
+import Constants from "share/game-constant";
+import _ from "lodash";
 
 let gameScreenEntities = world.with("gameScreen");
 type GameEntity = With<Entity, "gameScreen">;
@@ -36,7 +39,17 @@ async function init(entity: GameEntity) {
   G.camera.lookAt(new Vector3(0, 0, 0));
 
   // load map
-  let gltf: GLTF = await loadGltf(entity.gameScreen.map);
+  let gltf: GLTF = assets.getModel(entity.gameScreen.map);
+  gltf.scene.traverse(async (child: any) => {
+    if (child.isMesh) {
+      const materialId =
+        myState.meshMaterial$.value[entity.gameScreen.map]?.[child.name];
+      if (materialId) {
+        child.material = myState.material$.value[materialId].mat;
+      }
+    }
+  });
+  gltf.scene.scale.copy(new Vector3(10, 10, 10));
   G.physicalGroup.add(gltf.scene);
   let pos: any[] = [];
   pos.forEach((child) => gltf.scene.remove(child));
@@ -211,8 +224,8 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         serverObject: player,
       },
       model: {
-        name: "model_chibi_male_premium",
-        scale: new Vector3(0.6, 0.6, 0.6),
+        name: "model_female_premium",
+        scale: new Vector3(0.3, 0.3, 0.3),
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
           if (child.isMesh) {
@@ -229,72 +242,16 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       animator: {
         items: [
           {
-            model: "anim_chibi_male_premium_top",
+            model: "female_anim_top",
             currentAnimation: "",
             nextAnimation: "idle",
-            clips: [
-              { name: "die", clampWhenFinished: true, loop: LoopOnce },
-              { name: "aim_to_down", clampWhenFinished: true, loop: LoopOnce },
-              { name: "down_to_aim", clampWhenFinished: true, loop: LoopOnce },
-              { name: "climb_up" },
-              { name: "climb_down" },
-              { name: "climb_up_finish" },
-              { name: "fire" },
-              { name: "grenade_throw" },
-              { name: "idle" },
-              { name: "jump_backward" },
-              { name: "jump_forward" },
-              { name: "jump_left" },
-              { name: "jump_right" },
-              { name: "pistol_fire" },
-              { name: "pistol_idle" },
-              { name: "pistol_run_horizontal" },
-              { name: "pistol_run_vertical" },
-              { name: "reload" },
-              { name: "roll_horizontal", timeScale: 1.6 },
-              { name: "roll_backward", timeScale: 2 },
-              { name: "roll_forward", timeScale: 2.1 },
-              { name: "run_backward" },
-              { name: "run_forward" },
-              { name: "run_left" },
-              { name: "run_right" },
-              { name: "stabbing", timeScale: 2 },
-              { name: "use_bandage", clampWhenFinished: true, loop: LoopOnce },
-            ],
+            clips: _.cloneDeep(Constants.AnimClipModel),
           },
           {
-            model: "anim_chibi_male_premium_bottom",
+            model: "female_anim_bottom",
             currentAnimation: "",
             nextAnimation: "idle",
-            clips: [
-              { name: "die", clampWhenFinished: true, loop: LoopOnce },
-              { name: "aim_to_down", clampWhenFinished: true, loop: LoopOnce },
-              { name: "down_to_aim", clampWhenFinished: true, loop: LoopOnce },
-              { name: "climb_up" },
-              { name: "climb_down" },
-              { name: "climb_up_finish" },
-              { name: "fire" },
-              { name: "grenade_throw" },
-              { name: "idle" },
-              { name: "jump_backward" },
-              { name: "jump_forward" },
-              { name: "jump_left" },
-              { name: "jump_right" },
-              { name: "pistol_fire" },
-              { name: "pistol_idle" },
-              { name: "pistol_run_horizontal" },
-              { name: "pistol_run_vertical" },
-              { name: "reload" },
-              { name: "roll_horizontal", timeScale: 1.6 },
-              { name: "roll_backward", timeScale: 2 },
-              { name: "roll_forward", timeScale: 2.1 },
-              { name: "run_backward" },
-              { name: "run_forward" },
-              { name: "run_left" },
-              { name: "run_right" },
-              { name: "stabbing", timeScale: 2 },
-              { name: "use_bandage", clampWhenFinished: true, loop: LoopOnce },
-            ],
+            clips: _.cloneDeep(Constants.AnimClipModel),
           },
         ],
         ready$: new BehaviorSubject<boolean>(false),
@@ -313,8 +270,8 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       gameObject: playerObject,
       position: playerObject.position.clone(),
       model: {
-        name: "model_chibi_male_premium",
-        scale: new Vector3(0.6, 0.6, 0.6),
+        name: "model_female_premium",
+        scale: new Vector3(0.3, 0.3, 0.3),
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
           if (child.isMesh) {
@@ -341,72 +298,16 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       animator: {
         items: [
           {
-            model: "anim_chibi_male_premium_top",
+            model: "female_anim_top",
             currentAnimation: "",
             nextAnimation: "idle",
-            clips: [
-              { name: "die", clampWhenFinished: true, loop: LoopOnce },
-              { name: "aim_to_down", clampWhenFinished: true, loop: LoopOnce },
-              { name: "down_to_aim", clampWhenFinished: true, loop: LoopOnce },
-              { name: "climb_up" },
-              { name: "climb_down" },
-              { name: "climb_up_finish" },
-              { name: "fire" },
-              { name: "grenade_throw" },
-              { name: "idle" },
-              { name: "jump_backward" },
-              { name: "jump_forward" },
-              { name: "jump_left" },
-              { name: "jump_right" },
-              { name: "pistol_fire" },
-              { name: "pistol_idle" },
-              { name: "pistol_run_horizontal" },
-              { name: "pistol_run_vertical" },
-              { name: "reload" },
-              { name: "roll_horizontal", timeScale: 1.6 },
-              { name: "roll_backward", timeScale: 2 },
-              { name: "roll_forward", timeScale: 2.1 },
-              { name: "run_backward" },
-              { name: "run_forward" },
-              { name: "run_left" },
-              { name: "run_right" },
-              { name: "stabbing" },
-              { name: "use_bandage", clampWhenFinished: true, loop: LoopOnce },
-            ],
+            clips: _.cloneDeep(Constants.AnimClipModel),
           },
           {
-            model: "anim_chibi_male_premium_bottom",
+            model: "female_anim_bottom",
             currentAnimation: "",
             nextAnimation: "idle",
-            clips: [
-              { name: "die", clampWhenFinished: true, loop: LoopOnce },
-              { name: "aim_to_down", clampWhenFinished: true, loop: LoopOnce },
-              { name: "down_to_aim", clampWhenFinished: true, loop: LoopOnce },
-              { name: "climb_up" },
-              { name: "climb_down" },
-              { name: "climb_up_finish" },
-              { name: "fire" },
-              { name: "grenade_throw" },
-              { name: "idle" },
-              { name: "jump_backward" },
-              { name: "jump_forward" },
-              { name: "jump_left" },
-              { name: "jump_right" },
-              { name: "pistol_fire" },
-              { name: "pistol_idle" },
-              { name: "pistol_run_horizontal" },
-              { name: "pistol_run_vertical" },
-              { name: "reload" },
-              { name: "roll_horizontal", timeScale: 1.6 },
-              { name: "roll_backward", timeScale: 2 },
-              { name: "roll_forward", timeScale: 2.1 },
-              { name: "run_backward" },
-              { name: "run_forward" },
-              { name: "run_left" },
-              { name: "run_right" },
-              { name: "stabbing" },
-              { name: "use_bandage", clampWhenFinished: true, loop: LoopOnce },
-            ],
+            clips: _.cloneDeep(Constants.AnimClipModel),
           },
         ],
         ready$: new BehaviorSubject<boolean>(false),

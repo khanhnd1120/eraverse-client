@@ -4,7 +4,7 @@
 
 @font-face {
   font-family: counterstrike;
-  src: url('../font/agency.ttf');
+  src: url("../font/agency.ttf");
 }
 
 @keyframes battle-border-animation {
@@ -66,4 +66,20 @@
 :where(.css-dev-only-do-not-override-1qhpsh8).ant-modal .ant-modal-title {
   color: white;
   font-size: 20px;
+}
+
+.ant-select-selector,
+.ant-select-dropdown {
+  background-color: #03071289 !important;
+  color: white !important;
+}
+.ant-select-dropdown {
+  height: 230px !important;
+}
+.ant-select-item-option-content {
+  color: white !important;
+}
+.ant-select-item-option-active,
+.ant-select-item-option-selected {
+  background-color: #030712 !important;
 }

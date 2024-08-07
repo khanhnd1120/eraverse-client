@@ -1,6 +1,12 @@
 /** @format */
 
-import { AudioLoader, LoadingManager, Texture, TextureLoader } from "three";
+import {
+  AudioLoader,
+  ImageBitmapLoader,
+  LoadingManager,
+  Texture,
+  TextureLoader,
+} from "three";
 import {
   DRACOLoader,
   Font,
@@ -10,20 +16,38 @@ import {
 } from "three/examples/jsm/Addons.js";
 import api from "./api";
 import myState from "./my-state";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 
 const MODELS: { [key: string]: { url: string; gltf?: GLTF } } = {
-  model_chibi_male_premium: { url: "character/eragon/model_chibi_male_premium.glb" },
-  anim_chibi_male_premium_bottom: { url: "character/eragon/anim_chibi_male_premium_bottom.glb" },
-  anim_chibi_male_premium_top: { url: "character/eragon/anim_chibi_male_premium_top.glb" },
+  map: { url: "map/map.glb" },
+  model_female_premium: {
+    url: "character/eragon/model_female_premium.glb",
+  },
+  female_anim_bottom: {
+    url: "character/eragon/female_anim_bottom.glb",
+  },
+  female_anim_top: {
+    url: "character/eragon/female_anim_top.glb",
+  },
 };
-const SOUNDS: { [key: string]: { url: string; buffer?: any } } = {
-  
-};
-const TEXTURES: { [key: string]: { url: string; texture?: Texture } } = {
+const SOUNDS: { [key: string]: { url: string; buffer?: any } } = {};
+const TEXTURES: { [key: string]: { url: string; texture?: Texture } } = {};
+const BITMAP_IMAGES: { [key: string]: { url: string; img?: ImageBitmap } } = {
+  Island_Displacement: {
+    url: "Island_Displacement.png",
+  },
 };
 const FONTS: { [key: string]: { url: string; font?: any } } = {
   agency: { url: "font/gentilis_bold.typeface.json" },
 };
+function loadImage(manager: LoadingManager) {
+  const bitmapLoader = new ImageBitmapLoader(manager);
+  Object.keys(BITMAP_IMAGES).forEach((key: string) => {
+    bitmapLoader.load(BITMAP_IMAGES[key].url, (res) => {
+      BITMAP_IMAGES[key].img = res;
+    });
+  });
+}
 function loadFont(manager: LoadingManager) {
   const fontLoader = new FontLoader(manager);
   Object.keys(FONTS).forEach((key: string) => {
@@ -37,6 +61,7 @@ function loadModel(manager: LoadingManager) {
   const gltfLoader = new GLTFLoader(manager);
   const dracoLoader = new DRACOLoader();
   gltfLoader.setDRACOLoader(dracoLoader);
+  gltfLoader.setMeshoptDecoder(MeshoptDecoder);
   Object.keys(MODELS).forEach((key: string) => {
     gltfLoader.load(MODELS[key].url, (gltf) => {
       MODELS[key].gltf = gltf;
@@ -63,17 +88,18 @@ function loadTexture(manager: LoadingManager) {
 }
 let manager: LoadingManager = null;
 async function loadAssets(): Promise<LoadingManager> {
-  const dataMaterial: any = await api.getMaterial();
-  const { textures, materials, meshMaterials } = dataMaterial;
-  myState.texture$.next(textures);
-  myState.material$.next(materials);
-  myState.meshMaterial$.next(meshMaterials);
   if (!manager) {
     manager = new LoadingManager();
+    const dataMaterial: any = await api.getMaterial();
+    const { textures, materials, meshMaterials } = dataMaterial;
+    myState.texture$.next(textures);
+    myState.material$.next(materials);
+    myState.meshMaterial$.next(meshMaterials);
     loadModel(manager);
     loadSound(manager);
     loadTexture(manager);
     loadFont(manager);
+    loadImage(manager);
   }
   return manager;
 }
@@ -93,11 +119,22 @@ function getTexture(name: string): Texture {
 function getFont(name: string): Font {
   return FONTS[name].font;
 }
+function getImage(name: string): ImageBitmap {
+  return BITMAP_IMAGES[name]?.img;
+}
+function setImage(
+  name: string,
+  data: { url: string; img?: ImageBitmap }
+): void {
+  BITMAP_IMAGES[name] = data;
+}
 const assets = {
   loadAssets,
   getModel,
   getSound,
   getTexture,
   getFont,
+  getImage,
+  setImage,
 };
 export default assets;
