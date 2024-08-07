@@ -10,28 +10,38 @@ export default function removePlayerState(
   }
   let updatedState: { stateTop: PlayerState; stateBottom: PlayerState };
   switch (state) {
+    case PlayerState.Move:
+    case PlayerState.Dance:
+      updatedState = removeDefault(player, state);
+      break;
     case PlayerState.Attack:
       updatedState = removeAttack(player);
       break;
   }
   const { stateTop, stateBottom } = updatedState;
-  player = {
-    ...player,
-    stateTop,
-    stateBottom,
-  };
-  G.getCurrentRoom().send("state", {
-    stateBottom: player.stateBottom,
-    stateTop: player.stateTop,
-  });
+  let isChange = false;
+  if (player.stateTop !== stateTop || player.stateBottom !== stateBottom) {
+    isChange = true;
+  }
+  if (isChange) {
+    player = {
+      ...player,
+      stateTop,
+      stateBottom,
+    };
+    G.getCurrentRoom().send("state", {
+      stateBottom: player.stateBottom,
+      stateTop: player.stateTop,
+    });
+  }
   return player;
 }
 
 function removeAttack(player: PlayerWorldType) {
   let tmpTop, tmpBottom: PlayerState;
   switch (player.stateTop) {
+    case PlayerState.Move:
     case PlayerState.Beaten:
-      case PlayerState.Idle:
       tmpTop = player.stateTop;
       break;
     default:
@@ -39,12 +49,37 @@ function removeAttack(player: PlayerWorldType) {
       break;
   }
   switch (player.stateBottom) {
+    case PlayerState.Move:
     case PlayerState.Beaten:
-    case PlayerState.Idle:
       tmpBottom = player.stateBottom;
       break;
     default:
       tmpBottom = PlayerState.Idle;
+      break;
+  }
+
+  return {
+    stateTop: tmpTop,
+    stateBottom: tmpBottom,
+  };
+}
+
+function removeDefault(player: PlayerWorldType, state: PlayerState) {
+  let tmpTop, tmpBottom: PlayerState;
+  switch (player.stateTop) {
+    case state:
+      tmpTop = PlayerState.Idle;
+      break;
+    default:
+      tmpTop = player.stateTop;
+      break;
+  }
+  switch (player.stateBottom) {
+    case state:
+      tmpBottom = PlayerState.Idle;
+      break;
+    default:
+      tmpBottom = player.stateBottom;
       break;
   }
 

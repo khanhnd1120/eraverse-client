@@ -1,65 +1,179 @@
 import _ from "lodash";
-import { combineLatest } from "rxjs";
-import { MaterialConfigData, TextureConfigData } from "share/game-interface";
 import myState from "share/my-state";
-import { Color, MeshPhysicalMaterial, Vector2 } from "three";
+import { Color, Euler, MeshPhysicalMaterial, Vector2 } from "three";
 
 export default function loadMaterial() {
-  combineLatest([myState.texture$, myState.material$]).subscribe(
-    ([texture, material]: [TextureConfigData, MaterialConfigData]) => {
-      if (!texture || !material) return;
-      Object.keys(material).map((key) => {
-        if (material[key].mat) {
-          // @ts-ignore
-          material[key].mat.normalMap =
-            texture[material[key].data.normalMap].texture;
-          // @ts-ignore
-          material[key].mat.roughnessMap =
-            texture[material[key].data.roughnessMap].texture;
-          // @ts-ignore
-          material[key].mat.metalnessMap =
-            texture[material[key].data.metalnessMap].texture;
-          // @ts-ignore
-          material[key].mat.emissiveMap =
-            texture[material[key].data.emissiveMap].texture;
-          // @ts-ignore
-          material[key].mat.map = texture[material[key].data.map].texture;
-          return;
-        }
-        const mat = new MeshPhysicalMaterial(material[key].data);
+  myState.material$.subscribe((material) => {
+    const tmp = _.cloneDeep(material);
+    let isChanged = false;
+    Object.keys(tmp).map((key) => {
+      if (tmp[key].mat) {
+        return;
+      }
+      isChanged = true;
+      const materialData = tmp[key].data;
+      delete materialData.metadata;
+      const mat = new MeshPhysicalMaterial(materialData);
 
-        const dataMat = _.cloneDeep(material[key].data);
-        mat.normalMap = texture[dataMat.normalMap].texture;
-        mat.roughnessMap = texture[dataMat.roughnessMap].texture;
-        mat.metalnessMap = texture[dataMat.metalnessMap].texture;
-        mat.emissiveMap = texture[dataMat.emissiveMap].texture;
-        mat.map = texture[dataMat.map].texture;
-        mat.clearcoat = 0.3;
-        mat.clearcoatRoughness = 0.25;
-        mat.ior = 1.2;
-        mat.thickness = 10.0;
-        Object.keys(dataMat).map((property) => {
-          if (property in mat) {
-            if (!["color", "emissive", "normalScale"].includes(property)) {
-              // @ts-ignore
-              mat[property] = material[key].data[property];
-            }
-            if (property == "emissive") {
-              mat.emissive = new Color(material[key].data[property]);
-            }
-            if (property == "color") {
-              mat.color = new Color(material[key].data[property]);
-            }
-            if (property == "normalScale") {
-              mat[property] = new Vector2(
-                material[key].data[property][0],
-                material[key].data[property][1]
-              );
-            }
+      const dataMat = _.cloneDeep(materialData);
+      if (dataMat.normalMap && myState.texture$.value[dataMat.normalMap]) {
+        mat.normalMap = myState.texture$.value[dataMat.normalMap].texture;
+      }
+      if (
+        dataMat.roughnessMap &&
+        myState.texture$.value[dataMat.roughnessMap]
+      ) {
+        mat.roughnessMap = myState.texture$.value[dataMat.roughnessMap].texture;
+      }
+      if (
+        dataMat.metalnessMap &&
+        myState.texture$.value[dataMat.metalnessMap]
+      ) {
+        mat.metalnessMap = myState.texture$.value[dataMat.metalnessMap].texture;
+      }
+      if (dataMat.emissiveMap && myState.texture$.value[dataMat.emissiveMap]) {
+        mat.emissiveMap = myState.texture$.value[dataMat.emissiveMap].texture;
+      }
+      if (dataMat.map && myState.texture$.value[dataMat.map]) {
+        mat.map = myState.texture$.value[dataMat.map].texture;
+      }
+      // mat.clearcoat = 0.3;
+      mat.clearcoatRoughness = 0;
+      mat.ior = 1.45;
+      mat.thickness = 0;
+      Object.keys(dataMat).map((property) => {
+        if (property in mat) {
+          if (
+            [
+              "map",
+              "emissiveMap",
+              "metalnessMap",
+              "roughnessMap",
+              "normalMap",
+              "metadata",
+            ].includes(property)
+          ) {
+            return;
           }
-        });
-        material[key].mat = mat;
+          if (
+            ![
+              "color",
+              "emissive",
+              "normalScale",
+              "envMapRotation",
+              "blendColor",
+              "attenuationColor",
+              "specularColor",
+              "emissive",
+              "sheenColor",
+            ].includes(property)
+          ) {
+            // @ts-ignore
+            mat[property] = materialData[property];
+          }
+          if (property == "emissive") {
+            mat.emissive = new Color(materialData[property]);
+          }
+          if (
+            [
+              "color",
+              "blendColor",
+              "attenuationColor",
+              "specularColor",
+              "emissive",
+              "sheenColor",
+            ].includes(property)
+          ) {
+            // @ts-ignore
+            mat[property] = new Color(materialData[property]);
+          }
+          if (property == "envMapRotation") {
+            mat[property] = new Euler(
+              materialData[property][0],
+              materialData[property][1],
+              materialData[property][2],
+              materialData[property][3]
+            );
+          }
+          if (property == "normalScale") {
+            mat[property] = new Vector2(
+              materialData[property][0],
+              materialData[property][1]
+            );
+          }
+        }
       });
+      tmp[key].mat = mat;
+    });
+    if (isChanged) {
+      myState.material$.next(tmp);
     }
-  );
+  });
+  myState.texture$.subscribe((texture) => {
+    if (!texture || !myState.material$.value) return;
+    let isChange = false;
+    Object.keys(myState.material$.value).map((key) => {
+      let materialData = myState.material$.value[key];
+      if (materialData.mat) {
+        if (
+          // @ts-ignore
+          !materialData.mat.normalMap &&
+          materialData.data.normalMap &&
+          texture[materialData.data.normalMap]
+        ) {
+          // @ts-ignore
+          materialData.mat.normalMap =
+            texture[materialData.data.normalMap].texture;
+          isChange = true;
+        }
+        if (
+          // @ts-ignore
+          !materialData.mat.roughnessMap &&
+          materialData.data.roughnessMap &&
+          texture[materialData.data.roughnessMap]
+        ) {
+          // @ts-ignore
+          materialData.mat.roughnessMap =
+            texture[materialData.data.roughnessMap].texture;
+          isChange = true;
+        }
+        if (
+          // @ts-ignore
+          !materialData.mat.metalnessMap &&
+          materialData.data.metalnessMap &&
+          texture[materialData.data.metalnessMap]
+        ) {
+          // @ts-ignore
+          materialData.mat.metalnessMap =
+            texture[materialData.data.metalnessMap].texture;
+          isChange = true;
+        }
+        if (
+          // @ts-ignore
+          !materialData.mat.emissiveMap &&
+          materialData.data.emissiveMap &&
+          texture[materialData.data.emissiveMap]
+        ) {
+          // @ts-ignore
+          materialData.mat.emissiveMap =
+            texture[materialData.data.emissiveMap].texture;
+          isChange = true;
+        }
+        if (
+          // @ts-ignore
+          !materialData.mat.map &&
+          materialData.data.map &&
+          texture[materialData.data.map]
+        ) {
+          // @ts-ignore
+          materialData.mat.map = texture[materialData.data.map].texture;
+          isChange = true;
+        }
+        return;
+      }
+    });
+    if (isChange) {
+      myState.material$.next(myState.material$.value);
+    }
+  });
 }

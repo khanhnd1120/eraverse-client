@@ -65,7 +65,7 @@ function setupEnvironment() {
   // setup bloom
   const bloomPass = new UnrealBloomPass(
     new Vector2(window.innerWidth, window.innerHeight),
-    0.3,
+    0.15,
     0.1,
     0.3
   );
@@ -109,7 +109,7 @@ function openGameScreen(
   setupEnvironment();
   world.add({
     gameScreen: {
-      map: "./map/wooden_plane.glb",
+      map: "map",
       keyEntities: {},
       points: {},
       roomName,

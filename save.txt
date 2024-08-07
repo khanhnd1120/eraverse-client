@@ -1,0 +1,57 @@
+let model = SkeletonUtils.clone(
+    assets.getModel("model_chibi_male_premium").scene
+  );
+  model.scale.set(1.5, 1.5, 1.5);
+
+  let material: any = {};
+  let textures: any = {};
+  let meshMaterial: any = {};
+  const names = [
+    "FEMALE_02",
+    "FEMALE_03",
+    "FEMALE_04",
+    "FEMALE_05",
+    "FEMALE_06",
+    "FEMALE_07",
+    "FEMALE_08",
+    "FEMALE_09",
+    "FEMALE_10",
+  ];
+  for (let index of [2, 3, 4, 5, 6, 7, 8, 9, 10]) {
+    model = SkeletonUtils.clone(
+      assets.getModel(`${names[[2, 3, 4, 5, 6, 7, 8, 9, 10].indexOf(index)]}`)
+        .scene
+    );
+    model.scale.set(1.5, 1.5, 1.5);
+    meshMaterial[names[[2, 3, 4, 5, 6, 7, 8, 9, 10].indexOf(index)]] = {};
+    model.traverse((child: any) => {
+      if (child.isMesh) {
+        const tmp = child.material.toJSON();
+        meshMaterial[names[[2, 3, 4, 5, 6, 7, 8, 9, 10].indexOf(index)]][
+          child.name
+        ] = tmp.uuid;
+        if (tmp.textures) {
+          tmp.textures.map((i: any) => {
+            if (!textures[i.uuid]) {
+              if (i.image) {
+                i.url = tmp.images.find((img: any) => img.uuid == i.image).url;
+              }
+              textures[i.uuid] = {};
+              textures[i.uuid].data = i;
+            }
+          });
+        }
+        material[tmp.uuid] = {};
+        material[tmp.uuid].data = child.material.toJSON();
+        delete material[tmp.uuid].data.textures;
+        delete material[tmp.uuid].data.images;
+        child.visible = true;
+      }
+    });
+  }
+  const file = new Blob([JSON.stringify(material)], { type: 'text/plain;charset=utf-8' });
+  saveAs(file, 'materials.json');
+  const file1 = new Blob([JSON.stringify(textures)], { type: 'text/plain;charset=utf-8' });
+  saveAs(file1, 'textures.json');
+  const file2 = new Blob([JSON.stringify(meshMaterial)], { type: 'text/plain;charset=utf-8' });
+  saveAs(file2, 'meshMaterial.json');

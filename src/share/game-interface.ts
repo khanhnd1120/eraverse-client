@@ -23,8 +23,9 @@ export type ContextType = {
 
 export type TextureConfigData = {
   [key: string]: {
-    data: any;
-    texture: Texture;
+    data?: any;
+    texture?: Texture;
+    loading?: boolean;
   };
 };
 export type MaterialConfigData = {
@@ -50,6 +51,7 @@ export enum PlayerState {
   Run,
   Beaten,
   Attack,
+  Dance,
 }
 
 export enum Direction {
