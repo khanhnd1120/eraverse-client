@@ -9,7 +9,6 @@ import { useState } from "react";
 import Setting from "share/setting";
 import { ConfigKey } from "share/game-interface";
 import G from "share/G";
-import Dance from "screens/game/dance";
 
 export default function Menu() {
   const { userInfo } = useGlobalContext();
@@ -91,9 +90,6 @@ export default function Menu() {
           </div>
         </div>
       )}
-      <Dance
-       
-      />
     </div>
   );
 }
