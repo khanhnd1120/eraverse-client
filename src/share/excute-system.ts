@@ -5,13 +5,17 @@ import initComponent from "game/system/queries";
 import { animatorSystem } from "game/system/animator-system";
 import { animationControllerSystem } from "game/system/animation-controller-system";
 import weaponSystem from "game/system/weapon-system";
+import { playerSystem } from "game/system/player-system";
+import { positionSystem } from "game/system/position-system";
 
 initComponent();
 export function executeSystems(delta: number) {
   meSystem(delta);
-  gameScreenSystem(delta);
   animatorSystem(delta);
   animationControllerSystem(delta);
   weaponSystem(delta);
+  playerSystem(delta);
+  positionSystem(delta);
+  gameScreenSystem(delta);
   G.render();
 }

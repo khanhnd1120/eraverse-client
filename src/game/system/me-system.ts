@@ -6,7 +6,8 @@ import myState from "share/my-state";
 import removePlayerState from "share/remove-player-state";
 import Setting from "share/setting";
 import { Entity } from "share/world";
-import { Euler, MathUtils, Raycaster, Vector3 } from "three";
+import { Euler, MathUtils, Vector3 } from "three";
+import { Capsule } from "three/examples/jsm/Addons.js";
 
 const _PI_2 = Math.PI / 2;
 const STEPS_PER_FRAME = 5;
@@ -29,6 +30,17 @@ function updateMe(entity: MeEntity, delta: number) {
   controls(entity, delta);
   updatePlayer(entity, delta);
   playerRigidBody(entity, delta);
+  teleportPlayerIfOob(entity);
+}
+function teleportPlayerIfOob(entity: MeEntity) {
+  if (entity.gameObject.position.y >= -25) {
+    return;
+  }
+  let collider = entity.me.collider as Capsule;
+  collider.start.set(0, 5, 0);
+  collider.end.set(0, 5.75, 0);
+  collider.radius = 0.35;
+  G.camera.rotation.set(0, 0, 0);
 }
 function playerRigidBody(entity: MeEntity, delta: number) {
   let stepTime = Math.min(0.05, delta) / STEPS_PER_FRAME;
@@ -110,6 +122,7 @@ function updatePlayer(entity: MeEntity, delta: number) {
 function controls(entity: MeEntity, delta: number) {
   const ACCELERATOR = 50;
   let checkMove = false;
+  let checkJump = false;
   // gives a bit of air control
   let maxSpeed = Setting.getSetting().CHARACTER_SPEED;
   let vel = entity.me.velocity.clone();
@@ -162,10 +175,19 @@ function controls(entity: MeEntity, delta: number) {
 
   if (entity.me.isOnFloor) {
     if (entity.me.keyStates["Space"]) {
-      checkMove = true;
+      checkJump = true;
       vel.y = Setting.getSetting().JUMP_FORCE;
     }
   }
+
+  if (entity.me.isOnFloor) {
+    entity.player = removePlayerState(PlayerState.Jump, entity.player);
+  }
+  // check jump
+  if (checkJump && !checkMove) {
+    entity.player = addPlayerState(PlayerState.Jump, entity.player);
+  }
+  // check move
   if (checkMove) {
     entity.player = addPlayerState(PlayerState.Move, entity.player);
   } else {
@@ -234,7 +256,7 @@ async function onEntityAdded(entity: MeEntity) {
       return false;
     }
     switch (event.code) {
-      case "Tab":
+      case "KeyG":
         myState.showDance$.next(!myState.showDance$.value);
         break;
       case "KeyC":
@@ -305,7 +327,18 @@ async function onEntityAdded(entity: MeEntity) {
       entity.player = addPlayerState(PlayerState.Dance, entity.player);
     } else {
       bindInputEvent(entity);
-      entity.player = removePlayerState(PlayerState.Dance, entity.player);
+    }
+  });
+  myState.danceAnim$.subscribe((val) => {
+    entity.player.danceAnim = val;
+    G.getCurrentRoom().send("danceAnim", { danceAnim: val });
+  });
+
+  entity.player.serverObject.listen("isBeaten", (isBeaten: any) => {
+    if (isBeaten) {
+      entity.player = addPlayerState(PlayerState.Beaten, entity.player);
+    } else {
+      entity.player = removePlayerState(PlayerState.Beaten, entity.player);
     }
   });
   bindInputEvent(entity);

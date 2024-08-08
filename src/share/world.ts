@@ -6,10 +6,12 @@ import {
   Material,
   Object3D,
   Object3DEventMap,
+  Raycaster,
   Vector3,
 } from "three";
 import {
   AnimatorItem,
+  MeWorldType,
   PlayerWorldType,
   ServerConfigItem,
 } from "./game-interface";
@@ -32,32 +34,10 @@ export type Entity = {
     items: AnimatorItem[];
     ready$?: BehaviorSubject<boolean>;
   };
-  me?: {
-    onMouseMove: EventListener;
-    onKeyDown: EventListener;
-    onKeyUp: EventListener;
-    onMouseDown: EventListener;
-    onMouseUp: EventListener;
-    onPointerLockChange: EventListener;
-    keyStates: { [key: string]: boolean };
-    direction: Vector3;
-    moveForward: number;
-    moveBackward: number;
-    moveLeft: number;
-    moveRight: number;
-    velocity: Vector3;
-    collider: Capsule;
-    isOnFloor: boolean;
-    followCamera: Object3D;
-    secondaryCamera: Object3D;
-    mainObject: Object3D;
-    secondaryObject: Object3D;
-    viewPoint: Object3D;
-    aimPoint: Object3D;
-    defaultFollowCam: Object3D;
-  };
+  me?: MeWorldType;
   weapon?: {
     attackTimer?: number;
+    aimRaycaster: Raycaster;
   };
   gameObject?: Object3D<Object3DEventMap>;
   position?: Vector3;

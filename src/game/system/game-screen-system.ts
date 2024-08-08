@@ -7,6 +7,7 @@ import {
   LoopOnce,
   Object3D,
   Object3DEventMap,
+  Raycaster,
   Vector3,
 } from "three";
 import { loadGltf, loadTexture } from "game/help/loader";
@@ -78,6 +79,7 @@ async function init(entity: GameEntity) {
   room.state.players.onRemove((player: any, key: any) => {
     world.remove(entity.gameScreen.keyEntities[key]);
   });
+  myState.loadingGame$.next(false);
 }
 function onPlayerAdded(entity: GameEntity, player: any, key: string) {
   let room = G.getCurrentRoom();
@@ -131,7 +133,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
     secondaryObject.position.set(0, Setting.getSetting().PLAYER_VIEW + 0.2, 0);
     mainObject.position.set(0, Setting.getSetting().PLAYER_VIEW + 0.2, 0);
 
-    const followCameraPosition = new Vector3(0, 0.3, -4);
+    const followCameraPosition = new Vector3(0, 0.1, -1.2);
     let followCamera = new Object3D();
     followCamera.position.set(
       followCameraPosition.x,
@@ -156,7 +158,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
     );
     secondaryObject.add(secondaryCamera);
 
-    const viewPointPosition = new Vector3(0, 0.3, 2);
+    const viewPointPosition = new Vector3(0, 0.1, 2);
     let viewPoint = new Object3D();
     viewPoint.position.set(
       viewPointPosition.x,
@@ -216,16 +218,19 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       },
       weapon: {
         attackTimer: 0,
+        aimRaycaster: new Raycaster(),
       },
       player: {
         stateTop: player.stateTop,
         stateBottom: player.stateBottom,
         direction: player.direction,
         serverObject: player,
+        danceAnim: "",
+        key,
       },
       model: {
         name: "model_female_premium",
-        scale: new Vector3(0.3, 0.3, 0.3),
+        scale: new Vector3(0.1, 0.1, 0.1),
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
           if (child.isMesh) {
@@ -271,7 +276,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       position: playerObject.position.clone(),
       model: {
         name: "model_female_premium",
-        scale: new Vector3(0.3, 0.3, 0.3),
+        scale: new Vector3(0.1, 0.1, 0.1),
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
           if (child.isMesh) {
@@ -288,12 +293,14 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       },
       weapon: {
         attackTimer: 0,
+        aimRaycaster: new Raycaster(),
       },
       player: {
         stateTop: player.stateTop,
         stateBottom: player.stateBottom,
         direction: player.direction,
         serverObject: player,
+        danceAnim: "",
       },
       animator: {
         items: [

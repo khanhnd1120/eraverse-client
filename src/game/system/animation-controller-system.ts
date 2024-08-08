@@ -1,6 +1,7 @@
 import { With } from "miniplex";
 import { world } from "share/G";
 import { PlayerState } from "share/game-interface";
+import myState from "share/my-state";
 import { Entity } from "share/world";
 
 let playerEntities = world.with("player");
@@ -40,6 +41,17 @@ function animationDirectionMove(entity: PlayerEntity) {
     case PlayerState.Attack:
       entity.animator.items[0].nextAnimation = "punch";
       break;
+    case PlayerState.Jump:
+      entity.animator.items[0].nextAnimation = "run_forward";
+      break;
+    case PlayerState.Dance:
+      if (player.danceAnim) {
+        entity.animator.items[0].nextAnimation = player.danceAnim;
+      }
+      break;
+    case PlayerState.Beaten:
+      entity.animator.items[0].nextAnimation = "falling";
+      break;
   }
   switch (player.stateBottom) {
     case PlayerState.Move:
@@ -48,6 +60,17 @@ function animationDirectionMove(entity: PlayerEntity) {
       break;
     case PlayerState.Attack:
       entity.animator.items[1].nextAnimation = "punch";
+      break;
+    case PlayerState.Jump:
+      entity.animator.items[1].nextAnimation = "run_forward";
+      break;
+    case PlayerState.Dance:
+      if (player.danceAnim) {
+        entity.animator.items[1].nextAnimation = player.danceAnim;
+      }
+      break;
+    case PlayerState.Beaten:
+      entity.animator.items[1].nextAnimation = "falling";
       break;
   }
 }

@@ -3,8 +3,11 @@ import {
   AnimationAction,
   AnimationActionLoopStyles,
   Material,
+  Object3D,
   Texture,
+  Vector3,
 } from "three";
+import { Capsule } from "three/examples/jsm/Addons.js";
 
 export type UserInfo = {
   name: string;
@@ -101,4 +104,29 @@ export interface PlayerWorldType {
   stateTop: PlayerState;
   stateBottom: PlayerState;
   direction: Direction;
+  danceAnim: string;
+}
+export interface MeWorldType {
+  onMouseMove: EventListener;
+  onKeyDown: EventListener;
+  onKeyUp: EventListener;
+  onMouseDown: EventListener;
+  onMouseUp: EventListener;
+  onPointerLockChange: EventListener;
+  keyStates: { [key: string]: boolean };
+  direction: Vector3;
+  moveForward: number;
+  moveBackward: number;
+  moveLeft: number;
+  moveRight: number;
+  velocity: Vector3;
+  collider: Capsule;
+  isOnFloor: boolean;
+  followCamera: Object3D;
+  secondaryCamera: Object3D;
+  mainObject: Object3D;
+  secondaryObject: Object3D;
+  viewPoint: Object3D;
+  aimPoint: Object3D;
+  defaultFollowCam: Object3D;
 }

@@ -1,5 +1,6 @@
 import G from "./G";
 import { PlayerState, PlayerWorldType } from "./game-interface";
+import myState from "./my-state";
 
 export default function removePlayerState(
   state: PlayerState,
@@ -12,6 +13,8 @@ export default function removePlayerState(
   switch (state) {
     case PlayerState.Move:
     case PlayerState.Dance:
+    case PlayerState.Jump:
+    case PlayerState.Beaten:
       updatedState = removeDefault(player, state);
       break;
     case PlayerState.Attack:
@@ -42,6 +45,7 @@ function removeAttack(player: PlayerWorldType) {
   switch (player.stateTop) {
     case PlayerState.Move:
     case PlayerState.Beaten:
+    case PlayerState.Jump:
       tmpTop = player.stateTop;
       break;
     default:
@@ -51,6 +55,7 @@ function removeAttack(player: PlayerWorldType) {
   switch (player.stateBottom) {
     case PlayerState.Move:
     case PlayerState.Beaten:
+    case PlayerState.Jump:
       tmpBottom = player.stateBottom;
       break;
     default:
@@ -66,6 +71,9 @@ function removeAttack(player: PlayerWorldType) {
 
 function removeDefault(player: PlayerWorldType, state: PlayerState) {
   let tmpTop, tmpBottom: PlayerState;
+  if (state == PlayerState.Dance) {
+    myState.danceAnim$.next("");
+  }
   switch (player.stateTop) {
     case state:
       tmpTop = PlayerState.Idle;
