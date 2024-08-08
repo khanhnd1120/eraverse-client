@@ -13,11 +13,21 @@ export default function addPlayerState(
     case PlayerState.Move:
       updatedState = switchMove(player);
       break;
+    case PlayerState.Jump:
+      updatedState = switchJump(player);
+      break;
     case PlayerState.Attack:
       updatedState = switchAttack(player);
       break;
     case PlayerState.Dance:
       updatedState = switchDance(player);
+      break;
+    case PlayerState.Beaten:
+      updatedState = {
+        stateTop: PlayerState.Beaten,
+        stateBottom: PlayerState.Beaten,
+      };
+      break;
   }
   const { stateTop, stateBottom } = updatedState;
   let isChange = false;
@@ -76,6 +86,7 @@ function switchAttack(player: PlayerWorldType) {
   switch (player.stateBottom) {
     case PlayerState.Beaten:
     case PlayerState.Move:
+    case PlayerState.Jump:
       tmpBottom = player.stateBottom;
       break;
     default:
@@ -88,11 +99,39 @@ function switchAttack(player: PlayerWorldType) {
     stateBottom: tmpBottom,
   };
 }
+
+function switchJump(player: PlayerWorldType) {
+  let tmpTop, tmpBottom: PlayerState;
+  switch (player.stateTop) {
+    case PlayerState.Idle:
+    case PlayerState.Dance:
+      tmpTop = PlayerState.Jump;
+      break;
+    default:
+      tmpTop = player.stateTop;
+      break;
+  }
+  switch (player.stateBottom) {
+    case PlayerState.Idle:
+    case PlayerState.Dance:
+      tmpBottom = PlayerState.Jump;
+      break;
+    default:
+      tmpBottom = player.stateBottom;
+      break;
+  }
+  return {
+    stateTop: tmpTop,
+    stateBottom: tmpBottom,
+  };
+}
+
 function switchMove(player: PlayerWorldType) {
   let tmpTop, tmpBottom: PlayerState;
   switch (player.stateTop) {
     case PlayerState.Idle:
     case PlayerState.Dance:
+    case PlayerState.Jump:
       tmpTop = PlayerState.Move;
       break;
     default:
@@ -102,6 +141,7 @@ function switchMove(player: PlayerWorldType) {
   switch (player.stateBottom) {
     case PlayerState.Idle:
     case PlayerState.Dance:
+    case PlayerState.Jump:
       tmpBottom = PlayerState.Move;
       break;
     default:

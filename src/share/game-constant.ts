@@ -10,13 +10,32 @@ const Constants = {
     "FEMALE_03",
     "FEMALE_02",
   ],
+  // right - bottom - left - top
   DanceAnim: [
-    { anim: "capoeira", name: "Capoeira" },
-    { anim: "chicken_dance", name: "Chicken Dance" },
-    { anim: "falling", name: "Falling" },
-    { anim: "flair", name: "Flair" },
-    { anim: "gangnam_style", name: "Gangnam Style" },
-    { anim: "hiphop", name: "Hiphop" },
+    {
+      anim: "capoeira",
+      name: "Capoeira",
+    },
+    {
+      anim: "chicken_dance",
+      name: "Chicken Dance",
+    },
+    {
+      anim: "falling",
+      name: "Falling",
+    },
+    {
+      anim: "flair",
+      name: "Flair",
+    },
+    {
+      anim: "gangnam_style",
+      name: "Gangnam Style",
+    },
+    {
+      anim: "hiphop",
+      name: "Hiphop",
+    },
   ],
   AnimClipModel: [
     { name: "idle" },
@@ -32,6 +51,7 @@ const Constants = {
     { name: "hiphop" },
     { name: "ninja_idle" },
     { name: "punch", timeScale: 2 },
+    { name: "jump", timeScale: 1.5 },
   ],
 };
 export default Constants;

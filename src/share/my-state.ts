@@ -19,6 +19,8 @@ const showChat$ = new BehaviorSubject<boolean>(false);
 const chatMessages$ = new BehaviorSubject<any>([]);
 const showDance$ = new BehaviorSubject<boolean>(false);
 const loadingTexture$ = new BehaviorSubject<boolean>(false);
+const danceAnim$ = new BehaviorSubject<string>("");
+const loadingGame$ = new BehaviorSubject<boolean>(true);
 
 const myState = {
   texture$,
@@ -32,5 +34,7 @@ const myState = {
   chatMessages$,
   showDance$,
   loadingTexture$,
+  danceAnim$,
+  loadingGame$,
 };
 export default myState;
