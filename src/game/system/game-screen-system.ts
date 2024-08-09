@@ -45,8 +45,12 @@ async function init(entity: GameEntity) {
     if (child.isMesh) {
       const materialId =
         myState.meshMaterial$.value[entity.gameScreen.map]?.[child.name];
-      if (materialId) {
-        child.material = myState.material$.value[materialId].mat;
+      if (
+        materialId &&
+        assets.getMaterials()[materialId] &&
+        assets.getMaterials()[materialId].mat
+      ) {
+        child.material = assets.getMaterials()[materialId].mat;
       }
     }
   });
@@ -236,8 +240,12 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
           if (child.isMesh) {
             const materialId =
               myState.meshMaterial$.value[player.character]?.[child.name];
-            if (materialId) {
-              child.material = myState.material$.value[materialId].mat;
+            if (
+              materialId &&
+              assets.getMaterials()[materialId] &&
+              assets.getMaterials()[materialId].mat
+            ) {
+              child.material = assets.getMaterials()[materialId].mat;
             }
           }
         },
@@ -282,8 +290,12 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
           if (child.isMesh) {
             const materialId =
               myState.meshMaterial$.value[player.character]?.[child.name];
-            if (materialId) {
-              child.material = myState.material$.value[materialId].mat;
+            if (
+              materialId &&
+              assets.getMaterials()[materialId] &&
+              assets.getMaterials()[materialId].mat
+            ) {
+              child.material = assets.getMaterials()[materialId].mat;
             }
             child.userData = { type: "enemy", id: key };
           }
