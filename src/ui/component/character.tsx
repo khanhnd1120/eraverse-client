@@ -23,12 +23,16 @@ function Model({
   );
   model.scale.set(-0.85, 0.85, 0.85);
 
-  myState.material$.subscribe(() => {
+  myState.reloadMaterial$.subscribe(() => {
     model.traverse((child: any) => {
       if (child.isMesh) {
         const materialId = myState.meshMaterial$.value[code]?.[child.name];
-        if (materialId) {
-          child.material = myState.material$.value[materialId].mat;
+        if (
+          materialId &&
+          assets.getMaterials()[materialId] &&
+          assets.getMaterials()[materialId].mat
+        ) {
+          child.material = assets.getMaterials()[materialId].mat;
         }
         child.visible = true;
       }
