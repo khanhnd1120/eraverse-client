@@ -7,6 +7,7 @@ import {
   Euler,
   ImageBitmapLoader,
   LoadingManager,
+  Material,
   MeshPhysicalMaterial,
   Vector2,
 } from "three";
@@ -21,7 +22,7 @@ import api from "./api";
 import myState from "./my-state";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { MaterialConfigData, TextureConfigData } from "./game-interface";
-import _ from "lodash";
+import _, { keys, property } from "lodash";
 
 const MODELS: { [key: string]: { url: string; gltf?: GLTF } } = {
   map: { url: "map/map.glb" },
@@ -76,16 +77,10 @@ let manager: LoadingManager = null;
 async function loadAssets(): Promise<LoadingManager> {
   if (!manager) {
     manager = new LoadingManager();
-    const textureManager = new LoadingManager();
     const dataMaterial: any = await api.getMaterial();
     const { textures, materials, meshMaterials } = dataMaterial;
     TEXTURES = textures;
     MATERIALS = materials;
-    loadTextures(textureManager);
-    textureManager.onLoad = () => {
-      loadMaterials();
-      myState.reloadMaterial$.next(myState.reloadMaterial$.value + 1);
-    };
     myState.meshMaterial$.next(meshMaterials);
     loadModel(manager);
     loadSound(manager);
@@ -112,16 +107,40 @@ function getMaterials(): MaterialConfigData {
 function getFont(name: string): Font {
   return FONTS[name].font;
 }
-function loadTextures(manager: LoadingManager) {
-  if (!TEXTURES) {
+function setMaterial(name: string, mat: Material) {
+  MATERIALS[name] = {
+    data: {},
+    mat,
+  };
+}
+function requestMaterial(name: string) {
+  if (MATERIALS[name] && MATERIALS[name].mat) {
+    return MATERIALS[name]?.mat;
+  }
+  if (MATERIALS[name].loading) return;
+  MATERIALS[name].loading = true;
+
+  const textureManager = new LoadingManager();
+  const materialData = MATERIALS[name].data;
+  const textureIds: string[] = [];
+
+  ["map", "emissiveMap", "metalnessMap", "roughnessMap", "normalMap"].map(
+    (property) => {
+      if (materialData[property]) {
+        textureIds.push(materialData[property]);
+      }
+    }
+  );
+
+  if (!textureIds.length) {
+    loadMaterials(name);
     return;
   }
-  if (myState.loadingTexture$.value) {
-    return;
-  }
-  myState.loadingTexture$.next(true);
-  const bitmapLoader = new ImageBitmapLoader(manager);
-  Object.keys(TEXTURES).map((key) => {
+  const bitmapLoader = new ImageBitmapLoader(textureManager);
+  textureIds.map((key) => {
+    if (!TEXTURES[key]) {
+      return;
+    }
     if (TEXTURES[key].texture || TEXTURES[key].loading) {
       return;
     }
@@ -152,96 +171,119 @@ function loadTextures(manager: LoadingManager) {
       TEXTURES[key].texture = tex;
     });
   });
+
+  textureManager.onLoad = () => {
+    loadMaterials(name);
+  };
+  return;
 }
-function loadMaterials() {
+
+function loadMaterials(name: string) {
+  if (MATERIALS[name].mat) {
+    return;
+  }
+  const materialData = MATERIALS[name].data;
+  delete materialData.metadata;
+  const mat = new MeshPhysicalMaterial(materialData);
+
+  const dataMat = _.cloneDeep(materialData);
+  if (dataMat.normalMap && TEXTURES[dataMat.normalMap]) {
+    mat.normalMap = TEXTURES[dataMat.normalMap].texture;
+  }
+  if (dataMat.roughnessMap && TEXTURES[dataMat.roughnessMap]) {
+    mat.roughnessMap = TEXTURES[dataMat.roughnessMap].texture;
+  }
+  if (dataMat.metalnessMap && TEXTURES[dataMat.metalnessMap]) {
+    mat.metalnessMap = TEXTURES[dataMat.metalnessMap].texture;
+  }
+  if (dataMat.emissiveMap && TEXTURES[dataMat.emissiveMap]) {
+    mat.emissiveMap = TEXTURES[dataMat.emissiveMap].texture;
+  }
+  if (dataMat.map && TEXTURES[dataMat.map]) {
+    mat.map = TEXTURES[dataMat.map].texture;
+  }
+  // mat.clearcoat = 0.3;
+  mat.clearcoatRoughness = 0;
+  mat.ior = 1.45;
+  mat.thickness = 0;
+  Object.keys(dataMat).map((property) => {
+    if (property in mat) {
+      if (
+        [
+          "map",
+          "emissiveMap",
+          "metalnessMap",
+          "roughnessMap",
+          "normalMap",
+          "metadata",
+        ].includes(property)
+      ) {
+        return;
+      }
+      if (
+        ![
+          "color",
+          "emissive",
+          "normalScale",
+          "envMapRotation",
+          "blendColor",
+          "attenuationColor",
+          "specularColor",
+          "emissive",
+          "sheenColor",
+        ].includes(property)
+      ) {
+        // @ts-ignore
+        mat[property] = materialData[property];
+      }
+      if (
+        [
+          "color",
+          "blendColor",
+          "attenuationColor",
+          "specularColor",
+          "emissive",
+          "sheenColor",
+        ].includes(property)
+      ) {
+        // @ts-ignore
+        mat[property] = new Color(materialData[property]);
+      }
+      if (property == "envMapRotation") {
+        mat[property] = new Euler(
+          materialData[property][0],
+          materialData[property][1],
+          materialData[property][2],
+          materialData[property][3]
+        );
+      }
+      if (property == "normalScale") {
+        mat[property] = new Vector2(
+          materialData[property][0],
+          materialData[property][1]
+        );
+      }
+    }
+  });
+  MATERIALS[name].mat = mat;
+  myState.reloadMaterial$.next([name]);
+}
+
+function clearAssets() {
+  Object.keys(TEXTURES).map((key) => {
+    if (TEXTURES[key].texture) {
+      TEXTURES[key].texture.dispose();
+    }
+  });
   Object.keys(MATERIALS).map((key) => {
     if (MATERIALS[key].mat) {
-      return;
+      MATERIALS[key].mat.dispose();
     }
-    const materialData = MATERIALS[key].data;
-    delete materialData.metadata;
-    const mat = new MeshPhysicalMaterial(materialData);
-
-    const dataMat = _.cloneDeep(materialData);
-    if (dataMat.normalMap && TEXTURES[dataMat.normalMap]) {
-      mat.normalMap = TEXTURES[dataMat.normalMap].texture;
-    }
-    if (dataMat.roughnessMap && TEXTURES[dataMat.roughnessMap]) {
-      mat.roughnessMap = TEXTURES[dataMat.roughnessMap].texture;
-    }
-    if (dataMat.metalnessMap && TEXTURES[dataMat.metalnessMap]) {
-      mat.metalnessMap = TEXTURES[dataMat.metalnessMap].texture;
-    }
-    if (dataMat.emissiveMap && TEXTURES[dataMat.emissiveMap]) {
-      mat.emissiveMap = TEXTURES[dataMat.emissiveMap].texture;
-    }
-    if (dataMat.map && TEXTURES[dataMat.map]) {
-      mat.map = TEXTURES[dataMat.map].texture;
-    }
-    // mat.clearcoat = 0.3;
-    mat.clearcoatRoughness = 0;
-    mat.ior = 1.45;
-    mat.thickness = 0;
-    Object.keys(dataMat).map((property) => {
-      if (property in mat) {
-        if (
-          [
-            "map",
-            "emissiveMap",
-            "metalnessMap",
-            "roughnessMap",
-            "normalMap",
-            "metadata",
-          ].includes(property)
-        ) {
-          return;
-        }
-        if (
-          ![
-            "color",
-            "emissive",
-            "normalScale",
-            "envMapRotation",
-            "blendColor",
-            "attenuationColor",
-            "specularColor",
-            "emissive",
-            "sheenColor",
-          ].includes(property)
-        ) {
-          // @ts-ignore
-          mat[property] = materialData[property];
-        }
-        if (
-          [
-            "color",
-            "blendColor",
-            "attenuationColor",
-            "specularColor",
-            "emissive",
-            "sheenColor",
-          ].includes(property)
-        ) {
-          // @ts-ignore
-          mat[property] = new Color(materialData[property]);
-        }
-        if (property == "envMapRotation") {
-          mat[property] = new Euler(
-            materialData[property][0],
-            materialData[property][1],
-            materialData[property][2],
-            materialData[property][3]
-          );
-        }
-        if (property == "normalScale") {
-          mat[property] = new Vector2(
-            materialData[property][0],
-            materialData[property][1]
-          );
-        }
-      }
+  });
+  [SOUNDS, SOUNDS, FONTS, TEXTURES, MATERIALS].map((ass) => {
+    Object.keys(ass).map((key) => {
+      delete ass[key];
     });
-    MATERIALS[key].mat = mat;
   });
 }
 const assets = {
@@ -251,5 +293,8 @@ const assets = {
   getTextures,
   getMaterials,
   getFont,
+  setMaterial,
+  requestMaterial,
+  clearAssets,
 };
 export default assets;

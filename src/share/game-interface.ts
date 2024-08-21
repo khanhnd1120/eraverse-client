@@ -35,6 +35,7 @@ export type MaterialConfigData = {
   [key: string]: {
     data: any;
     mat: Material;
+    loading?: boolean;
   };
 };
 export interface DialogInfo {
