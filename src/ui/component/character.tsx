@@ -7,6 +7,7 @@ import { AnimationMixer, Vector3 } from "three";
 import assets from "share/assets";
 import myState from "share/my-state";
 import { useEffect } from "react";
+import updateMaterialModel from "share/update-material-model";
 let mixer: AnimationMixer = null;
 let currentAnim = 1;
 function Model({
@@ -23,19 +24,9 @@ function Model({
   );
   model.scale.set(-0.85, 0.85, 0.85);
 
-  myState.reloadMaterial$.subscribe(() => {
+  myState.reloadMaterial$.subscribe((names: string[]) => {
     model.traverse((child: any) => {
-      if (child.isMesh) {
-        const materialId = myState.meshMaterial$.value[code]?.[child.name];
-        if (
-          materialId &&
-          assets.getMaterials()[materialId] &&
-          assets.getMaterials()[materialId].mat
-        ) {
-          child.material = assets.getMaterials()[materialId].mat;
-        }
-        child.visible = true;
-      }
+      updateMaterialModel(child, code, names);
     });
   });
   let animBottom = assets.getModel("female_anim_bottom");
@@ -55,7 +46,7 @@ function Model({
     let secondIdleTop = mixer.clipAction(
       animTop.animations.find((a) => a.name == secondAnim)
     );
-    switchAnimInterval = setInterval(() => {
+    switchAnimInterval = () => {
       let currentAnimTop = idleTop;
       let currentAnimBottom = idleBottom;
       let nextAnimTop = secondIdleTop;
@@ -73,7 +64,7 @@ function Model({
       currentAnimBottom.fadeOut(1);
       nextAnimTop.reset().fadeIn(1).play();
       nextAnimBottom.reset().fadeIn(1).play();
-    }, 30000);
+    };
   }
 
   idleBottom.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).play();
@@ -81,7 +72,7 @@ function Model({
   model.position.set(1, 0, -2.5);
   useEffect(() => {
     if (switchAnimInterval) {
-      let intervalId = setInterval(switchAnimInterval, 30000);
+      let intervalId = setInterval(switchAnimInterval, 10000);
       return () => {
         clearInterval(intervalId);
       };

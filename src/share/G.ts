@@ -7,6 +7,11 @@ import {
   AudioListener,
   Vector2,
   Fog,
+  SpotLight,
+  Vector3,
+  SpotLightHelper,
+  TextureLoader,
+  AmbientLight,
 } from "three";
 import {
   EffectComposer,
@@ -28,7 +33,8 @@ export const world = new World<Entity>();
 let camera: PerspectiveCamera = new PerspectiveCamera();
 let audioListener: AudioListener = new AudioListener();
 let scene: Scene = new Scene();
-const light = new DirectionalLight(0xffffff, 1);
+const directionalLight = new DirectionalLight(0xffffff, 1); // Color and intensity
+const ambientLight = new AmbientLight(0xffffff, 1); // Color and intensity
 const renderer: WebGLRenderer = new WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -45,10 +51,12 @@ function setupEnvironment() {
   // setup camera
   camera.near = 0.01;
   window.addEventListener("resize", setupCamera);
-  // setup lighting
-  scene.add(light);
-  scene.fog = new Fog(0xcccccc, 1, 500);
 
+  // setup lighting
+  directionalLight.position.set(0.5, 1, 1).normalize(); // Set the position of the light
+  directionalLight.castShadow = true; // Enable shadow casting if needed
+  scene.add(directionalLight);
+  scene.add(ambientLight);
   // setup group
   scene.add(particleGroup);
   scene.add(physicalGroup);
@@ -65,7 +73,7 @@ function setupEnvironment() {
   // setup bloom
   const bloomPass = new UnrealBloomPass(
     new Vector2(window.innerWidth, window.innerHeight),
-    0.15,
+    0.05,
     0.1,
     0.3
   );
@@ -152,5 +160,7 @@ const G = {
   particleGroup,
   render,
   messages,
+  composer,
+  renderer,
 };
 export default G;

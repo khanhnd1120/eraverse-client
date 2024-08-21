@@ -2,6 +2,7 @@ import G, { world } from "share/G";
 import { With } from "miniplex";
 import { Entity } from "share/world";
 import {
+  DirectionalLight,
   EquirectangularReflectionMapping,
   Euler,
   LoopOnce,
@@ -21,6 +22,7 @@ import Setting from "share/setting";
 import assets from "share/assets";
 import Constants from "share/game-constant";
 import _ from "lodash";
+import updateMaterialModel from "share/update-material-model";
 
 let gameScreenEntities = world.with("gameScreen");
 type GameEntity = With<Entity, "gameScreen">;
@@ -41,18 +43,10 @@ async function init(entity: GameEntity) {
 
   // load map
   let gltf: GLTF = assets.getModel(entity.gameScreen.map);
-  gltf.scene.traverse(async (child: any) => {
-    if (child.isMesh) {
-      const materialId =
-        myState.meshMaterial$.value[entity.gameScreen.map]?.[child.name];
-      if (
-        materialId &&
-        assets.getMaterials()[materialId] &&
-        assets.getMaterials()[materialId].mat
-      ) {
-        child.material = assets.getMaterials()[materialId].mat;
-      }
-    }
+  myState.reloadMaterial$.subscribe((names: string[]) => {
+    gltf.scene.traverse(async (child: any) => {
+      updateMaterialModel(child, entity.gameScreen.map, names);
+    });
   });
   gltf.scene.scale.copy(new Vector3(10, 10, 10));
   G.physicalGroup.add(gltf.scene);
@@ -60,7 +54,7 @@ async function init(entity: GameEntity) {
   pos.forEach((child) => gltf.scene.remove(child));
 
   // load enviroment
-  let texture = await loadTexture("FpLUaV5aMAAZz3i.jfif");
+  let texture = await loadTexture("textures/png/skybox.jpg");
   texture.mapping = EquirectangularReflectionMapping;
   G.scene.background = texture;
   G.scene.environment = texture;

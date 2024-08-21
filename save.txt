@@ -55,3 +55,585 @@ let model = SkeletonUtils.clone(
   saveAs(file1, 'textures.json');
   const file2 = new Blob([JSON.stringify(meshMaterial)], { type: 'text/plain;charset=utf-8' });
   saveAs(file2, 'meshMaterial.json');
+
+
+
+   let material: any = {};
+  let textures: any = {};
+  let meshMaterial: any = {
+    map: {},
+  };
+  function calculateMesh(obj: any) {
+    if (obj.isMesh) {
+      const tmp = obj.material.toJSON();
+      meshMaterial["map"][obj.name] = tmp.uuid;
+      if (tmp.textures) {
+        tmp.textures.map((i: any) => {
+          if (!textures[i.uuid]) {
+            if (i.image) {
+              i.url = tmp.images.find((img: any) => img.uuid == i.image).url;
+            }
+            textures[i.uuid] = {};
+            textures[i.uuid].data = i;
+          }
+        });
+      }
+      material[tmp.uuid] = {};
+      material[tmp.uuid].data = obj.material.toJSON();
+      delete material[tmp.uuid].data.textures;
+      delete material[tmp.uuid].data.images;
+      obj.visible = true;
+    }
+    if (obj.isGroup) {
+      obj.children.map((c: any) => {
+        c.traverse((a: any) => {
+          calculateMesh(a);
+        });
+      });
+    }
+  }
+  model.traverse((child: any) => {
+    calculateMesh(child);
+  });
+  // myState.reloadMaterial$.subscribe(() => {
+  //   model.traverse((child: any) => {
+  //     calculateMesh(child);
+  //   });
+  // });
+  console.log(meshMaterial);
+  const file = new Blob([JSON.stringify(material)], { type: 'text/plain;charset=utf-8' });
+  saveAs(file, 'mapMaterials.json');
+  const file1 = new Blob([JSON.stringify(textures)], { type: 'text/plain;charset=utf-8' });
+  saveAs(file1, 'mapTextures.json');
+  const file2 = new Blob([JSON.stringify(meshMaterial)], { type: 'text/plain;charset=utf-8' });
+  saveAs(file2, 'mapMeshMaterial.json');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  import { useEffect } from "react";
+import assets from "share/assets";
+import myState from "share/my-state";
+import {
+  Color,
+  Euler,
+  LinearFilter,
+  MeshBasicMaterial,
+  MeshPhongMaterial,
+  MeshPhysicalMaterial,
+  MeshStandardMaterial,
+  RGBAFormat,
+  ShaderMaterial,
+  Vector2,
+  VideoTexture,
+} from "three";
+
+export default function Playing() {
+  useEffect(() => {
+    const vidElement = document.createElement("video");
+    vidElement.loop = true;
+    vidElement.autoplay = true;
+    vidElement.playsInline = true;
+    vidElement.crossOrigin = "anonymous";
+    vidElement.muted = true;
+    vidElement.style.display = "none";
+    const source = document.createElement("source");
+    source.src = "videos/tap2.mp4";
+    vidElement.appendChild(source);
+    document.getElementById("game-container")?.appendChild(vidElement);
+    vidElement.play();
+    const matVid = new VideoTexture(vidElement);
+    const matData: any = {
+      uuid: "f0cc278b-efc2-4f37-9454-7e96c52c86c2",
+      name: "tap2.mp4",
+      image: "058ef957-7435-422f-8f07-83d0520220d6",
+      mapping: 300,
+      channel: 0,
+      repeat: [1, 1],
+      offset: [0, 0],
+      center: [0, 0],
+      rotation: 0,
+      wrap: [1000, 1000],
+      format: 1023,
+      internalFormat: null,
+      type: 1009,
+      colorSpace: "srgb",
+      minFilter: 1008,
+      magFilter: 1006,
+      anisotropy: 1,
+      flipY: false,
+      generateMipmaps: true,
+      premultiplyAlpha: false,
+      unpackAlignment: 4,
+      userData: {
+        mimeType: "image/png",
+      },
+    };
+    Object.keys(matData).map((property) => {
+      if (["repeat", "offset", "center"].includes(property)) {
+        // @ts-ignore
+        matVid[property] = new Vector2(
+          matData[property][0],
+          matData[property][1]
+        );
+      } else {
+        if (!["image"].includes(property)) {
+          // @ts-ignore
+          matVid[property] = matData[property];
+        }
+      }
+    });
+    const material = new MeshBasicMaterial({
+      transparent: true,
+      map: matVid,
+    });
+    const vertexShader = `
+    varying vec2 vUv;
+    void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+`;
+
+    const fragmentShader = `
+    varying vec2 vUv;
+
+    uniform sampler2D videoTexture;
+    uniform vec3 color;
+    uniform float opacity;
+
+    void main() {
+        vec4 videoColor = texture2D(videoTexture, vUv);
+
+        float rowCount = 100.0;
+        float lightRow = step(0.8, fract(vUv.y * rowCount));
+
+        vec3 finalColor = mix(videoColor.rgb, color, lightRow);
+        gl_FragColor = vec4(finalColor, videoColor.a * opacity);
+    }
+`;
+    const shaderMaterial = new ShaderMaterial({
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
+      transparent: true,
+      uniforms: {
+        videoTexture: { value: null }, // This will be set to the video texture later
+        color: { value: new Color(0x00FFF4) },
+        opacity: { value: 0.5 },
+      },
+    });
+    shaderMaterial.uniforms.videoTexture.value = matVid;
+
+    material.onBeforeCompile = (shader) => {
+      // Add vertex shader logic
+      shader.vertexShader = vertexShader;
+
+      // Add fragment shader logic
+      shader.fragmentShader = fragmentShader;
+
+      // Ensure the shader includes the new uniforms
+      shader.uniforms.videoTexture = { value: matVid };
+      shader.uniforms.color = { value: new Color(0x00FFF4) };
+      shader.uniforms.opacity = { value: 0 };
+    };
+
+    // const materialData: any = {
+    //   uuid: "fb990f59-0df2-4db2-b930-4296da067749",
+    //   type: "MeshPhysicalMaterial",
+    //   name: "Light",
+    //   color: 16777215,
+    //   roughness: 0.858578622341156,
+    //   metalness: 1,
+    //   sheen: 0,
+    //   sheenColor: 0,
+    //   sheenRoughness: 1,
+    //   emissive: 0,
+    //   specularIntensity: 0,
+    //   specularColor: 16777215,
+    //   clearcoat: 0,
+    //   clearcoatRoughness: 0,
+    //   dispersion: 0,
+    //   iridescence: 0,
+    //   iridescenceIOR: 1.3,
+    //   iridescenceThicknessRange: [100, 400],
+    //   anisotropy: 0,
+    //   anisotropyRotation: 0,
+    //   envMapRotation: [0, 0, 0, "XYZ"],
+    //   envMapIntensity: 1,
+    //   reflectivity: 0.4591837131892669,
+    //   transmission: 0,
+    //   thickness: 0,
+    //   attenuationColor: 16777215,
+    //   side: 2,
+    //   blendColor: 0,
+    // };
+    // Object.keys(materialData).map((property) => {
+    //   if (property in material) {
+    //     if (
+    //       [
+    //         "map",
+    //         "emissiveMap",
+    //         "metalnessMap",
+    //         "roughnessMap",
+    //         "normalMap",
+    //         "metadata",
+    //       ].includes(property)
+    //     ) {
+    //       return;
+    //     }
+    //     if (
+    //       ![
+    //         "color",
+    //         "emissive",
+    //         "normalScale",
+    //         "envMapRotation",
+    //         "blendColor",
+    //         "attenuationColor",
+    //         "specularColor",
+    //         "emissive",
+    //         "sheenColor",
+    //       ].includes(property)
+    //     ) {
+    //       // @ts-ignore
+    //       material[property] = materialData[property];
+    //     }
+    //     if (
+    //       [
+    //         "color",
+    //         "blendColor",
+    //         "attenuationColor",
+    //         "specularColor",
+    //         "emissive",
+    //         "sheenColor",
+    //       ].includes(property)
+    //     ) {
+    //       // @ts-ignore
+    //       material[property] = new Color(materialData[property]);
+    //     }
+    //     if (property == "envMapRotation") {
+    //       material[property] = new Euler(
+    //         materialData[property][0],
+    //         materialData[property][1],
+    //         materialData[property][2],
+    //         materialData[property][3]
+    //       );
+    //     }
+    //     if (property == "normalScale") {
+    //       material[property] = new Vector2(
+    //         materialData[property][0],
+    //         materialData[property][1]
+    //       );
+    //     }
+    //   }
+    // });
+    assets.setMaterial("test", material);
+    myState.reloadMaterial$.next(myState.reloadMaterial$.value + 1);
+    console.log("reload di");
+  }, []);
+  return (
+    <div
+      onClick={() => {
+        document.body.requestPointerLock();
+        myState.showChat$.next(false);
+        myState.showDance$.next(false);
+      }}
+    >
+      <div className="absolute w-screen h-screen top-0 left-0 opacity-0"></div>
+    </div>
+  );
+}
+
+
+
+
+import { useEffect } from "react";
+import assets from "share/assets";
+import myState from "share/my-state";
+import {
+  Color,
+  Euler,
+  LinearFilter,
+  MeshBasicMaterial,
+  MeshPhongMaterial,
+  MeshPhysicalMaterial,
+  MeshStandardMaterial,
+  RGBAFormat,
+  ShaderMaterial,
+  Vector2,
+  VideoTexture,
+} from "three";
+
+export default function Playing() {
+  useEffect(() => {
+    const vidElement = document.createElement("video");
+    vidElement.loop = true;
+    vidElement.autoplay = true;
+    vidElement.playsInline = true;
+    vidElement.crossOrigin = "anonymous";
+    vidElement.muted = true;
+    vidElement.style.display = "none";
+    const source = document.createElement("source");
+    source.src = "videos/biden.mp4";
+    vidElement.appendChild(source);
+    document.getElementById("game-container")?.appendChild(vidElement);
+    vidElement.play();
+    const matVid = new VideoTexture(vidElement);
+    const matData: any = {
+      uuid: "f0cc278b-efc2-4f37-9454-7e96c52c86c2",
+      name: "tap2.mp4",
+      image: "058ef957-7435-422f-8f07-83d0520220d6",
+      mapping: 300,
+      channel: 0,
+      repeat: [1, 1],
+      offset: [0, 0],
+      center: [0, 0],
+      rotation: 0,
+      wrap: [1000, 1000],
+      format: 1023,
+      internalFormat: null,
+      type: 1009,
+      colorSpace: "srgb",
+      minFilter: 1008,
+      magFilter: 1006,
+      anisotropy: 1,
+      flipY: false,
+      generateMipmaps: true,
+      premultiplyAlpha: false,
+      unpackAlignment: 4,
+      userData: {
+        mimeType: "image/png",
+      },
+    };
+    Object.keys(matData).map((property) => {
+      if (["repeat", "offset", "center"].includes(property)) {
+        // @ts-ignore
+        matVid[property] = new Vector2(
+          matData[property][0],
+          matData[property][1]
+        );
+      } else {
+        if (!["image"].includes(property)) {
+          // @ts-ignore
+          matVid[property] = matData[property];
+        }
+      }
+    });
+    const material = new MeshBasicMaterial({
+      transparent: true,
+      map: matVid,
+    });
+    const vertexShader = `
+    varying vec2 vUv;
+    void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+`;
+
+    const fragmentShader = `
+    varying vec2 vUv;
+
+    uniform sampler2D videoTexture;
+    uniform vec3 color;
+    uniform float opacity;
+
+    void main() {
+        vec4 videoColor = texture2D(videoTexture, vUv);
+
+        float rowCount = 50.0;
+        float lightRow = step(0.8, fract(vUv.y * rowCount));
+
+        vec3 finalColor = mix(videoColor.rgb, color, lightRow);
+        gl_FragColor = vec4(finalColor, videoColor.a * opacity);
+    }
+`;
+    const shaderMaterial = new ShaderMaterial({
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
+      transparent: true,
+      uniforms: {
+        videoTexture: { value: null }, // This will be set to the video texture later
+        color: { value: new Color(0x00FFF4) },
+        opacity: { value: 0.5 },
+      },
+    });
+    shaderMaterial.uniforms.videoTexture.value = matVid;
+
+    material.onBeforeCompile = (shader) => {
+      // Add vertex shader logic
+      shader.vertexShader = vertexShader;
+
+      // Add fragment shader logic
+      shader.fragmentShader = fragmentShader;
+
+      // Ensure the shader includes the new uniforms
+      shader.uniforms.videoTexture = { value: matVid };
+      shader.uniforms.color = { value: new Color(0x00FFF4) };
+      shader.uniforms.opacity = { value: 0 };
+    };
+
+    assets.setMaterial("test", material);
+    myState.reloadMaterial$.next(myState.reloadMaterial$.value + 1);
+    console.log("reload di");
+  }, []);
+  return (
+    <div
+      onClick={() => {
+        document.body.requestPointerLock();
+        myState.showChat$.next(false);
+        myState.showDance$.next(false);
+      }}
+    >
+      <div className="absolute w-screen h-screen top-0 left-0 opacity-0"></div>
+    </div>
+  );
+}
+
+
+
+
+
+
+
+    if (key === "1deeadeb-bac9-4392-a416-f96bae16a8ae") {
+      mat.onBeforeCompile = (shader) => {
+        // Inject uniforms
+        shader.uniforms.u_time = { value: 0.1 };
+        shader.uniforms.u_color1 = { value: new Color(0x00fff4) };
+        shader.uniforms.u_color2 = { value: new Color(0x00fff4) };
+
+        // Declare vUv in vertex shader and pass it to the fragment shader
+        shader.vertexShader = `
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        void main() {
+            vUv = uv;
+            vNormal = normalize(normalMatrix * normal);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+        `;
+        // Modify the fragment shader
+        shader.fragmentShader = `
+          varying vec2 vUv;
+          varying vec3 vNormal;
+          uniform float u_time;
+          uniform vec2 u_resolution;
+          uniform vec3 u_color1;
+          uniform vec3 u_color2;
+  
+          // Simple 3D noise function
+          float random(vec3 st) {
+              return fract(sin(dot(st.xyz, vec3(12.9898, 78.233, 54.53))) * 43758.5453123);
+          }
+  
+          // Function to create a noise pattern
+          float noise(vec3 st) {
+              vec3 i = floor(st);
+              vec3 f = fract(st);
+              float a = random(i);
+              float b = random(i + vec3(1.0, 0.0, 0.0));
+              float c = random(i + vec3(0.0, 1.0, 0.0));
+              float d = random(i + vec3(1.0, 1.0, 0.0));
+              vec3 u = f * f * (3.0 - 2.0 * f);
+              return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+          }
+  
+          void main() {
+              // Increase UV scaling to create more dense noise points
+              vec3 st = vec3(vUv * 50.0, u_time * 0.05); // Adjust the scaling factor (50.0) for more noise points
+              float n = noise(st);
+  
+              // Create a gradient based on the normal
+              float intensity = dot(vNormal, vec3(0.0, 0.0, 1.0));
+              vec3 color = mix(u_color1, u_color2, intensity);
+  
+              // Create a soft glow effect around each point
+              float glow = smoothstep(0.4, 0.6, n) * 2.0; // Adjust smoothstep for soft edges
+              color *= glow;
+  
+              // Apply noise and glow
+              gl_FragColor = vec4(color, glow);
+          }
+      `;
+      };
+    }
+
+
+
+
+    import { Object3D, Vector3 } from "three";
+import assets from "./assets";
+import myState from "./my-state";
+
+export default function updateMaterialModel(
+  child: any,
+  name: string,
+  scene?: any
+) {
+  if (child.isMesh) {
+    let materialId = myState.meshMaterial$.value[name]?.[child.name];
+    child.castShadow = true;
+    child.receiveShadow = true;
+    if (child.name == "Light_Ball001") {
+      // Adjust the pivot point to the mesh's center
+      child.geometry.computeBoundingBox();
+      const bbox = child.geometry.boundingBox;
+      const center = new Vector3();
+      bbox.getCenter(center);
+      if (center.y > 0) {
+        child.geometry.center(); // Center geometry in the mesh's local space
+
+        // Animate rotation of the specific mesh
+        const animate = () => {
+          requestAnimationFrame(animate);
+
+          // Apply rotation to the pivot to rotate around the mesh's center
+          child.rotation.y += 0.0000000005; // Rotate around the Y-axis
+          child.position.set(center.x, center.y, center.z);
+        };
+
+        animate();
+      }
+
+      const animate = () => {
+        requestAnimationFrame(animate);
+
+        // Apply rotation to the target mesh
+        child.rotation.y += 0.01; // Rotate around the Y-axis
+      };
+
+      animate();
+    }
+    if (
+      materialId &&
+      assets.getMaterials()[materialId] &&
+      assets.getMaterials()[materialId].mat
+    ) {
+      if (materialId == "4560dd85-492c-412e-8507-c4cc4a1dfc47") {
+        materialId = "test";
+      }
+      child.material = assets.getMaterials()[materialId]?.mat;
+    }
+  }
+  if (child.isGroup) {
+    child.children.map((obj: any) => {
+      obj.traverse((childObj: any) => {
+        updateMaterialModel(childObj, name);
+      });
+    });
+  }
+}

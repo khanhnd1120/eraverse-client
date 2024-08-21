@@ -1,0 +1,41 @@
+function loadTextures(manager: LoadingManager) {
+  if (!TEXTURES) {
+    return;
+  }
+  if (myState.loadingTexture$.value) {
+    return;
+  }
+  myState.loadingTexture$.next(true);
+  const bitmapLoader = new ImageBitmapLoader(manager);
+  Object.keys(TEXTURES).map((key) => {
+    if (TEXTURES[key].texture || TEXTURES[key].loading) {
+      return;
+    }
+    const textureData = TEXTURES[key].data;
+    TEXTURES[key].loading = true;
+    let url = textureData.url;
+    bitmapLoader.load(url, (res) => {
+      const tex = new CanvasTexture(res);
+      tex.colorSpace = "srgb";
+      Object.keys(textureData).map((property) => {
+        if (["repeat", "offset", "center"].includes(property)) {
+          // @ts-ignore
+          tex[property] = new Vector2(
+            textureData[property][0],
+            textureData[property][1]
+          );
+        } else {
+          if (!["image"].includes(property)) {
+            // @ts-ignore
+            tex[property] = textureData[property];
+          }
+        }
+      });
+      // @ts-ignore
+      delete tex.url;
+      tex.wrapS = 1000;
+      tex.wrapT = 1000;
+      TEXTURES[key].texture = tex;
+    });
+  });
+}
