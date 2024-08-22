@@ -1,11 +1,15 @@
 import { Color, MeshBasicMaterial, VideoTexture } from "three";
 import myState from "./my-state";
 import assets from "./assets";
+import createMaterialShader from "./create-material-shader";
+import { ShaderType } from "./game-interface";
 
 export default function createVideoMaterial(data: {
   src: string;
   force: boolean;
-  rowShader: boolean;
+  isShader?: boolean;
+  typeShader?: ShaderType;
+  colorShader?: string;
   name: string;
 }) {
   if (
@@ -13,7 +17,7 @@ export default function createVideoMaterial(data: {
     assets.getMaterials()[data.name].mat &&
     !data.force
   ) {
-    return;
+    return assets.getMaterials()[data.name].mat;
   }
   const oldVideo = document.getElementById(data.name);
   if (oldVideo && !data.force) {
@@ -42,44 +46,8 @@ export default function createVideoMaterial(data: {
     map: matVid,
   });
 
-  if (data.rowShader) {
-    const vertexShader = `
-    varying vec2 vUv;
-    void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-`;
-
-    const fragmentShader = `
-    varying vec2 vUv;
-
-    uniform sampler2D videoTexture;
-    uniform vec3 color;
-    uniform float opacity;
-
-    void main() {
-        vec4 videoColor = texture2D(videoTexture, vUv);
-
-        float rowCount = 50.0;
-        float lightRow = step(0.8, fract(vUv.y * rowCount));
-
-        vec3 finalColor = mix(videoColor.rgb, color, lightRow);
-        gl_FragColor = vec4(finalColor, videoColor.a * opacity);
-    }
-`;
-    material.onBeforeCompile = (shader) => {
-      // Add vertex shader logic
-      shader.vertexShader = vertexShader;
-
-      // Add fragment shader logic
-      shader.fragmentShader = fragmentShader;
-
-      // Ensure the shader includes the new uniforms
-      shader.uniforms.videoTexture = { value: matVid };
-      shader.uniforms.color = { value: new Color(0x00fff4) };
-      shader.uniforms.opacity = { value: 0 };
-    };
+  if (data.isShader) {
+    createMaterialShader(material, data.colorShader, data.typeShader, matVid);
   }
   assets.setMaterial(data.name, material);
   myState.reloadMaterial$.next([data.name]);

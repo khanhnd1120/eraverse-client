@@ -22,7 +22,8 @@ import api from "./api";
 import myState from "./my-state";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { MaterialConfigData, TextureConfigData } from "./game-interface";
-import _, { keys, property } from "lodash";
+import _ from "lodash";
+import createMaterialShader from "./create-material-shader";
 
 const MODELS: { [key: string]: { url: string; gltf?: GLTF } } = {
   map: { url: "map/map.glb" },
@@ -111,6 +112,18 @@ function setMaterial(name: string, mat: Material) {
   MATERIALS[name] = {
     data: {},
     mat,
+  };
+}
+function setMaterialData(name: string, data: any) {
+  MATERIALS[name] = {
+    data: data,
+    mat: null,
+  };
+}
+function setTextureData(name: string, data: any) {
+  TEXTURES[name] = {
+    data,
+    texture: null,
   };
 }
 function requestMaterial(name: string) {
@@ -265,6 +278,14 @@ function loadMaterials(name: string) {
       }
     }
   });
+  if (dataMat.isShader) {
+    createMaterialShader(
+      mat,
+      dataMat.colorShader,
+      dataMat.typeShader,
+      mat?.map
+    );
+  }
   MATERIALS[name].mat = mat;
   myState.reloadMaterial$.next([name]);
 }
@@ -296,5 +317,7 @@ const assets = {
   setMaterial,
   requestMaterial,
   clearAssets,
+  setMaterialData,
+  setTextureData,
 };
 export default assets;
