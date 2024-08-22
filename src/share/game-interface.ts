@@ -79,6 +79,8 @@ export enum ConfigKey {
   SERVER_URLS = "SERVER_URLS",
   MATERIALS_MESH = "MATERIALS_MESH",
   LOBBY_ROOM = "LOBBY_ROOM",
+  ADS_BOARD = "ADS_BOARD",
+  ROTATE_MESH = "ROTATE_MESH",
 }
 export type SettingData = {
   PLAYER_VIEW: number;
@@ -131,3 +133,27 @@ export interface MeWorldType {
   aimPoint: Object3D;
   defaultFollowCam: Object3D;
 }
+
+export enum AdsType {
+  Banner,
+  Video,
+}
+
+export enum ShaderType {
+  RowShader,
+  PointShader,
+}
+
+export type AdsConfig = {
+  type: AdsType;
+  src: string;
+  isShader?: boolean;
+  id: string;
+  time: number;
+  typeShader?: ShaderType;
+  colorShader?: string;
+};
+
+export type AdsBoard = {
+  [key: string]: AdsConfig[];
+};

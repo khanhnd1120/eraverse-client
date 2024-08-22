@@ -19,6 +19,13 @@ function Model({
   code: string;
   secondAnim?: string;
 }) {
+  useEffect(() => {
+    myState.reloadMaterial$.next(
+      Object.keys(myState.meshMaterial$.value[code]).map(
+        (key: any) => myState.meshMaterial$.value[code][key]
+      )
+    );
+  }, [code]);
   let model = SkeletonUtils.clone(
     assets.getModel("model_female_premium").scene
   );

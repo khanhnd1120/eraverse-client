@@ -1,10 +1,6 @@
-import { useEffect } from "react";
 import myState from "share/my-state";
 
 export default function Playing() {
-  useEffect(() => {
-    console.log("alooo")
-  }, []);
   return (
     <div
       onClick={() => {
