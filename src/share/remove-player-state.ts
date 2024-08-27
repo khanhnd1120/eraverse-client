@@ -4,7 +4,9 @@ import myState from "./my-state";
 
 export default function removePlayerState(
   state: PlayerState,
-  player: PlayerWorldType
+  player: PlayerWorldType,
+  top: boolean = true,
+  bottom: boolean = true
 ) {
   if (!player) {
     return;
@@ -27,10 +29,16 @@ export default function removePlayerState(
     isChange = true;
   }
   if (isChange) {
+    let changeData: any = {};
+    if (top) {
+      changeData.stateTop = stateTop;
+    }
+    if (bottom) {
+      changeData.stateBottom = stateBottom;
+    }
     player = {
       ...player,
-      stateTop,
-      stateBottom,
+      ...changeData,
     };
     G.getCurrentRoom().send("state", {
       stateBottom: player.stateBottom,

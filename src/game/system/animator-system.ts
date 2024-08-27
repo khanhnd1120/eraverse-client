@@ -3,7 +3,12 @@
 import { With } from "miniplex";
 import assets from "share/assets";
 import { world } from "share/G";
-import { AnimationClipItem, AnimatorItem } from "share/game-interface";
+import {
+  AnimationClipItem,
+  AnimatorItem,
+  PlayerState,
+} from "share/game-interface";
+import removePlayerState from "share/remove-player-state";
 import { Entity } from "share/world";
 import {
   AnimationAction,
@@ -12,8 +17,11 @@ import {
   LoopRepeat,
 } from "three";
 const TRANSITION = 0.3;
-let animatorEntities = world.with("animator", "model", "gameObject");
-type AnimatorEntity = With<Entity, "animator" | "model" | "gameObject">;
+let animatorEntities = world.with("animator", "model", "gameObject", "player");
+type AnimatorEntity = With<
+  Entity,
+  "animator" | "model" | "gameObject" | "player"
+>;
 animatorEntities.onEntityAdded.subscribe(onEntityAdded);
 animatorEntities.onEntityRemoved.subscribe(onEntityRemoved);
 export function animatorSystem(delta: number) {
@@ -29,8 +37,52 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
     return;
   }
   e.animator.mixer.update(delta);
-  e.animator.items.forEach((animatorItem: AnimatorItem) => {
+  e.animator.items.forEach((animatorItem: AnimatorItem, index: number) => {
+    if (animatorItem.duration > 0 || animatorItem.arrAnimation.length) {
+      if (animatorItem.currentClip) {
+        animatorItem.duration =
+          animatorItem.currentClip.getClip().duration -
+          animatorItem.currentClip.time;
+      }
+      if (animatorItem.duration < 0.3) {
+        if (animatorItem.arrAnimation.length > 0) {
+          // array action not finish
+          const nextAnim = animatorItem.arrAnimation.shift();
+          let playClip = animatorItem.clips.find(
+            (clipItem: AnimationClipItem) => clipItem.name === nextAnim
+          );
+
+          if (playClip) {
+            let fadeoutClip = animatorItem.clips.find(
+              (clipItem: AnimationClipItem) =>
+                clipItem.name === animatorItem.currentAnimation
+            );
+            if (fadeoutClip) {
+              fadeoutClip.clip.fadeOut(TRANSITION);
+            }
+
+            animatorItem.duration = playClip.clip.getClip().duration;
+            animatorItem.currentClip = playClip.clip;
+            playClip.clip.reset().fadeIn(TRANSITION).play();
+            animatorItem.currentAnimation = nextAnim;
+          }
+        } else {
+          let state = [e.player.stateTop, e.player.stateBottom][index];
+          e.player = removePlayerState(
+            state,
+            e.player,
+            [true, false][index],
+            [false, true][index]
+          );
+          animatorItem.duration = 0;
+          animatorItem.currentClip = null;
+        }
+      }
+    }
     if (animatorItem.nextAnimation === animatorItem.currentAnimation) {
+      return;
+    }
+    if (animatorItem.arrAnimation.length || animatorItem.duration > 0.3) {
       return;
     }
     if (animatorItem.currentAnimation) {
