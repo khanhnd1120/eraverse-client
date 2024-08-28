@@ -2,12 +2,17 @@ import G, { world } from "share/G";
 import { With } from "miniplex";
 import { Entity } from "share/world";
 import {
+  BufferAttribute,
+  BufferGeometry,
   DirectionalLight,
+  DynamicDrawUsage,
   EquirectangularReflectionMapping,
   Euler,
   LoopOnce,
   Object3D,
   Object3DEventMap,
+  Points,
+  PointsMaterial,
   Raycaster,
   Vector3,
 } from "three";
@@ -52,6 +57,20 @@ async function init(entity: GameEntity) {
   G.physicalGroup.add(gltf.scene);
   let pos: any[] = [];
   pos.forEach((child) => gltf.scene.remove(child));
+
+  // load characters
+  const character: GLTF = assets.getModel("model_female_premium");
+  const positions = combineBuffer(character.scene, "position");
+  let parent = new Object3D();
+  parent.position.set(-8.9, 3.2, -2.5);
+  G.scene.add(parent);
+  createMesh(parent, positions, 0.5, 0, 0, 0, "#B1008D");
+  const animate = () => {
+    requestAnimationFrame(animate);
+    // Apply rotation to the target mesh
+    parent.rotation.y += 0.01; // Rotate around the Y-axis
+  };
+  animate();
 
   // load enviroment
   let texture = await loadTexture("textures/png/skybox.jpg");
@@ -335,3 +354,69 @@ function dispose(entity: GameEntity) {
   G.getCurrentRoom().leave();
 }
 export function gameScreenSystem(delta: number) {}
+
+function createMesh(
+  parent: Object3D,
+  positions: BufferAttribute,
+  scale: number,
+  x: number,
+  y: number,
+  z: number,
+  color: string
+) {
+  const geometry = new BufferGeometry();
+  geometry.setAttribute("position", positions.clone());
+  geometry.setAttribute("initialPosition", positions.clone());
+
+  // geometry.attributes.position.setUsage(DynamicDrawUsage);
+
+  const clones = [
+    [6000, 0, -4000],
+    [5000, 0, 0],
+    [4000, 0, 2000],
+    [1000, 0, 5000],
+    [1000, 0, -5000],
+    [0, 0, 0],
+    [-4000, 0, 1000],
+    [-5000, 0, -5000],
+  ];
+
+  for (let i = 0; i < clones.length; i++) {
+    let mesh = new Points(
+      geometry,
+      new PointsMaterial({ size: 0.01, color })
+    );
+    mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
+
+    mesh.position.x = x + clones[i][0];
+    mesh.position.y = y + clones[i][1];
+    mesh.position.z = z + clones[i][2];
+    parent.add(mesh);
+  }
+}
+function combineBuffer(model: any, bufferName: any) {
+  let count = 0;
+
+  model.traverse(function (child: any) {
+    if (child.isMesh) {
+      const buffer = child.geometry.attributes[bufferName];
+
+      count += buffer.array.length;
+    }
+  });
+
+  const combined = new Float32Array(count);
+
+  let offset = 0;
+
+  model.traverse(function (child: any) {
+    if (child.isMesh) {
+      const buffer = child.geometry.attributes[bufferName];
+
+      combined.set(buffer.array, offset);
+      offset += buffer.array.length;
+    }
+  });
+
+  return new BufferAttribute(combined, 3);
+}

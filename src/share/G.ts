@@ -77,6 +77,9 @@ function setupEnvironment() {
     0.1,
     0.3
   );
+  // 1.5,
+  //   1,
+  //   0
 
   // setup composer
   const outputPass = new OutputPass();
@@ -98,6 +101,7 @@ function setupCamera() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function cleanAll() {
