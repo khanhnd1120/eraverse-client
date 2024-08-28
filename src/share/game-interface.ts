@@ -94,6 +94,9 @@ export interface AnimatorItem {
   currentAnimation: string;
   nextAnimation: string;
   clips: AnimationClipItem[];
+  duration: number,
+  arrAnimation: string[],
+  currentClip: AnimationAction,
 }
 export interface AnimationClipItem {
   name: string;
@@ -108,6 +111,10 @@ export interface PlayerWorldType {
   stateBottom: PlayerState;
   direction: Direction;
   danceAnim: string;
+  nameObject?: Object3D;
+  chatBox?: Object3D;
+  chatMessage?: Object3D;
+  timeoutHideMessage?: any
 }
 export interface MeWorldType {
   onMouseMove: EventListener;

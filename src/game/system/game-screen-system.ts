@@ -6,9 +6,13 @@ import {
   BufferGeometry,
   DirectionalLight,
   DynamicDrawUsage,
+  BoxGeometry,
+  EdgesGeometry,
   EquirectangularReflectionMapping,
   Euler,
-  LoopOnce,
+  LineSegments,
+  Mesh,
+  MeshStandardMaterial,
   Object3D,
   Object3DEventMap,
   Points,
@@ -16,8 +20,8 @@ import {
   Raycaster,
   Vector3,
 } from "three";
-import { loadGltf, loadTexture } from "game/help/loader";
-import { Capsule, GLTF } from "three/examples/jsm/Addons.js";
+import { loadTexture } from "game/help/loader";
+import { Capsule, GLTF, TextGeometry } from "three/examples/jsm/Addons.js";
 import * as Colyseus from "colyseus.js";
 import api from "share/api";
 import myState from "share/my-state";
@@ -50,7 +54,7 @@ async function init(entity: GameEntity) {
   let gltf: GLTF = assets.getModel(entity.gameScreen.map);
   myState.reloadMaterial$.subscribe((names: string[]) => {
     gltf.scene.traverse(async (child: any) => {
-      updateMaterialModel(child, entity.gameScreen.map, names);
+      // updateMaterialModel(child, entity.gameScreen.map, names);
     });
   });
   gltf.scene.scale.copy(new Vector3(10, 10, 10));
@@ -100,6 +104,7 @@ async function init(entity: GameEntity) {
 }
 function onPlayerAdded(entity: GameEntity, player: any, key: string) {
   let room = G.getCurrentRoom();
+  const { nameObject, chatBox } = createTextPlayer(player);
   if (key === room.sessionId) {
     //collect event and send to server
     let dataSubscription = [];
@@ -137,6 +142,8 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         })
     );
     let meObject = new Object3D<Object3DEventMap>();
+    meObject.add(nameObject);
+    meObject.add(chatBox);
     meObject.position.set(
       player.position.x,
       player.position.y,
@@ -147,8 +154,8 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
 
     meObject.add(mainObject);
     meObject.add(secondaryObject);
-    secondaryObject.position.set(0, Setting.getSetting().PLAYER_VIEW + 0.2, 0);
-    mainObject.position.set(0, Setting.getSetting().PLAYER_VIEW + 0.2, 0);
+    secondaryObject.position.set(0, Setting.getSetting().PLAYER_VIEW, 0);
+    mainObject.position.set(0, Setting.getSetting().PLAYER_VIEW, 0);
 
     const followCameraPosition = new Vector3(0, 0.1, -1.2);
     let followCamera = new Object3D();
@@ -244,6 +251,8 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         serverObject: player,
         danceAnim: "",
         key,
+        nameObject,
+        chatBox,
       },
       model: {
         name: "model_female_premium",
@@ -272,12 +281,18 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             currentAnimation: "",
             nextAnimation: "idle",
             clips: _.cloneDeep(Constants.AnimClipModel),
+            duration: 0,
+            arrAnimation: [],
+            currentClip: null,
           },
           {
             model: "female_anim_bottom",
             currentAnimation: "",
             nextAnimation: "idle",
             clips: _.cloneDeep(Constants.AnimClipModel),
+            duration: 0,
+            arrAnimation: [],
+            currentClip: null,
           },
         ],
         ready$: new BehaviorSubject<boolean>(false),
@@ -286,6 +301,8 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
     entity.gameScreen.keyEntities[key] = e;
   } else {
     let playerObject = new Object3D<Object3DEventMap>();
+    playerObject.add(nameObject);
+    playerObject.add(chatBox);
     playerObject.position.set(
       player.position.x,
       player.position.y,
@@ -326,6 +343,8 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         direction: player.direction,
         serverObject: player,
         danceAnim: "",
+        nameObject,
+        chatBox,
       },
       animator: {
         items: [
@@ -334,12 +353,18 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             currentAnimation: "",
             nextAnimation: "idle",
             clips: _.cloneDeep(Constants.AnimClipModel),
+            duration: 0,
+            arrAnimation: [],
+            currentClip: null,
           },
           {
             model: "female_anim_bottom",
             currentAnimation: "",
             nextAnimation: "idle",
             clips: _.cloneDeep(Constants.AnimClipModel),
+            duration: 0,
+            arrAnimation: [],
+            currentClip: null,
           },
         ],
         ready$: new BehaviorSubject<boolean>(false),
@@ -352,6 +377,43 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
 function dispose(entity: GameEntity) {
   entity.gameScreen.room?.leave(true);
   G.getCurrentRoom().leave();
+}
+
+function createTextPlayer(player: any) {
+  const nameObject = new Object3D();
+  nameObject.position.set(0, Setting.getSetting().PLAYER_VIEW + 0.1, 0);
+  const name = assets.createNeonLightText(player.name.slice(0, 10));
+  nameObject.add(name);
+
+  const chatBox = new Object3D();
+  console.log(Setting.getSetting().PLAYER_VIEW)
+  chatBox.position.set(0, Setting.getSetting().PLAYER_VIEW + 0.2, 0);
+  const geometry = new BoxGeometry(0.6, 0.05, 0.01);
+  const edges = new EdgesGeometry(geometry);
+  const line = new LineSegments(edges, assets.getNeonTextMaterial());
+  line.position.set(0, 0, 0);
+  chatBox.add(line);
+
+  const contentGeometry = new BoxGeometry(0.6, 0.05, 0.01);
+  const content = new Mesh(
+    contentGeometry,
+    new MeshStandardMaterial({
+      color: 0x00ffff,
+      emissive: 0x00ffff,
+      emissiveIntensity: 1,
+      metalness: 0.5,
+      roughness: 0.1,
+      opacity: 0.2,
+      transparent: true,
+    })
+  );
+  chatBox.add(content);
+  chatBox.visible = false;
+
+  return {
+    chatBox,
+    nameObject,
+  };
 }
 export function gameScreenSystem(delta: number) {}
 

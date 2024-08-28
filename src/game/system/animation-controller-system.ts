@@ -39,7 +39,12 @@ function animationDirectionMove(entity: PlayerEntity) {
         RunAnimationDirection[player.direction][0];
       break;
     case PlayerState.Attack:
-      entity.animator.items[0].nextAnimation = "punch";
+      if (
+        entity.animator.items[0].arrAnimation.length == 0 &&
+        entity.animator.items[0].duration <= 0
+      ) {
+        entity.animator.items[0].arrAnimation = ["punch"];
+      }
       break;
     case PlayerState.Jump:
       entity.animator.items[0].nextAnimation = "run_forward";
@@ -59,7 +64,12 @@ function animationDirectionMove(entity: PlayerEntity) {
         RunAnimationDirection[player.direction][1];
       break;
     case PlayerState.Attack:
-      entity.animator.items[1].nextAnimation = "punch";
+      if (
+        entity.animator.items[1].arrAnimation.length == 0 &&
+        entity.animator.items[1].duration <= 0
+      ) {
+        entity.animator.items[1].arrAnimation = ["punch"];
+      }
       break;
     case PlayerState.Jump:
       entity.animator.items[1].nextAnimation = "run_forward";
