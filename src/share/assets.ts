@@ -1,14 +1,20 @@
 /** @format */
 
 import {
+  AdditiveBlending,
   AudioLoader,
   CanvasTexture,
   Color,
   Euler,
+  Float32BufferAttribute,
   ImageBitmapLoader,
+  Line,
   LoadingManager,
   Material,
+  Mesh,
   MeshPhysicalMaterial,
+  MeshStandardMaterial,
+  ShaderMaterial,
   Vector2,
 } from "three";
 import {
@@ -17,6 +23,7 @@ import {
   FontLoader,
   GLTF,
   GLTFLoader,
+  TextGeometry,
 } from "three/examples/jsm/Addons.js";
 import api from "./api";
 import myState from "./my-state";
@@ -40,7 +47,7 @@ const MODELS: { [key: string]: { url: string; gltf?: GLTF } } = {
 const SOUNDS: { [key: string]: { url: string; buffer?: any } } = {};
 
 const FONTS: { [key: string]: { url: string; font?: any } } = {
-  agency: { url: "font/gentilis_bold.typeface.json" },
+  agency: { url: "font/helvetiker_bold.typeface.json" },
 };
 let TEXTURES: TextureConfigData = {};
 let MATERIALS: MaterialConfigData = {};
@@ -307,6 +314,106 @@ function clearAssets() {
     });
   });
 }
+
+function createNeonLightText(text: string) {
+  const textGeometry = new TextGeometry(text, {
+    font: assets.getFont("agency"),
+    size: 0.03,
+    height: 0.005,
+    curveSegments: 1,
+    bevelThickness: 0,
+    bevelSize: 0,
+    bevelSegments: 0,
+  });
+  textGeometry.center();
+
+  const textMaterial = new MeshStandardMaterial({
+    color: '#B1008D',
+    emissive: "#B1008D",
+    emissiveIntensity: 1,
+    metalness: 0.5,
+    roughness: 0.1,
+  });
+
+  const uniforms = {
+    amplitude: { value: 5.0 },
+    opacity: { value: 0.3 },
+    color: { value: new Color(0xffffff) },
+  };
+
+  const shaderMaterial = new ShaderMaterial({
+    uniforms: uniforms,
+    vertexShader: `uniform float amplitude;
+
+    attribute vec3 displacement;
+    attribute vec3 customColor;
+
+    varying vec3 vColor;
+
+    void main() {
+
+      vec3 newPosition = position + amplitude * displacement;
+
+      vColor = customColor;
+
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
+
+    }`,
+    fragmentShader: `uniform vec3 color;
+    uniform float opacity;
+
+    varying vec3 vColor;
+
+    void main() {
+
+      gl_FragColor = vec4( vColor * color, opacity );
+
+    }`,
+    blending: AdditiveBlending,
+    depthTest: false,
+    transparent: true,
+  });
+
+  const textMesh = new Mesh(textGeometry, textMaterial);
+  textMesh.position.set(0, 0, 0);
+
+  textGeometry.center();
+
+  const count = textGeometry.attributes.position.count;
+
+  const displacement = new Float32BufferAttribute(count * 3, 3);
+  textGeometry.setAttribute("displacement", displacement);
+
+  const customColor = new Float32BufferAttribute(count * 3, 3);
+  textGeometry.setAttribute("customColor", customColor);
+
+  const color = new Color(0xffffff);
+
+  for (let i = 0, l = customColor.count; i < l; i++) {
+    color.setHSL(i / l, 0.5, 0.5);
+    color.toArray(customColor.array, i * customColor.itemSize);
+  }
+
+  const line1 = new Line(textGeometry, shaderMaterial);
+  line1.rotation.x = 0.2;
+  return line1;
+}
+
+function getNeonTextMaterial() {
+  if (!MATERIALS["text"]) {
+    MATERIALS["text"] = {
+      data: {},
+      mat: new MeshStandardMaterial({
+        color: 0x00ffff,
+        emissive: 0x00ffff,
+        emissiveIntensity: 1,
+        metalness: 0.5,
+        roughness: 0.1,
+      }),
+    };
+  }
+  return MATERIALS["text"].mat;
+}
 const assets = {
   loadAssets,
   getModel,
@@ -319,5 +426,7 @@ const assets = {
   clearAssets,
   setMaterialData,
   setTextureData,
+  createNeonLightText,
+  getNeonTextMaterial,
 };
 export default assets;

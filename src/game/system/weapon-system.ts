@@ -52,7 +52,7 @@ function updateWeapon(entity: WeaponEntity, delta: number) {
     entity.weapon.attackTimer <= 0 &&
     entity.player.stateTop == PlayerState.Attack
   ) {
-    entity.player = removePlayerState(PlayerState.Attack, entity.player);
+    // entity.player = removePlayerState(PlayerState.Attack, entity.player);
   }
 }
 

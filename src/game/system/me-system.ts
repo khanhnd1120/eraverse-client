@@ -24,6 +24,7 @@ export function meSystem(delta: number) {
 }
 
 function updateMe(entity: MeEntity, delta: number) {
+  G.mePlayer = entity;
   if (!entity.model.object) {
     return;
   }

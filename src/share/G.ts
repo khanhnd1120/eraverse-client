@@ -46,6 +46,7 @@ let client: Colyseus.Client = new Colyseus.Client(Environment.SERVER_SOCKET);
 let currentRoom: any;
 let stats = new Stats();
 let messages: any = [];
+let mePlayer: any = null;
 
 function setupEnvironment() {
   // setup camera
@@ -166,5 +167,6 @@ const G = {
   messages,
   composer,
   renderer,
+  mePlayer,
 };
 export default G;
