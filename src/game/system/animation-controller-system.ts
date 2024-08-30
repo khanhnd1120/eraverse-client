@@ -47,7 +47,16 @@ function animationDirectionMove(entity: PlayerEntity) {
       }
       break;
     case PlayerState.Jump:
-      entity.animator.items[0].nextAnimation = "run_forward";
+    case PlayerState.Falling:
+      if (
+        entity.animator.items[0].arrAnimation.length == 0 &&
+        entity.animator.items[0].duration <= 0
+      ) {
+        entity.animator.items[0].arrAnimation = [
+          "fa",
+          "fall_to_landing",
+        ];
+      }
       break;
     case PlayerState.Dance:
       if (player.danceAnim) {
@@ -72,7 +81,16 @@ function animationDirectionMove(entity: PlayerEntity) {
       }
       break;
     case PlayerState.Jump:
-      entity.animator.items[1].nextAnimation = "run_forward";
+    case PlayerState.Falling:
+      if (
+        entity.animator.items[1].arrAnimation.length == 0 &&
+        entity.animator.items[1].duration <= 0
+      ) {
+        entity.animator.items[1].arrAnimation = [
+          "fa",
+          "fall_to_landing",
+        ];
+      }
       break;
     case PlayerState.Dance:
       if (player.danceAnim) {

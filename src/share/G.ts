@@ -12,11 +12,18 @@ import {
   SpotLightHelper,
   TextureLoader,
   AmbientLight,
+  Color,
+  PCFSoftShadowMap,
+  PointLight,
+  PlaneGeometry,
+  MeshStandardMaterial,
+  Mesh,
 } from "three";
 import {
   EffectComposer,
   Octree,
   OutputPass,
+  ProgressiveLightMap,
   RenderPass,
   UnrealBloomPass,
 } from "three/examples/jsm/Addons.js";
@@ -33,7 +40,7 @@ export const world = new World<Entity>();
 let camera: PerspectiveCamera = new PerspectiveCamera();
 let audioListener: AudioListener = new AudioListener();
 let scene: Scene = new Scene();
-const directionalLight = new DirectionalLight(0xffffff, 1); // Color and intensity
+const directionalLight = new DirectionalLight(0xffffff, 2); // Color and intensity
 const ambientLight = new AmbientLight(0xffffff, 1); // Color and intensity
 const renderer: WebGLRenderer = new WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -54,8 +61,14 @@ function setupEnvironment() {
   window.addEventListener("resize", setupCamera);
 
   // setup lighting
-  directionalLight.position.set(0.5, 1, 1).normalize(); // Set the position of the light
   directionalLight.castShadow = true; // Enable shadow casting if needed
+  directionalLight.position.x = 10;
+  directionalLight.position.y = 10;
+  directionalLight.position.z = 10;
+  directionalLight.shadow.mapSize.width = 1024;
+  directionalLight.shadow.mapSize.height = 1024;
+  directionalLight.shadow.camera.near = 0.5;
+  directionalLight.shadow.camera.far = 500;
   scene.add(directionalLight);
   scene.add(ambientLight);
   // setup group
@@ -65,6 +78,8 @@ function setupEnvironment() {
   // setup renderer
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = PCFSoftShadowMap; // Optional: use a softer shadow type
   let containerElement = document.getElementById("game-container");
   if (containerElement) {
     containerElement.appendChild(renderer.domElement);
@@ -74,9 +89,9 @@ function setupEnvironment() {
   // setup bloom
   const bloomPass = new UnrealBloomPass(
     new Vector2(window.innerWidth, window.innerHeight),
-    0.05,
-    0.1,
-    0.3
+    0.15,
+    0.0005,
+    1
   );
   // 1.5,
   //   1,

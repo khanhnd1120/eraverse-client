@@ -54,7 +54,7 @@ async function init(entity: GameEntity) {
   let gltf: GLTF = assets.getModel(entity.gameScreen.map);
   myState.reloadMaterial$.subscribe((names: string[]) => {
     gltf.scene.traverse(async (child: any) => {
-      // updateMaterialModel(child, entity.gameScreen.map, names);
+      updateMaterialModel(child, entity.gameScreen.map, names);
     });
   });
   gltf.scene.scale.copy(new Vector3(10, 10, 10));
@@ -78,9 +78,10 @@ async function init(entity: GameEntity) {
 
   // load enviroment
   let texture = await loadTexture("textures/png/skybox.jpg");
-  texture.mapping = EquirectangularReflectionMapping;
-  G.scene.background = texture;
-  G.scene.environment = texture;
+  let environment = await loadTexture("textures/png/V4.png");
+  environment.mapping = EquirectangularReflectionMapping;
+  G.scene.background = environment;
+  G.scene.environment = environment;
 
   // setup world logic
   G.worldOctree.fromGraphNode(gltf.scene);
@@ -232,7 +233,6 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
           ),
           0.35
         ),
-        isOnFloor: false,
         keyStates: {},
         direction: new Vector3(),
         moveForward: 0,
@@ -253,23 +253,25 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         key,
         nameObject,
         chatBox,
+        isOnFloor: false,
       },
       model: {
-        name: "model_female_premium",
+        name: Constants.CharacterData[player.character].model,
         scale: new Vector3(0.1, 0.1, 0.1),
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
-          if (child.isMesh) {
-            const materialId =
-              myState.meshMaterial$.value[player.character]?.[child.name];
-            if (
-              materialId &&
-              assets.getMaterials()[materialId] &&
-              assets.getMaterials()[materialId].mat
-            ) {
-              child.material = assets.getMaterials()[materialId].mat;
+          updateMaterialModel(
+            child,
+            player.character,
+            assets.getMeshNameByCode(player.character),
+            {
+              type: "enemy",
+              id: key,
             }
-          }
+          );
+          myState.reloadMaterial$.subscribe((names: string[]) => {
+            updateMaterialModel(child, player.character, names);
+          });
         },
         parent: meObject,
         modelReady$: new BehaviorSubject<boolean>(false),
@@ -277,7 +279,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       animator: {
         items: [
           {
-            model: "female_anim_top",
+            model: Constants.CharacterData[player.character].anim_top,
             currentAnimation: "",
             nextAnimation: "idle",
             clips: _.cloneDeep(Constants.AnimClipModel),
@@ -286,7 +288,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             currentClip: null,
           },
           {
-            model: "female_anim_bottom",
+            model: Constants.CharacterData[player.character].anim_bottom,
             currentAnimation: "",
             nextAnimation: "idle",
             clips: _.cloneDeep(Constants.AnimClipModel),
@@ -313,22 +315,25 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       gameObject: playerObject,
       position: playerObject.position.clone(),
       model: {
-        name: "model_female_premium",
+        name: Constants.CharacterData[player.character].model,
         scale: new Vector3(0.1, 0.1, 0.1),
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
-          if (child.isMesh) {
-            const materialId =
-              myState.meshMaterial$.value[player.character]?.[child.name];
-            if (
-              materialId &&
-              assets.getMaterials()[materialId] &&
-              assets.getMaterials()[materialId].mat
-            ) {
-              child.material = assets.getMaterials()[materialId].mat;
+          updateMaterialModel(
+            child,
+            player.character,
+            assets.getMeshNameByCode(player.character),
+            {
+              type: "enemy",
+              id: key,
             }
-            child.userData = { type: "enemy", id: key };
-          }
+          );
+          myState.reloadMaterial$.subscribe((names: string[]) => {
+            updateMaterialModel(child, player.character, names, {
+              type: "enemy",
+              id: key,
+            });
+          });
         },
         parent: playerObject,
         modelReady$: new BehaviorSubject<boolean>(false),
@@ -345,11 +350,12 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         danceAnim: "",
         nameObject,
         chatBox,
+        isOnFloor: false,
       },
       animator: {
         items: [
           {
-            model: "female_anim_top",
+            model: Constants.CharacterData[player.character].anim_top,
             currentAnimation: "",
             nextAnimation: "idle",
             clips: _.cloneDeep(Constants.AnimClipModel),
@@ -358,7 +364,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             currentClip: null,
           },
           {
-            model: "female_anim_bottom",
+            model: Constants.CharacterData[player.character].anim_bottom,
             currentAnimation: "",
             nextAnimation: "idle",
             clips: _.cloneDeep(Constants.AnimClipModel),
@@ -386,7 +392,7 @@ function createTextPlayer(player: any) {
   nameObject.add(name);
 
   const chatBox = new Object3D();
-  console.log(Setting.getSetting().PLAYER_VIEW)
+  console.log(Setting.getSetting().PLAYER_VIEW);
   chatBox.position.set(0, Setting.getSetting().PLAYER_VIEW + 0.2, 0);
   const geometry = new BoxGeometry(0.6, 0.05, 0.01);
   const edges = new EdgesGeometry(geometry);
@@ -444,10 +450,7 @@ function createMesh(
   ];
 
   for (let i = 0; i < clones.length; i++) {
-    let mesh = new Points(
-      geometry,
-      new PointsMaterial({ size: 0.01, color })
-    );
+    let mesh = new Points(geometry, new PointsMaterial({ size: 0.01, color }));
     mesh.scale.x = mesh.scale.y = mesh.scale.z = scale;
 
     mesh.position.x = x + clones[i][0];

@@ -16,6 +16,9 @@ export default function addPlayerState(
     case PlayerState.Jump:
       updatedState = switchJump(player);
       break;
+    case PlayerState.Falling:
+      updatedState = switchFalling(player);
+      break;
     case PlayerState.Attack:
       updatedState = switchAttack(player);
       break;
@@ -87,6 +90,7 @@ function switchAttack(player: PlayerWorldType) {
     case PlayerState.Beaten:
     case PlayerState.Move:
     case PlayerState.Jump:
+    case PlayerState.Falling:
       tmpBottom = player.stateBottom;
       break;
     default:
@@ -126,12 +130,39 @@ function switchJump(player: PlayerWorldType) {
   };
 }
 
+function switchFalling(player: PlayerWorldType) {
+  let tmpTop, tmpBottom: PlayerState;
+  switch (player.stateTop) {
+    case PlayerState.Idle:
+    case PlayerState.Dance:
+      tmpTop = PlayerState.Falling;
+      break;
+    default:
+      tmpTop = player.stateTop;
+      break;
+  }
+  switch (player.stateBottom) {
+    case PlayerState.Idle:
+    case PlayerState.Dance:
+      tmpBottom = PlayerState.Falling;
+      break;
+    default:
+      tmpBottom = player.stateBottom;
+      break;
+  }
+  return {
+    stateTop: tmpTop,
+    stateBottom: tmpBottom,
+  };
+}
+
 function switchMove(player: PlayerWorldType) {
   let tmpTop, tmpBottom: PlayerState;
   switch (player.stateTop) {
     case PlayerState.Idle:
     case PlayerState.Dance:
     case PlayerState.Jump:
+    case PlayerState.Falling:
       tmpTop = PlayerState.Move;
       break;
     default:
@@ -142,6 +173,7 @@ function switchMove(player: PlayerWorldType) {
     case PlayerState.Idle:
     case PlayerState.Dance:
     case PlayerState.Jump:
+    case PlayerState.Falling:
       tmpBottom = PlayerState.Move;
       break;
     default:

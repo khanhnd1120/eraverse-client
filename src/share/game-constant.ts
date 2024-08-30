@@ -1,5 +1,6 @@
-const Constants = {
+const Constants: any = {
   CharacterCodes: [
+    "FEMALE_02",
     "FEMALE_10",
     "FEMALE_09",
     "FEMALE_08",
@@ -8,8 +9,138 @@ const Constants = {
     "FEMALE_05",
     "FEMALE_04",
     "FEMALE_03",
-    "FEMALE_02",
+    "FEMALE_01",
+    "MALE_10",
+    "MALE_09",
+    "MALE_08",
+    "MALE_07",
+    "MALE_06",
+    "MALE_05",
+    "MALE_04",
+    "MALE_03",
+    "MALE_02",
+    "MALE_01",
+    "BASIC_01",
+    "BASIC_02",
+    "BASIC_03",
   ],
+  CharacterData: {
+    MALE_10: {
+      model: "model_male_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    MALE_09: {
+      model: "model_male_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    MALE_08: {
+      model: "model_male_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    MALE_07: {
+      model: "model_male_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    MALE_06: {
+      model: "model_male_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    MALE_05: {
+      model: "model_male_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    MALE_04: {
+      model: "model_male_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    MALE_03: {
+      model: "model_male_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    MALE_02: {
+      model: "model_male_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    MALE_01: {
+      model: "model_male_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    BASIC_01: {
+      model: "model_basic",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    BASIC_02: {
+      model: "model_basic",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    BASIC_03: {
+      model: "model_basic",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    FEMALE_10: {
+      model: "model_female_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    FEMALE_09: {
+      model: "model_female_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    FEMALE_08: {
+      model: "model_female_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    FEMALE_07: {
+      model: "model_female_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    FEMALE_06: {
+      model: "model_female_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    FEMALE_05: {
+      model: "model_female_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    FEMALE_04: {
+      model: "model_female_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    FEMALE_03: {
+      model: "model_female_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    FEMALE_02: {
+      model: "model_female_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+    FEMALE_01: {
+      model: "model_female_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+    },
+  },
   // right - bottom - left - top
   DanceAnim: [
     {
@@ -52,6 +183,9 @@ const Constants = {
     { name: "ninja_idle" },
     { name: "punch", timeScale: 2 },
     { name: "jump", timeScale: 1.5 },
+    { name: "jump_up", timeScale: 1.5 },
+    { name: "fa", timeScale: 1.5 },
+    { name: "fall_to_landing", timeScale: 1 },
   ],
 };
 export default Constants;
