@@ -104,6 +104,9 @@ function removeDefault(player: PlayerWorldType, state: PlayerState) {
       tmpBottom = player.stateBottom;
       break;
   }
+  if (tmpTop === PlayerState.Attack && tmpBottom == PlayerState.Idle) {
+    tmpBottom = PlayerState.Attack;
+  }
 
   return {
     stateTop: tmpTop,
