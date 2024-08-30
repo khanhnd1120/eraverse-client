@@ -41,6 +41,7 @@ export default function createVideoMaterial(data: {
   document.getElementById("game-container")?.appendChild(vidElement);
   vidElement.play();
   const matVid = new VideoTexture(vidElement);
+  matVid.flipY = false;
 
   const material = new MeshBasicMaterial({
     transparent: true,
