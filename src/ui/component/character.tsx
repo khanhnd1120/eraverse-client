@@ -8,6 +8,7 @@ import assets from "share/assets";
 import myState from "share/my-state";
 import { useEffect } from "react";
 import updateMaterialModel from "share/update-material-model";
+import Constants from "share/game-constant";
 let mixer: AnimationMixer = null;
 let currentAnim = 1;
 function Model({
@@ -27,7 +28,7 @@ function Model({
     );
   }, [code]);
   let model = SkeletonUtils.clone(
-    assets.getModel("model_female_premium").scene
+    assets.getModel(Constants.CharacterData[code].model).scene
   );
   model.scale.set(-0.85, 0.85, 0.85);
 
@@ -36,8 +37,8 @@ function Model({
       updateMaterialModel(child, code, names);
     });
   });
-  let animBottom = assets.getModel("female_anim_bottom");
-  let animTop = assets.getModel("female_anim_top");
+  let animBottom = assets.getModel(Constants.CharacterData[code].anim_top);
+  let animTop = assets.getModel(Constants.CharacterData[code].anim_bottom);
   mixer = new AnimationMixer(model);
   let idleBottom = mixer.clipAction(
     animBottom.animations.find((a) => a.name == anim)

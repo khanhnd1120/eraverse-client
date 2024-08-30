@@ -56,6 +56,7 @@ export enum PlayerState {
   Beaten,
   Attack,
   Dance,
+  Falling,
 }
 
 export enum Direction {
@@ -114,7 +115,8 @@ export interface PlayerWorldType {
   nameObject?: Object3D;
   chatBox?: Object3D;
   chatMessage?: Object3D;
-  timeoutHideMessage?: any
+  timeoutHideMessage?: any;
+  isOnFloor: boolean;
 }
 export interface MeWorldType {
   onMouseMove: EventListener;
@@ -131,7 +133,6 @@ export interface MeWorldType {
   moveRight: number;
   velocity: Vector3;
   collider: Capsule;
-  isOnFloor: boolean;
   followCamera: Object3D;
   secondaryCamera: Object3D;
   mainObject: Object3D;

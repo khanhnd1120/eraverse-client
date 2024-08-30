@@ -11,11 +11,15 @@ export default function removePlayerState(
   if (!player) {
     return;
   }
+  if (state == PlayerState.Idle) {
+    return player;
+  }
   let updatedState: { stateTop: PlayerState; stateBottom: PlayerState };
   switch (state) {
     case PlayerState.Move:
     case PlayerState.Dance:
     case PlayerState.Jump:
+    case PlayerState.Falling:
     case PlayerState.Beaten:
       updatedState = removeDefault(player, state);
       break;
@@ -54,6 +58,7 @@ function removeAttack(player: PlayerWorldType) {
     case PlayerState.Move:
     case PlayerState.Beaten:
     case PlayerState.Jump:
+    case PlayerState.Falling:
       tmpTop = player.stateTop;
       break;
     default:
@@ -64,6 +69,7 @@ function removeAttack(player: PlayerWorldType) {
     case PlayerState.Move:
     case PlayerState.Beaten:
     case PlayerState.Jump:
+    case PlayerState.Falling:
       tmpBottom = player.stateBottom;
       break;
     default:

@@ -1,3 +1,4 @@
+import { Color } from "three";
 import assets from "./assets";
 import createVideoMaterial from "./create-video-material";
 import { AdsBoard, AdsType, ConfigKey } from "./game-interface";
@@ -8,9 +9,17 @@ import Setting from "./setting";
 export default function updateMaterialModel(
   child: any,
   name: string,
-  names: string[]
+  names: string[],
+  userData?: any
 ) {
   if (child.isMesh) {
+    child.castShadow = true;
+    child.receiveShadow = true;
+    child.material.needsUpdate = true;
+    child.userData = {
+      ...child.userData,
+      userData,
+    };
     const adsBoard = Setting.getConfig(ConfigKey.ADS_BOARD) as AdsBoard;
     const rotateMeshData = Setting.getConfig(ConfigKey.ROTATE_MESH);
 

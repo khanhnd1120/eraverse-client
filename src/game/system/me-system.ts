@@ -34,6 +34,13 @@ function updateMe(entity: MeEntity, delta: number) {
   teleportPlayerIfOob(entity);
 }
 function teleportPlayerIfOob(entity: MeEntity) {
+  if (
+    entity.gameObject.position.y < -1 &&
+    ![PlayerState.Falling, PlayerState.Jump].includes(entity.player.stateBottom)
+  ) {
+    // case falling
+    entity.player = addPlayerState(PlayerState.Falling, entity.player);
+  }
   if (entity.gameObject.position.y >= -25) {
     return;
   }
@@ -55,7 +62,7 @@ function playerRigidBody(entity: MeEntity, delta: number) {
 function updatePlayerRigidBodyStep(entity: MeEntity, deltaTime: number) {
   let damping = Math.exp(-1.5 * deltaTime) - 1;
 
-  if (!entity.me.isOnFloor) {
+  if (!entity.player.isOnFloor) {
     entity.me.velocity.y -= Setting.getSetting().GRAVITY * deltaTime;
     damping *= 0.1;
   }
@@ -67,12 +74,12 @@ function updatePlayerRigidBodyStep(entity: MeEntity, deltaTime: number) {
 
   const result = G.worldOctree.capsuleIntersect(entity.me.collider);
 
-  entity.me.isOnFloor = false;
+  entity.player.isOnFloor = false;
 
   if (result) {
-    entity.me.isOnFloor = result.normal.y > 0;
+    entity.player.isOnFloor = result.normal.y > 0;
 
-    if (!entity.me.isOnFloor) {
+    if (!entity.player.isOnFloor) {
       entity.me.velocity.addScaledVector(
         result.normal,
         -result.normal.dot(entity.me.velocity)
@@ -174,15 +181,27 @@ function controls(entity: MeEntity, delta: number) {
   vel.clampLength(-maxSpeed, maxSpeed);
   vel.y = entity.me.velocity.y;
 
-  if (entity.me.isOnFloor) {
-    if (entity.me.keyStates["Space"]) {
+  if (entity.player.isOnFloor) {
+    if (
+      entity.me.keyStates["Space"] &&
+      entity.player.stateBottom !== PlayerState.Jump
+    ) {
       checkJump = true;
       vel.y = Setting.getSetting().JUMP_FORCE;
     }
   }
-
-  if (entity.me.isOnFloor) {
-    entity.player = removePlayerState(PlayerState.Jump, entity.player);
+  if (
+    !entity.player.isOnFloor &&
+    !(
+      [PlayerState.Jump, PlayerState.Falling].includes(
+        entity.player.stateTop
+      ) ||
+      [PlayerState.Jump, PlayerState.Falling].includes(
+        entity.player.stateBottom
+      )
+    )
+  ) {
+    entity.player = addPlayerState(PlayerState.Falling, entity.player);
   }
   // check jump
   if (checkJump && !checkMove) {

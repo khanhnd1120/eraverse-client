@@ -34,6 +34,7 @@ export default function createVideoMaterial(data: {
   vidElement.crossOrigin = "anonymous";
   vidElement.muted = true;
   vidElement.style.display = "none";
+  vidElement.playbackRate = 0.5;
   const source = document.createElement("source");
   source.src = data.src;
   vidElement.appendChild(source);

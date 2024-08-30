@@ -44,6 +44,17 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
           animatorItem.currentClip.getClip().duration -
           animatorItem.currentClip.time;
       }
+      let isWtf = false;
+      if (
+        animatorItem.currentAnimation == "fa" &&
+        [e.player.stateTop, e.player.stateBottom][index] === PlayerState.Falling
+      ) {
+        if (!e.player.isOnFloor) {
+          return;
+        }
+        isWtf = true;
+        animatorItem.duration = 0;
+      }
       if (animatorItem.duration < 0.3) {
         if (animatorItem.arrAnimation.length > 0) {
           // array action not finish
@@ -57,13 +68,19 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
               (clipItem: AnimationClipItem) =>
                 clipItem.name === animatorItem.currentAnimation
             );
-            if (fadeoutClip) {
-              fadeoutClip.clip.fadeOut(TRANSITION);
-            }
 
+            let transitionFadeIn = TRANSITION;
+            let transitionFadeOut = TRANSITION;
+            if (nextAnim === "fall_to_landing") {
+              transitionFadeIn = 0;
+              transitionFadeOut = 0;
+            }
+            if (fadeoutClip) {
+              fadeoutClip.clip.fadeOut(transitionFadeOut);
+            }
             animatorItem.duration = playClip.clip.getClip().duration;
             animatorItem.currentClip = playClip.clip;
-            playClip.clip.reset().fadeIn(TRANSITION).play();
+            playClip.clip.reset().fadeIn(transitionFadeIn).play();
             animatorItem.currentAnimation = nextAnim;
           }
         } else {

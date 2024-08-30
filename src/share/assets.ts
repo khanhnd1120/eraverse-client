@@ -14,7 +14,9 @@ import {
   Mesh,
   MeshPhysicalMaterial,
   MeshStandardMaterial,
+  RepeatWrapping,
   ShaderMaterial,
+  Texture,
   Vector2,
 } from "three";
 import {
@@ -31,6 +33,7 @@ import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.j
 import { MaterialConfigData, TextureConfigData } from "./game-interface";
 import _ from "lodash";
 import createMaterialShader from "./create-material-shader";
+import { loadTexture } from "game/help/loader";
 
 const MODELS: { [key: string]: { url: string; gltf?: GLTF } } = {
   map: { url: "map/map.glb" },
@@ -42,6 +45,12 @@ const MODELS: { [key: string]: { url: string; gltf?: GLTF } } = {
   },
   female_anim_top: {
     url: "character/eragon/female_anim_top.glb",
+  },
+  model_basic: {
+    url: "character/eragon/model_basic.glb",
+  },
+  model_male_premium: {
+    url: "character/eragon/model_male_premium.glb",
   },
 };
 const SOUNDS: { [key: string]: { url: string; buffer?: any } } = {};
@@ -204,7 +213,17 @@ function loadMaterials(name: string) {
   }
   const materialData = MATERIALS[name].data;
   delete materialData.metadata;
-  const mat = new MeshPhysicalMaterial(materialData);
+  let mat;
+  if (materialData.type === "MeshStandardMaterial") {
+    mat = new MeshStandardMaterial(materialData);
+  } else {
+    mat = new MeshPhysicalMaterial(materialData);
+    mat.clearcoat = 0.3;
+    mat.clearcoatRoughness = 0;
+    mat.ior = 1.45;
+    mat.thickness = 0;
+    mat.anisotropy = 4;
+  }
 
   const dataMat = _.cloneDeep(materialData);
   if (dataMat.normalMap && TEXTURES[dataMat.normalMap]) {
@@ -222,10 +241,6 @@ function loadMaterials(name: string) {
   if (dataMat.map && TEXTURES[dataMat.map]) {
     mat.map = TEXTURES[dataMat.map].texture;
   }
-  // mat.clearcoat = 0.3;
-  mat.clearcoatRoughness = 0;
-  mat.ior = 1.45;
-  mat.thickness = 0;
   Object.keys(dataMat).map((property) => {
     if (property in mat) {
       if (
@@ -328,7 +343,7 @@ function createNeonLightText(text: string) {
   textGeometry.center();
 
   const textMaterial = new MeshStandardMaterial({
-    color: '#B1008D',
+    color: "#B1008D",
     emissive: "#B1008D",
     emissiveIntensity: 1,
     metalness: 0.5,
@@ -414,6 +429,11 @@ function getNeonTextMaterial() {
   }
   return MATERIALS["text"].mat;
 }
+function getMeshNameByCode(code: string) {
+  return Object.keys(myState.meshMaterial$.value[code]).map(
+    (key: any) => myState.meshMaterial$.value[code][key]
+  );
+}
 const assets = {
   loadAssets,
   getModel,
@@ -428,5 +448,6 @@ const assets = {
   setTextureData,
   createNeonLightText,
   getNeonTextMaterial,
+  getMeshNameByCode,
 };
 export default assets;
