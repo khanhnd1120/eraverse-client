@@ -72,6 +72,9 @@ function checkHit(entity: WeaponEntity) {
     if (!hit && inter.object.type == "Mesh") {
       hit = inter;
     }
+    if (inter.object.type == "Mesh") {
+      console.log(inter.object.name);
+    }
   });
   if (!hit) {
     return {};

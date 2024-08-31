@@ -55,7 +55,7 @@ export default function Dance() {
     } else {
       convertDegree = 450 + angleDegrees;
     }
-    Constants.DanceAnim.map((anim, ind) => {
+    Constants.DanceAnim.map((anim: any, ind: number) => {
       let deg = (360 / Constants.DanceAnim.length) * (ind + 1);
       let from = deg - 360 / Constants.DanceAnim.length / 2;
       let to = deg + 360 / Constants.DanceAnim.length / 2;
@@ -70,7 +70,7 @@ export default function Dance() {
 
   return (
     <div className="dance-menu">
-      {Constants.DanceAnim.map((anim, ind) => {
+      {Constants.DanceAnim.map((anim: any, ind: number) => {
         let deg = (360 / Constants.DanceAnim.length) * (ind + 1);
         let from = deg - 360 / Constants.DanceAnim.length / 2;
         let to = deg + 360 / Constants.DanceAnim.length / 2;
