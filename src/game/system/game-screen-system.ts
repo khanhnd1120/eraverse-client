@@ -142,6 +142,18 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
           });
         })
     );
+    dataSubscription.push(
+      myState.isRun$
+        .pipe(throttleTime(100, asyncScheduler, { trailing: true }))
+        .subscribe((isRun: boolean) => {
+          if (isRun === null) {
+            return;
+          }
+          G.getCurrentRoom().send("updatePlayer", {
+            isRun,
+          });
+        })
+    );
     let meObject = new Object3D<Object3DEventMap>();
     meObject.add(nameObject);
     meObject.add(chatBox);
@@ -264,10 +276,6 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             child,
             player.character,
             assets.getMeshNameByCode(player.character),
-            {
-              type: "enemy",
-              id: key,
-            }
           );
           myState.reloadMaterial$.subscribe((names: string[]) => {
             updateMaterialModel(child, player.character, names);
@@ -392,7 +400,6 @@ function createTextPlayer(player: any) {
   nameObject.add(name);
 
   const chatBox = new Object3D();
-  console.log(Setting.getSetting().PLAYER_VIEW);
   chatBox.position.set(0, Setting.getSetting().PLAYER_VIEW + 0.2, 0);
   const geometry = new BoxGeometry(0.6, 0.05, 0.01);
   const edges = new EdgesGeometry(geometry);

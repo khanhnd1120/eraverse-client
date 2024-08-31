@@ -67,7 +67,12 @@ function checkHit(entity: WeaponEntity) {
     G.physicalGroup.children,
     true
   );
-  let hit: Intersection<Object3D<Object3DEventMap>> = intersect[0];
+  let hit: Intersection<Object3D<Object3DEventMap>>;
+  intersect.forEach((inter) => {
+    if (!hit && inter.object.type == "Mesh") {
+      hit = inter;
+    }
+  });
   if (!hit) {
     return {};
   }

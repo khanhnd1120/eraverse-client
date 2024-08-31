@@ -7,19 +7,6 @@ import { useGlobalContext } from "ui/context";
 
 export default function AvatarPanel() {
   const { userInfo } = useGlobalContext();
-  useEffect(() => {
-    checkAuth();
-  }, []);
-  async function checkAuth() {
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    const poolId = urlParams.get("poolId");
-    const eragonToken = localStorage.getItem("access_token");
-    if (eragonToken) {
-      let rs = await api.auth(eragonToken, Number(poolId));
-      api.setToken(rs.accessToken);
-    }
-  }
   return (
     <div style={{ height: 120 }} className="flex">
       {userInfo?.name ? (

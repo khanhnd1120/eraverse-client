@@ -13,13 +13,13 @@ export default function updateMaterialModel(
   userData?: any
 ) {
   if (child.isMesh) {
+    child.userData = {
+      ...child.userData,
+      ...userData,
+    };
     child.castShadow = true;
     child.receiveShadow = true;
     child.material.needsUpdate = true;
-    child.userData = {
-      ...child.userData,
-      userData,
-    };
     const adsBoard = Setting.getConfig(ConfigKey.ADS_BOARD) as AdsBoard;
     const rotateMeshData = Setting.getConfig(ConfigKey.ROTATE_MESH);
 
@@ -138,7 +138,7 @@ export default function updateMaterialModel(
   if (child.isGroup) {
     child.children.map((obj: any) => {
       obj.traverse((childObj: any) => {
-        updateMaterialModel(childObj, name, names);
+        updateMaterialModel(childObj, name, names, userData);
       });
     });
   }

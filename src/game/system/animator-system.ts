@@ -46,7 +46,7 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
       }
       let isWtf = false;
       if (
-        animatorItem.currentAnimation == "fa" &&
+        animatorItem.currentAnimation == "fall_idle" &&
         [e.player.stateTop, e.player.stateBottom][index] === PlayerState.Falling
       ) {
         if (!e.player.isOnFloor) {
@@ -102,13 +102,15 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
     if (animatorItem.arrAnimation.length || animatorItem.duration > 0.3) {
       return;
     }
+    let transitionFadeIn = TRANSITION;
+    let transitionFadeOut = TRANSITION;
     if (animatorItem.currentAnimation) {
       let fadeoutClip = animatorItem.clips.find(
         (clipItem: AnimationClipItem) =>
           clipItem.name === animatorItem.currentAnimation
       );
       if (fadeoutClip) {
-        fadeoutClip.clip.fadeOut(TRANSITION);
+        fadeoutClip.clip.fadeOut(transitionFadeOut);
       }
     }
     if (animatorItem.nextAnimation) {
@@ -117,7 +119,7 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
           clipItem.name === animatorItem.nextAnimation
       );
       if (playClip) {
-        playClip.clip.reset().fadeIn(TRANSITION).play();
+        playClip.clip.reset().fadeIn(transitionFadeIn).play();
       }
     }
     animatorItem.currentAnimation = animatorItem.nextAnimation;

@@ -87,6 +87,7 @@ export type SettingData = {
   PLAYER_VIEW: number;
   GRAVITY: number;
   CHARACTER_SPEED: number;
+  CHARACTER_RUN_SPEED: number;
   CHARACTER_ATTACK_SPEED: number;
   JUMP_FORCE: number;
 };
@@ -117,6 +118,7 @@ export interface PlayerWorldType {
   chatMessage?: Object3D;
   timeoutHideMessage?: any;
   isOnFloor: boolean;
+  isRun?: boolean;
 }
 export interface MeWorldType {
   onMouseMove: EventListener;

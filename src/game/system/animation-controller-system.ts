@@ -26,17 +26,27 @@ const RunAnimationDirection = [
   ["run_left", "run_left"],
   ["run_right", "run_right"],
 ];
+const WalkAnimationDirection = [
+  [],
+  ["walking_forward", "walking_forward"],
+  ["walking_backward", "walking_backward"],
+  ["walking_left", "walking_left"],
+  ["walking_right", "walking_right"],
+];
 
 function animationDirectionMove(entity: PlayerEntity) {
   const player = entity.player;
 
   entity.animator.items[1].nextAnimation = "idle";
   entity.animator.items[0].nextAnimation = "idle";
-
+  let animMoveDirection = WalkAnimationDirection;
+  if (player.isRun) {
+    animMoveDirection = RunAnimationDirection;
+  }
   switch (player.stateTop) {
     case PlayerState.Move:
       entity.animator.items[0].nextAnimation =
-        RunAnimationDirection[player.direction][0];
+        animMoveDirection[player.direction][0];
       break;
     case PlayerState.Attack:
       if (
@@ -53,7 +63,7 @@ function animationDirectionMove(entity: PlayerEntity) {
         entity.animator.items[0].duration <= 0
       ) {
         entity.animator.items[0].arrAnimation = [
-          "fa",
+          "fall_idle",
           "fall_to_landing",
         ];
       }
@@ -70,7 +80,7 @@ function animationDirectionMove(entity: PlayerEntity) {
   switch (player.stateBottom) {
     case PlayerState.Move:
       entity.animator.items[1].nextAnimation =
-        RunAnimationDirection[player.direction][1];
+        animMoveDirection[player.direction][1];
       break;
     case PlayerState.Attack:
       if (
@@ -87,7 +97,7 @@ function animationDirectionMove(entity: PlayerEntity) {
         entity.animator.items[1].duration <= 0
       ) {
         entity.animator.items[1].arrAnimation = [
-          "fa",
+          "fall_idle",
           "fall_to_landing",
         ];
       }
