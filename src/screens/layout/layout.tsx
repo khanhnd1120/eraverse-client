@@ -24,14 +24,30 @@ const router = createMemoryRouter([
 function Layout() {
   const { setUserInfo } = useGlobalContext();
   useEffect(() => {
+    async function checkAuth() {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const poolId = urlParams.get("poolId");
+      const eragonToken = localStorage.getItem("access_token");
+      if (eragonToken) {
+        let rs = await api.auth(eragonToken, Number(poolId));
+        api.setToken(rs.accessToken);
+      }
+    }
     async function refreshToken() {
       let token = api.getToken();
-      if (!token) return;
+      if (!token) {
+        await checkAuth();
+        token = api.getToken();
+      }
+      if (!token) {
+        return;
+      }
       let rs = await api.refreshAccessToken();
       api.setToken(rs.accessToken);
       setUserInfo({
         name: rs.name,
-      })
+      });
     }
     refreshToken();
   }, []);

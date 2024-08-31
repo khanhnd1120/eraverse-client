@@ -17,6 +17,7 @@ const loadingTexture$ = new BehaviorSubject<boolean>(false);
 const danceAnim$ = new BehaviorSubject<string>("");
 const loadingGame$ = new BehaviorSubject<boolean>(true);
 const loadVideoMaterial$ = new BehaviorSubject<string[]>([]);
+const isRun$ = new BehaviorSubject<boolean>(false);
 
 const myState = {
   reloadMaterial$,
@@ -32,5 +33,6 @@ const myState = {
   danceAnim$,
   loadingGame$,
   loadVideoMaterial$,
+  isRun$,
 };
 export default myState;

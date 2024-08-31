@@ -133,6 +133,16 @@ function controls(entity: MeEntity, delta: number) {
   let checkJump = false;
   // gives a bit of air control
   let maxSpeed = Setting.getSetting().CHARACTER_SPEED;
+  let oldRun = entity.player.isRun;
+  if (entity.me.keyStates["ShiftLeft"]) {
+    maxSpeed = Setting.getSetting().CHARACTER_RUN_SPEED;
+    entity.player.isRun = true;
+  } else {
+    entity.player.isRun = false;
+  }
+  if(oldRun !== entity.player.isRun) {
+    myState.isRun$.next(entity.player.isRun);
+  }
   let vel = entity.me.velocity.clone();
   if (entity.me.keyStates["KeyW"]) {
     checkMove = true;

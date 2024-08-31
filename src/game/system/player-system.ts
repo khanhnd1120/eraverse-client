@@ -29,4 +29,7 @@ function onEntityAdded(entity: PlayerEntity) {
   entity.player.serverObject.listen("danceAnim", (danceAnim: any) => {
     entity.player.danceAnim = danceAnim;
   });
+  entity.player.serverObject.listen("isRun", (isRun: any) => {
+    entity.player.isRun = isRun;
+  });
 }
