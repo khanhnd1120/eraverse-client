@@ -69,11 +69,11 @@ function checkHit(entity: WeaponEntity) {
   );
   let hit: Intersection<Object3D<Object3DEventMap>>;
   intersect.forEach((inter) => {
-    if (!hit && inter.object.type == "Mesh") {
+    if (
+      !hit &&
+      (inter.object.type == "Mesh" || inter.object.type == "SkinnedMesh")
+    ) {
       hit = inter;
-    }
-    if (inter.object.type == "Mesh") {
-      console.log(inter.object.name);
     }
   });
   if (!hit) {

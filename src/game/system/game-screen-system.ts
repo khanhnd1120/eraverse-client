@@ -155,8 +155,8 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         })
     );
     let meObject = new Object3D<Object3DEventMap>();
-    meObject.add(nameObject);
-    meObject.add(chatBox);
+    // meObject.add(nameObject);
+    // meObject.add(chatBox);
     meObject.position.set(
       player.position.x,
       player.position.y,
@@ -167,8 +167,8 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
 
     meObject.add(mainObject);
     meObject.add(secondaryObject);
-    secondaryObject.position.set(0, Setting.getSetting().PLAYER_VIEW, 0);
-    mainObject.position.set(0, Setting.getSetting().PLAYER_VIEW, 0);
+    secondaryObject.position.set(0, 0.3, 0);
+    mainObject.position.set(0, 0.3, 0);
 
     const followCameraPosition = new Vector3(0, 0.1, -1.2);
     let followCamera = new Object3D();
@@ -311,8 +311,8 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
     entity.gameScreen.keyEntities[key] = e;
   } else {
     let playerObject = new Object3D<Object3DEventMap>();
-    playerObject.add(nameObject);
-    playerObject.add(chatBox);
+    // playerObject.add(nameObject);
+    // playerObject.add(chatBox);
     playerObject.position.set(
       player.position.x,
       player.position.y,

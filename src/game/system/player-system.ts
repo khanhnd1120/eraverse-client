@@ -1,5 +1,8 @@
 import { With } from "miniplex";
+import addPlayerState from "share/add-player-state";
 import { world } from "share/G";
+import { PlayerState } from "share/game-interface";
+import removePlayerState from "share/remove-player-state";
 import { Entity } from "share/world";
 
 let playerEntities = world.with("player", "position");
@@ -31,5 +34,12 @@ function onEntityAdded(entity: PlayerEntity) {
   });
   entity.player.serverObject.listen("isRun", (isRun: any) => {
     entity.player.isRun = isRun;
+  });
+  entity.player.serverObject.listen("isBeaten", (isBeaten: any) => {
+    if (isBeaten) {
+      entity.player = addPlayerState(PlayerState.Beaten, entity.player);
+    } else {
+      entity.player = removePlayerState(PlayerState.Beaten, entity.player);
+    }
   });
 }
