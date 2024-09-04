@@ -74,7 +74,12 @@ function animationDirectionMove(entity: PlayerEntity) {
       }
       break;
     case PlayerState.Beaten:
-      entity.animator.items[0].nextAnimation = "falling";
+      if (
+        entity.animator.items[0].arrAnimation.length == 0 &&
+        entity.animator.items[0].duration <= 0
+      ) {
+        entity.animator.items[0].arrAnimation = ["die", "stand"];
+      }
       break;
   }
   switch (player.stateBottom) {
@@ -108,7 +113,12 @@ function animationDirectionMove(entity: PlayerEntity) {
       }
       break;
     case PlayerState.Beaten:
-      entity.animator.items[1].nextAnimation = "falling";
+      if (
+        entity.animator.items[1].arrAnimation.length == 0 &&
+        entity.animator.items[1].duration <= 0
+      ) {
+        entity.animator.items[1].arrAnimation = ["die", "stand"];
+      }
       break;
   }
 }

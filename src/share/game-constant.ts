@@ -190,6 +190,8 @@ const Constants: any = {
     { name: "jump_up", timeScale: 1.5 },
     { name: "fall_idle", timeScale: 1.5 },
     { name: "fall_to_landing", timeScale: 1 },
+    { name: "die", timeScale: 1 },
+    { name: "stand", timeScale: 1 },
   ],
 };
 export default Constants;
