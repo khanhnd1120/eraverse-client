@@ -4,6 +4,7 @@ import Playing from "./playing";
 import myState from "share/my-state";
 import Dance from "./dance";
 import LoadingGame from "./loading-game";
+import ActionWheel from "./action-wheel";
 
 export default function Game() {
   const [showChat, setShowChat] = useState(false);
@@ -25,7 +26,7 @@ export default function Game() {
     <div className="text-white w-screen h-screen flex justify-center items-center">
       <Playing />
       {showChat && <Chat />}
-      {showDance && <Dance />}
+      {showDance && <ActionWheel />}
       {showLoadingGame && <LoadingGame />}
     </div>
   );
