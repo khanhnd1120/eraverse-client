@@ -152,10 +152,6 @@ const Constants: any = {
       name: "Chicken Dance",
     },
     {
-      anim: "falling",
-      name: "Falling",
-    },
-    {
       anim: "flair",
       name: "Flair",
     },

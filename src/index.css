@@ -99,7 +99,7 @@ body {
   overflow: hidden;
 }
 
-.dance-menu {
+.action-wheel {
   width: 500px;
   height: 500px;
   background-color: #cccccc00;
@@ -110,7 +110,7 @@ body {
   transition: 5s;
 }
 
-.dance-menu .dance-anim-item {
+.action-wheel .action-wheel-item {
   height: 50%;
   width: 270px;
   position: absolute;
@@ -129,12 +129,12 @@ body {
   background-color: #585858b8;
 }
 
-.dance-menu-text {
+.action-wheel-text {
   top: 30px;
   position: absolute;
 }
 
-.dance-anim-item-active {
+.action-wheel-item-active {
   background-color: #fff !important;
   color: #000 !important;
 }
