@@ -29,9 +29,9 @@ const RunAnimationDirection = [
 const WalkAnimationDirection = [
   [],
   ["walking_forward", "walking_forward"],
-  ["walking_backward", "walking_backward"],
-  ["walking_left", "walking_left"],
-  ["walking_right", "walking_right"],
+  ["walking_forward", "walking_forward"],
+  ["walking_horizontal", "walking_horizontal"],
+  ["walking_horizontal", "walking_horizontal"],
 ];
 
 function animationDirectionMove(entity: PlayerEntity) {

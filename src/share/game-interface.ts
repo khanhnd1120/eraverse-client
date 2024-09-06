@@ -97,6 +97,7 @@ export interface AnimatorItem {
   nextAnimation: string;
   clips: AnimationClipItem[];
   duration: number;
+  hold?: number;
   arrAnimation: string[];
   currentClip: AnimationAction;
 }

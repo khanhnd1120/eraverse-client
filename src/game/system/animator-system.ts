@@ -40,13 +40,16 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
   }
   e.animator.mixer.update(delta);
   e.animator.items.forEach((animatorItem: AnimatorItem, index: number) => {
+    if (animatorItem.hold > 0) {
+      animatorItem.hold -= delta;
+      return;
+    }
     if (animatorItem.duration > 0 || animatorItem.arrAnimation.length) {
       if (animatorItem.currentClip) {
         animatorItem.duration =
           animatorItem.currentClip.getClip().duration -
           animatorItem.currentClip.time;
       }
-      let isWtf = false;
       if (
         animatorItem.currentAnimation == "fall_idle" &&
         [e.player.stateTop, e.player.stateBottom][index] === PlayerState.Falling
@@ -54,7 +57,6 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
         if (!e.player.isOnFloor) {
           return;
         }
-        isWtf = true;
         animatorItem.duration = 0;
       }
       if (animatorItem.duration < 0.3) {
@@ -160,16 +162,32 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
         fadeoutClip.clip.fadeOut(transitionFadeOut);
       }
     }
+    let isRedirect = false;
     if (animatorItem.nextAnimation) {
       let playClip = animatorItem.clips.find(
         (clipItem: AnimationClipItem) =>
           clipItem.name === animatorItem.nextAnimation
       );
+      if (
+        ["walking_horizontal", "walking_left", "walking_right"].includes(
+          animatorItem.nextAnimation
+        ) &&
+        animatorItem.currentAnimation != "walking_forward"
+      ) {
+        isRedirect = true;
+        animatorItem.hold = 0.5;
+        playClip = animatorItem.clips.find(
+          (clipItem: AnimationClipItem) => clipItem.name === "walking_forward"
+        );
+      }
       if (playClip) {
         playClip.clip.reset().fadeIn(transitionFadeIn).play();
       }
     }
     animatorItem.currentAnimation = animatorItem.nextAnimation;
+    if (isRedirect) {
+      animatorItem.currentAnimation = "walking_forward";
+    }
   });
 }
 async function onEntityAdded(e: AnimatorEntity) {

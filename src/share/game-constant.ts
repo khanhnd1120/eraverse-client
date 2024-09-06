@@ -174,6 +174,7 @@ const Constants: any = {
     { name: "walking_forward" },
     { name: "walking_left", timeScale: 2 },
     { name: "walking_right", timeScale: 2 },
+    { name: "walking_horizontal" },
     { name: "capoeira" },
     { name: "chicken_dance" },
     { name: "falling" },
