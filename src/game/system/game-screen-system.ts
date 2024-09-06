@@ -101,7 +101,9 @@ async function init(entity: GameEntity) {
   room.state.players.onRemove((player: any, key: any) => {
     world.remove(entity.gameScreen.keyEntities[key]);
   });
-  myState.loadingGame$.next(false);
+  setTimeout(() => {
+    myState.loadingGame$.next(false);
+  }, 5000);
 }
 function onPlayerAdded(entity: GameEntity, player: any, key: string) {
   let room = G.getCurrentRoom();
@@ -155,8 +157,8 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         })
     );
     let meObject = new Object3D<Object3DEventMap>();
-    // meObject.add(nameObject);
-    // meObject.add(chatBox);
+    meObject.add(nameObject);
+    meObject.add(chatBox);
     meObject.position.set(
       player.position.x,
       player.position.y,
@@ -266,6 +268,8 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         nameObject,
         chatBox,
         isOnFloor: false,
+        character: player.character,
+        id: player.id,
       },
       model: {
         name: Constants.CharacterData[player.character].model,
@@ -275,10 +279,15 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
           updateMaterialModel(
             child,
             player.character,
-            assets.getMeshNameByCode(player.character),
+            assets.getMeshNameByCode(player.character)
           );
           myState.reloadMaterial$.subscribe((names: string[]) => {
-            updateMaterialModel(child, player.character, names);
+            const playerData = world
+              .with("player")
+              .entities.filter((entity) => entity.player.id === player.id);
+            if (playerData && playerData[0]) {
+              updateMaterialModel(child, playerData[0].player.character, names);
+            }
           });
         },
         parent: meObject,
@@ -311,8 +320,8 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
     entity.gameScreen.keyEntities[key] = e;
   } else {
     let playerObject = new Object3D<Object3DEventMap>();
-    // playerObject.add(nameObject);
-    // playerObject.add(chatBox);
+    playerObject.add(nameObject);
+    playerObject.add(chatBox);
     playerObject.position.set(
       player.position.x,
       player.position.y,
@@ -337,9 +346,21 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             }
           );
           myState.reloadMaterial$.subscribe((names: string[]) => {
-            updateMaterialModel(child, player.character, names, {
-              type: "enemy",
-              id: key,
+            myState.reloadMaterial$.subscribe((names: string[]) => {
+              const playerData = world
+                .with("player")
+                .entities.filter((entity) => entity.player.id === player.id);
+              if (playerData && playerData[0]) {
+                updateMaterialModel(
+                  child,
+                  playerData[0].player.character,
+                  names,
+                  {
+                    type: "enemy",
+                    id: key,
+                  }
+                );
+              }
             });
           });
         },
@@ -359,6 +380,8 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         nameObject,
         chatBox,
         isOnFloor: false,
+        character: player.character,
+        id: player.id,
       },
       animator: {
         items: [
@@ -396,8 +419,17 @@ function dispose(entity: GameEntity) {
 function createTextPlayer(player: any) {
   const nameObject = new Object3D();
   nameObject.position.set(0, Setting.getSetting().PLAYER_VIEW + 0.1, 0);
-  const name = assets.createNeonLightText(player.name.slice(0, 10));
-  nameObject.add(name);
+  const name = new TextGeometry(player.name.slice(0, 10), {
+    font: assets.getFont("agency"),
+    size: 0.02,
+    height: 0.005,
+    curveSegments: 1,
+    bevelThickness: 0,
+    bevelSize: 0,
+    bevelSegments: 0,
+  });
+  name.center();
+  nameObject.add(new Mesh(name, assets.getNeonTextMaterial()));
 
   const chatBox = new Object3D();
   chatBox.position.set(0, Setting.getSetting().PLAYER_VIEW + 0.2, 0);

@@ -109,6 +109,7 @@ function switchJump(player: PlayerWorldType) {
   switch (player.stateTop) {
     case PlayerState.Idle:
     case PlayerState.Dance:
+    case PlayerState.Move:
       tmpTop = PlayerState.Jump;
       break;
     default:
@@ -118,6 +119,7 @@ function switchJump(player: PlayerWorldType) {
   switch (player.stateBottom) {
     case PlayerState.Idle:
     case PlayerState.Dance:
+    case PlayerState.Move:
       tmpBottom = PlayerState.Jump;
       break;
     default:

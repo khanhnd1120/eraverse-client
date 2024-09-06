@@ -2,6 +2,7 @@ import { With } from "miniplex";
 import addPlayerState from "share/add-player-state";
 import { world } from "share/G";
 import { PlayerState } from "share/game-interface";
+import myState from "share/my-state";
 import removePlayerState from "share/remove-player-state";
 import { Entity } from "share/world";
 
@@ -41,5 +42,13 @@ function onEntityAdded(entity: PlayerEntity) {
     } else {
       entity.player = removePlayerState(PlayerState.Beaten, entity.player);
     }
+  });
+  entity.player.serverObject.listen("character", (character: any) => {
+    entity.player.character = character;
+    myState.reloadMaterial$.next(
+      Object.keys(myState.meshMaterial$.value[character]).map(
+        (key: any) => myState.meshMaterial$.value[character][key]
+      )
+    );
   });
 }

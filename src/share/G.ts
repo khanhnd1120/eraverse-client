@@ -34,6 +34,7 @@ import * as Colyseus from "colyseus.js";
 import Environment from "environment";
 import Stats from "three/addons/libs/stats.module.js";
 import myState from "./my-state";
+import TWEEN from '@tweenjs/tween.js'
 
 export const world = new World<Entity>();
 
@@ -109,6 +110,7 @@ function render() {
   composer.render();
   if (stats) {
     stats.update();
+    TWEEN.update();
   }
 }
 

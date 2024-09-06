@@ -15,7 +15,7 @@ export default function Game() {
     myState.showChat$.subscribe((v: boolean) => {
       setShowChat(v);
     });
-    myState.showDance$.subscribe((v: boolean) => {
+    myState.showActionWheel$.subscribe((v: boolean) => {
       setShowDance(v);
     });
     myState.loadingGame$.subscribe((v: boolean) => {

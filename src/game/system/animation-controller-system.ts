@@ -78,7 +78,11 @@ function animationDirectionMove(entity: PlayerEntity) {
         entity.animator.items[0].arrAnimation.length == 0 &&
         entity.animator.items[0].duration <= 0
       ) {
-        entity.animator.items[0].arrAnimation = ["die", "stand"];
+        entity.animator.items[0].arrAnimation = [
+          "die",
+          "stand",
+          "walking_backward",
+        ];
       }
       break;
   }
@@ -117,7 +121,11 @@ function animationDirectionMove(entity: PlayerEntity) {
         entity.animator.items[1].arrAnimation.length == 0 &&
         entity.animator.items[1].duration <= 0
       ) {
-        entity.animator.items[1].arrAnimation = ["die", "stand"];
+        entity.animator.items[1].arrAnimation = [
+          "die",
+          "stand",
+          "walking_backward",
+        ];
       }
       break;
   }

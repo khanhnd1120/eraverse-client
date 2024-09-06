@@ -96,9 +96,9 @@ export interface AnimatorItem {
   currentAnimation: string;
   nextAnimation: string;
   clips: AnimationClipItem[];
-  duration: number,
-  arrAnimation: string[],
-  currentClip: AnimationAction,
+  duration: number;
+  arrAnimation: string[];
+  currentClip: AnimationAction;
 }
 export interface AnimationClipItem {
   name: string;
@@ -119,6 +119,8 @@ export interface PlayerWorldType {
   timeoutHideMessage?: any;
   isOnFloor: boolean;
   isRun?: boolean;
+  id?: string;
+  character?: string;
 }
 export interface MeWorldType {
   onMouseMove: EventListener;

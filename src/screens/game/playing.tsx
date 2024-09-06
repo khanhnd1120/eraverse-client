@@ -6,7 +6,7 @@ export default function Playing() {
       onClick={() => {
         document.body.requestPointerLock();
         myState.showChat$.next(false);
-        myState.showDance$.next(false);
+        myState.showActionWheel$.next(false);
       }}
     >
       <div className="absolute w-screen h-screen top-0 left-0 opacity-0"></div>

@@ -19,7 +19,7 @@ export default function Dance() {
           event.movementX || event.mozMovementX || event.webkitMovementX || 0;
         const movementY =
           event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-        if (myState.showDance$.value) {
+        if (myState.showActionWheel$.value) {
           setIsMoving(true);
           setTimeout(() => {
             setIsMoving(false);
@@ -35,7 +35,7 @@ export default function Dance() {
 
     const handleClick = () => {
       myState.danceAnim$.next(activeMenu.anim);
-      myState.showDance$.next(false);
+      myState.showActionWheel$.next(false);
     };
     document.addEventListener("mouseup", handleClick);
     return () => {

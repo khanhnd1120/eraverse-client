@@ -16,6 +16,8 @@ import {
   AnimationMixer,
   LoopRepeat,
 } from "three";
+import { Easing, Tween } from "three/examples/jsm/libs/tween.module.js";
+import TWEEN from "@tweenjs/tween.js";
 const TRANSITION = 0.3;
 let animatorEntities = world.with("animator", "model", "gameObject", "player");
 type AnimatorEntity = With<
@@ -62,7 +64,6 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
           let playClip = animatorItem.clips.find(
             (clipItem: AnimationClipItem) => clipItem.name === nextAnim
           );
-
           if (playClip) {
             let fadeoutClip = animatorItem.clips.find(
               (clipItem: AnimationClipItem) =>
@@ -71,7 +72,7 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
 
             let transitionFadeIn = TRANSITION;
             let transitionFadeOut = TRANSITION;
-            if (nextAnim === "fall_to_landing") {
+            if (["fall_to_landing", "stand"].includes(nextAnim)) {
               transitionFadeIn = 0;
               transitionFadeOut = 0;
             }
@@ -80,7 +81,53 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
             }
             animatorItem.duration = playClip.clip.getClip().duration;
             animatorItem.currentClip = playClip.clip;
-            playClip.clip.reset().fadeIn(transitionFadeIn).play();
+            playClip.clip.reset().play();
+            if (nextAnim == "stand") {
+              e.model.object.position.set(0, 0, 0.35);
+            }
+            if (nextAnim == "die") {
+              e.model.object.traverse((child: any) => {
+                if (child.isMesh && child.material) {
+                  if (!child.userData.tweenOpacity) {
+                    child.material.transparent = true;
+                    child.material.needsUpdate = true;
+                    child.userData.oldMaterial = child.material;
+                    child.material = child.material.clone();
+                    child.userData.tweenOpacity = new TWEEN.Tween(
+                      child.material
+                    )
+                      .to(
+                        { opacity: 0 },
+                        playClip.clip.getClip().duration * 1000
+                      )
+                      .easing(Easing.Quadratic.Out)
+                      .onComplete(() => {
+                        new TWEEN.Tween(child.material)
+                          .to({ opacity: 1 }, 1000)
+                          .easing(Easing.Quadratic.Out)
+                          .start()
+                          .onComplete(() => {
+                            child.material = child.userData.oldMaterial;
+                            child.userData.tweenOpacity = null;
+                          });
+                      })
+                      .start();
+                  }
+                }
+              });
+            }
+            if (
+              nextAnim == "walking_backward" &&
+              animatorItem.currentAnimation == "stand"
+            ) {
+              new TWEEN.Tween(e.model.object.position)
+                .to(
+                  { x: 0, y: 0, z: 0 },
+                  playClip.clip.getClip().duration * 1000
+                )
+                .easing(Easing.Quadratic.Out)
+                .start();
+            }
             animatorItem.currentAnimation = nextAnim;
           }
         } else {

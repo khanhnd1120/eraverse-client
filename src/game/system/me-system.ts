@@ -24,6 +24,9 @@ export function meSystem(delta: number) {
 }
 
 function updateMe(entity: MeEntity, delta: number) {
+  if (myState.loadingGame$.value) {
+    return;
+  }
   G.mePlayer = entity;
   if (!entity.model.object) {
     return;
@@ -140,7 +143,7 @@ function controls(entity: MeEntity, delta: number) {
   } else {
     entity.player.isRun = false;
   }
-  if(oldRun !== entity.player.isRun) {
+  if (oldRun !== entity.player.isRun) {
     myState.isRun$.next(entity.player.isRun);
   }
   let vel = entity.me.velocity.clone();
@@ -214,17 +217,18 @@ function controls(entity: MeEntity, delta: number) {
     entity.player = addPlayerState(PlayerState.Falling, entity.player);
   }
   // check jump
-  if (checkJump && !checkMove) {
+  if (checkJump) {
     entity.player = addPlayerState(PlayerState.Jump, entity.player);
-  }
-  // check move
-  if (checkMove) {
-    entity.player = addPlayerState(PlayerState.Move, entity.player);
   } else {
-    // case not move
-    vel.x = MathUtils.lerp(vel.x, 0, 0.1);
-    vel.z = MathUtils.lerp(vel.z, 0, 0.1);
-    entity.player = removePlayerState(PlayerState.Move, entity.player);
+    // check move
+    if (checkMove) {
+      entity.player = addPlayerState(PlayerState.Move, entity.player);
+    } else {
+      // case not move
+      vel.x = MathUtils.lerp(vel.x, 0, 0.1);
+      vel.z = MathUtils.lerp(vel.z, 0, 0.1);
+      entity.player = removePlayerState(PlayerState.Move, entity.player);
+    }
   }
   entity.me.velocity.copy(vel);
 }
@@ -287,7 +291,7 @@ async function onEntityAdded(entity: MeEntity) {
     }
     switch (event.code) {
       case "KeyG":
-        myState.showDance$.next(!myState.showDance$.value);
+        myState.showActionWheel$.next(!myState.showActionWheel$.value);
         break;
       case "KeyC":
         break;
@@ -351,7 +355,7 @@ async function onEntityAdded(entity: MeEntity) {
       myState.pause$.next(false);
     }
   };
-  myState.showDance$.subscribe((val) => {
+  myState.showActionWheel$.subscribe((val) => {
     if (val) {
       unbindInputEvent(entity);
       entity.player = addPlayerState(PlayerState.Dance, entity.player);
@@ -370,6 +374,14 @@ async function onEntityAdded(entity: MeEntity) {
     } else {
       entity.player = removePlayerState(PlayerState.Beaten, entity.player);
     }
+  });
+  entity.player.serverObject.listen("character", (character: any) => {
+    entity.player.character = character;
+    myState.reloadMaterial$.next(
+      Object.keys(myState.meshMaterial$.value[character]).map(
+        (key: any) => myState.meshMaterial$.value[character][key]
+      )
+    );
   });
   bindInputEvent(entity);
   document.body.requestPointerLock();

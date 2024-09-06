@@ -12,7 +12,7 @@ const cameraRotation$ = new BehaviorSubject<Euler | null>(null);
 const pause$ = new BehaviorSubject<boolean>(false);
 const showChat$ = new BehaviorSubject<boolean>(false);
 const chatMessages$ = new BehaviorSubject<any>([]);
-const showDance$ = new BehaviorSubject<boolean>(false);
+const showActionWheel$ = new BehaviorSubject<boolean>(false);
 const loadingTexture$ = new BehaviorSubject<boolean>(false);
 const danceAnim$ = new BehaviorSubject<string>("");
 const loadingGame$ = new BehaviorSubject<boolean>(true);
@@ -28,7 +28,7 @@ const myState = {
   pause$,
   showChat$,
   chatMessages$,
-  showDance$,
+  showActionWheel$,
   loadingTexture$,
   danceAnim$,
   loadingGame$,

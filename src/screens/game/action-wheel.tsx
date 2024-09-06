@@ -1,7 +1,10 @@
 import _ from "lodash";
 import { useEffect, useState } from "react";
+import G from "share/G";
 import Constants from "share/game-constant";
 import myState from "share/my-state";
+
+const MAX_ITEM = 6;
 
 export default function ActionWheel() {
   const [positionMouse, setPositionMouse] = useState({ x: 0, y: 0 });
@@ -11,20 +14,91 @@ export default function ActionWheel() {
 
   const switchMenu = (menu: any) => {
     setActiveAction(menu);
-    setActiveMenu(-1);
     setPositionMouse({ x: 0, y: 0 });
+    setActiveMenu(0);
   };
 
-  const DanceAction = Constants.DanceAnim.map((anim: any) => {
-    return {
-      text: anim.name,
-      action: () => {
-        console.log(activeAction)
-        myState.danceAnim$.next(Constants.DanceAnim[activeMenu].anim);
-        myState.showDance$.next(false);
-      },
+  const paginateMenu = (
+    arr: any,
+    backFirst: any,
+    action: any,
+    ind: number = 0
+  ) => {
+    const firstBactItem = {
+      text: "Back",
+      action: backFirst,
     };
-  });
+    let arrMenu: any = [];
+    if (arr.length > MAX_ITEM - 2) {
+      arrMenu = [...arr].slice(
+        ind * (MAX_ITEM - 2),
+        (ind + 1) * (MAX_ITEM - 2)
+      );
+      let menu = arrMenu.map((item: any) => {
+        return {
+          text: item.name,
+          action: (activeMenu: any) => {
+            action(arrMenu, activeMenu);
+          },
+        };
+      });
+      if (ind == 0) {
+        menu.push(firstBactItem);
+      } else {
+        menu.push({
+          text: "Back",
+          action: () => {
+            switchMenu(paginateMenu(arr, backFirst, action, ind - 1));
+          },
+        });
+      }
+      if (ind + 1 < arr.length / (MAX_ITEM - 2)) {
+        menu.unshift({
+          text: "More",
+          action: () => {
+            switchMenu(paginateMenu(arr, backFirst, action, ind + 1));
+          },
+        });
+      }
+      return menu;
+    }
+    let menu = [...arr].map((item: any) => {
+      return {
+        text: item.name,
+        action: (activeMenu: any) => {
+          action(arr, activeMenu);
+        },
+      };
+    });
+    menu.push(firstBactItem);
+    return menu;
+  };
+
+  const DanceAction = paginateMenu(
+    Constants.DanceAnim,
+    () => {
+      switchMenu(MainAction);
+    },
+    (menu: any, activeMenu: any) => {
+      myState.danceAnim$.next(menu[activeMenu - 1].anim);
+      myState.showActionWheel$.next(false);
+    }
+  );
+
+  const SkinAction = paginateMenu(
+    Constants.CharacterCodes.map((item: string) => {
+      return { name: item };
+    }),
+    () => {
+      switchMenu(MainAction);
+    },
+    (menu: any, activeMenu: any) => {
+      G.getCurrentRoom().send("character", {
+        character: menu[activeMenu - 1].name,
+      });
+      myState.showActionWheel$.next(false);
+    }
+  );
 
   const MainAction = [
     {
@@ -41,7 +115,9 @@ export default function ActionWheel() {
     },
     {
       text: "Skin",
-      action: () => {},
+      action: () => {
+        switchMenu(SkinAction);
+      },
     },
   ];
   useEffect(() => {
@@ -57,7 +133,7 @@ export default function ActionWheel() {
           event.movementX || event.mozMovementX || event.webkitMovementX || 0;
         const movementY =
           event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-        if (myState.showDance$.value) {
+        if (myState.showActionWheel$.value) {
           setIsMoving(true);
           setTimeout(() => {
             setIsMoving(false);
@@ -72,16 +148,14 @@ export default function ActionWheel() {
     document.addEventListener("mousemove", handleInput);
 
     const handleClick = () => {
-      //   myState.danceAnim$.next(activeMenu.anim);
-      //   myState.showDance$.next(false);
-      activeAction[activeMenu].action();
+      activeAction[activeMenu].action(activeMenu);
     };
     document.addEventListener("mouseup", handleClick);
     return () => {
       document.removeEventListener("mousemove", handleInput);
       document.removeEventListener("mouseup", handleClick);
     };
-  }, [positionMouse, moving]);
+  }, [positionMouse, moving, activeAction]);
 
   useEffect(() => {
     let angleRadians = Math.atan2(positionMouse.y, positionMouse.x);
