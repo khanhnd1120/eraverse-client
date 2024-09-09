@@ -1,6 +1,6 @@
 import { With } from "miniplex";
 import { world } from "share/G";
-import { PlayerState } from "share/game-interface";
+import { AnimatorItem, PlayerState } from "share/game-interface";
 import myState from "share/my-state";
 import { Entity } from "share/world";
 
@@ -34,37 +34,48 @@ const WalkAnimationDirection = [
   ["walking_horizontal", "walking_horizontal"],
 ];
 
+function canSetArrAnimation(item: AnimatorItem) {
+  return (
+    !item?.currentArrAnimationItem ||
+    item?.currentArrAnimationItem?.canSwitchAnim
+  );
+}
+
 function animationDirectionMove(entity: PlayerEntity) {
   const player = entity.player;
 
-  entity.animator.items[1].nextAnimation = "idle";
-  entity.animator.items[0].nextAnimation = "idle";
   let animMoveDirection = WalkAnimationDirection;
   if (player.isRun) {
     animMoveDirection = RunAnimationDirection;
   }
   switch (player.stateTop) {
     case PlayerState.Move:
-      entity.animator.items[0].nextAnimation =
-        animMoveDirection[player.direction][0];
+      if (canSetArrAnimation(entity.animator.items[0])) {
+        console.log("dfbjh", entity.animator.items[0].duration);
+        entity.animator.items[0].arrAnimation = [
+          { anim: "walking_forward", canSwitchAnim: false, loop: false },
+          {
+            anim: animMoveDirection[player.direction][0],
+            canSwitchAnim: true,
+            loop: true,
+          },
+        ];
+        entity.animator.items[0].duration = 0;
+      }
       break;
     case PlayerState.Attack:
-      if (
-        entity.animator.items[0].arrAnimation.length == 0 &&
-        entity.animator.items[0].duration <= 0
-      ) {
-        entity.animator.items[0].arrAnimation = ["punch"];
+      if (canSetArrAnimation(entity.animator.items[0])) {
+        entity.animator.items[0].arrAnimation = [
+          { anim: "punch", canSwitchAnim: false, loop: false },
+        ];
       }
       break;
     case PlayerState.Jump:
     case PlayerState.Falling:
-      if (
-        entity.animator.items[0].arrAnimation.length == 0 &&
-        entity.animator.items[0].duration <= 0
-      ) {
+      if (canSetArrAnimation(entity.animator.items[0])) {
         entity.animator.items[0].arrAnimation = [
-          "fall_idle",
-          "fall_to_landing",
+          { anim: "fall_idle", canSwitchAnim: false, loop: false },
+          { anim: "fall_to_landing", canSwitchAnim: false, loop: false },
         ];
       }
       break;
@@ -74,29 +85,57 @@ function animationDirectionMove(entity: PlayerEntity) {
       }
       break;
     case PlayerState.Beaten:
+      if (canSetArrAnimation(entity.animator.items[0])) {
+        entity.animator.items[0].arrAnimation = [
+          { anim: "fall_to_landing", canSwitchAnim: false, loop: false },
+          { anim: "stand", canSwitchAnim: false, loop: false },
+          { anim: "walking_backward", canSwitchAnim: false, loop: false },
+        ];
+      }
+      break;
+    case PlayerState.Idle:
       if (
-        entity.animator.items[0].arrAnimation.length == 0 &&
-        entity.animator.items[0].duration <= 0
+        canSetArrAnimation(entity.animator.items[0]) &&
+        !(
+          entity.animator.items[0].currentArrAnimationItem &&
+          entity.animator.items[0].currentArrAnimationItem.anim === "idle"
+        )
       ) {
         entity.animator.items[0].arrAnimation = [
-          "die",
-          "stand",
-          "walking_backward",
+          {
+            anim: "idle",
+            canSwitchAnim: true,
+            loop: true,
+          },
         ];
       }
       break;
   }
   switch (player.stateBottom) {
     case PlayerState.Move:
-      entity.animator.items[1].nextAnimation =
-        animMoveDirection[player.direction][1];
+      if (
+        entity.animator.items[1].arrAnimation.length == 0 &&
+        entity.animator.items[1].duration <= 0
+      ) {
+        entity.animator.items[1].arrAnimation = [
+          { anim: "walking_forward", canSwitchAnim: false, loop: false },
+          {
+            anim: animMoveDirection[player.direction][1],
+            canSwitchAnim: true,
+            loop: true,
+          },
+        ];
+        entity.animator.items[1].duration = 0;
+      }
       break;
     case PlayerState.Attack:
       if (
         entity.animator.items[1].arrAnimation.length == 0 &&
         entity.animator.items[1].duration <= 0
       ) {
-        entity.animator.items[1].arrAnimation = ["punch"];
+        entity.animator.items[1].arrAnimation = [
+          { anim: "punch", canSwitchAnim: false, loop: false },
+        ];
       }
       break;
     case PlayerState.Jump:
@@ -106,8 +145,8 @@ function animationDirectionMove(entity: PlayerEntity) {
         entity.animator.items[1].duration <= 0
       ) {
         entity.animator.items[1].arrAnimation = [
-          "fall_idle",
-          "fall_to_landing",
+          { anim: "fall_idle", canSwitchAnim: false, loop: false },
+          { anim: "fall_to_landing", canSwitchAnim: false, loop: false },
         ];
       }
       break;
@@ -122,12 +161,54 @@ function animationDirectionMove(entity: PlayerEntity) {
         entity.animator.items[1].duration <= 0
       ) {
         entity.animator.items[1].arrAnimation = [
-          "die",
-          "stand",
-          "walking_backward",
+          { anim: "fall_to_landing", canSwitchAnim: false, loop: false },
+          { anim: "stand", canSwitchAnim: false, loop: false },
+          { anim: "walking_backward", canSwitchAnim: false, loop: false },
         ];
       }
       break;
+    case PlayerState.Idle:
+      if (
+        entity.animator.items[1].arrAnimation.length == 0 &&
+        entity.animator.items[1].duration <= 0 &&
+        !(
+          entity.animator.items[1].currentArrAnimationItem &&
+          entity.animator.items[1].currentArrAnimationItem.anim === "idle"
+        )
+      ) {
+        entity.animator.items[1].arrAnimation = [
+          {
+            anim: "idle",
+            canSwitchAnim: true,
+            loop: true,
+          },
+        ];
+      }
+      break;
+  }
+  if (
+    !entity.animator.items[1].currentArrAnimationItem &&
+    entity.animator.items[1].arrAnimation.length === 0
+  ) {
+    entity.animator.items[1].arrAnimation = [
+      {
+        anim: "idle",
+        canSwitchAnim: true,
+        loop: true,
+      },
+    ];
+  }
+  if (
+    !entity.animator.items[0].currentArrAnimationItem &&
+    entity.animator.items[0].arrAnimation.length === 0
+  ) {
+    entity.animator.items[0].arrAnimation = [
+      {
+        anim: "idle",
+        canSwitchAnim: true,
+        loop: true,
+      },
+    ];
   }
 }
 

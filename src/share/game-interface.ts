@@ -98,7 +98,16 @@ export interface AnimatorItem {
   clips: AnimationClipItem[];
   duration: number;
   hold?: number;
-  arrAnimation: string[];
+  arrAnimation: {
+    anim: string;
+    loop: boolean;
+    canSwitchAnim: boolean;
+  }[];
+  currentArrAnimationItem: {
+    anim: string;
+    loop: boolean;
+    canSwitchAnim: boolean;
+  };
   currentClip: AnimationAction;
 }
 export interface AnimationClipItem {

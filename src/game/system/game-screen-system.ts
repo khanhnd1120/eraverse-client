@@ -303,6 +303,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             duration: 0,
             arrAnimation: [],
             currentClip: null,
+            currentArrAnimationItem: null,
           },
           {
             model: Constants.CharacterData[player.character].anim_bottom,
@@ -312,6 +313,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             duration: 0,
             arrAnimation: [],
             currentClip: null,
+            currentArrAnimationItem: null,
           },
         ],
         ready$: new BehaviorSubject<boolean>(false),
@@ -393,6 +395,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             duration: 0,
             arrAnimation: [],
             currentClip: null,
+            currentArrAnimationItem: null,
           },
           {
             model: Constants.CharacterData[player.character].anim_bottom,
@@ -402,6 +405,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             duration: 0,
             arrAnimation: [],
             currentClip: null,
+            currentArrAnimationItem: null,
           },
         ],
         ready$: new BehaviorSubject<boolean>(false),
