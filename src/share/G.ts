@@ -18,6 +18,7 @@ import {
   PlaneGeometry,
   MeshStandardMaterial,
   Mesh,
+  AxesHelper,
 } from "three";
 import {
   EffectComposer,
@@ -34,7 +35,7 @@ import * as Colyseus from "colyseus.js";
 import Environment from "environment";
 import Stats from "three/addons/libs/stats.module.js";
 import myState from "./my-state";
-import TWEEN from '@tweenjs/tween.js'
+import TWEEN from "@tweenjs/tween.js";
 
 export const world = new World<Entity>();
 
@@ -75,6 +76,9 @@ function setupEnvironment() {
   // setup group
   scene.add(particleGroup);
   scene.add(physicalGroup);
+
+  const axesHelper = new AxesHelper(100);
+  scene.add(axesHelper);
 
   // setup renderer
   renderer.setPixelRatio(window.devicePixelRatio);
@@ -141,6 +145,7 @@ function openGameScreen(
     gameScreen: {
       map: "map",
       keyEntities: {},
+      airdropEntities: {},
       points: {},
       roomName,
       server,

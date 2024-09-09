@@ -14,9 +14,7 @@ import {
   Mesh,
   MeshPhysicalMaterial,
   MeshStandardMaterial,
-  RepeatWrapping,
   ShaderMaterial,
-  Texture,
   Vector2,
 } from "three";
 import {
@@ -33,7 +31,6 @@ import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.j
 import { MaterialConfigData, TextureConfigData } from "./game-interface";
 import _ from "lodash";
 import createMaterialShader from "./create-material-shader";
-import { loadTexture } from "game/help/loader";
 
 const MODELS: { [key: string]: { url: string; gltf?: GLTF } } = {
   map: { url: "map/map.glb" },
@@ -52,6 +49,9 @@ const MODELS: { [key: string]: { url: string; gltf?: GLTF } } = {
   model_male_premium: {
     url: "character/eragon/model_male_premium.glb",
   },
+  airdrop: {
+    url: "character/eragon/airdrop.glb",
+  }
 };
 const SOUNDS: { [key: string]: { url: string; buffer?: any } } = {};
 
@@ -113,6 +113,7 @@ function getSound(name: string): AudioBuffer {
   return buf;
 }
 function getModel(name: string) {
+  console.log(name)
   return MODELS[name].gltf;
 }
 function getTextures(): TextureConfigData {

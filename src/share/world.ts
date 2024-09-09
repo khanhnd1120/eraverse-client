@@ -10,12 +10,13 @@ import {
   Vector3,
 } from "three";
 import {
+  AirdropStatus,
   AnimatorItem,
   MeWorldType,
   PlayerWorldType,
+  RewardType,
   ServerConfigItem,
 } from "./game-interface";
-import { Capsule } from "three/examples/jsm/Addons.js";
 
 export type Entity = {
   model?: {
@@ -46,9 +47,18 @@ export type Entity = {
     map: string;
     room?: Colyseus.Room;
     keyEntities: { [key: string]: any };
+    airdropEntities: { [key: string]: any };
     points: any;
     roomName: string;
     server: ServerConfigItem;
     character: string;
+  };
+  airdrop?: {
+    position?: Vector3;
+    serverObject: any;
+    status: AirdropStatus;
+    amount: number;
+    rewardType: RewardType;
+    rewardId: number;
   };
 };

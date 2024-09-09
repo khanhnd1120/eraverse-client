@@ -13,6 +13,8 @@ const _PI_2 = Math.PI / 2;
 const STEPS_PER_FRAME = 5;
 
 let meEntities = world.with("me", "player");
+let airdropEntities = world.with("airdrop");
+type AirdropEntity = With<Entity, "airdrop">;
 type MeEntity = With<Entity, "me" | "player">;
 meEntities.onEntityAdded.subscribe(onEntityAdded);
 meEntities.onEntityRemoved.subscribe(onEntityRemoved);
@@ -234,13 +236,85 @@ function controls(entity: MeEntity, delta: number) {
 }
 
 async function onEntityAdded(entity: MeEntity) {
-  // entity.gameObject.add(G.camera);
-  let pos = new Vector3(
-    entity.player.serverObject.position.x,
-    entity.player.serverObject.position.y,
-    entity.player.serverObject.position.z
-  );
-  entity.gameObject.position.copy(pos);
+  setInputEvent(entity);
+  processServerEvent(entity);
+  processClientEvent(entity);
+  bindInputEvent(entity);
+  cronjob(entity);
+  document.body.requestPointerLock();
+}
+function processServerEvent(entity: MeEntity) {
+  entity.player.serverObject.listen("isBeaten", (isBeaten: any) => {
+    if (isBeaten) {
+      entity.player = addPlayerState(PlayerState.Beaten, entity.player);
+    } else {
+      entity.player = removePlayerState(PlayerState.Beaten, entity.player);
+    }
+  });
+  entity.player.serverObject.listen("character", (character: any) => {
+    entity.player.character = character;
+    myState.reloadMaterial$.next(
+      Object.keys(myState.meshMaterial$.value[character]).map(
+        (key: any) => myState.meshMaterial$.value[character][key]
+      )
+    );
+  });
+}
+function processClientEvent(entity: MeEntity) {
+  myState.showActionWheel$.subscribe((val) => {
+    if (val) {
+      unbindInputEvent(entity);
+      entity.player = addPlayerState(PlayerState.Dance, entity.player);
+    } else {
+      bindInputEvent(entity);
+    }
+  });
+  myState.danceAnim$.subscribe((val) => {
+    entity.player.danceAnim = val;
+    G.getCurrentRoom().send("danceAnim", { danceAnim: val });
+  });
+}
+function cronjob(entity: MeEntity) {
+  if (!entity.me.intervalCheckAirdrop) {
+    entity.me.intervalCheckAirdrop = setInterval(() => {
+      let nearestAirdrop: AirdropEntity = null;
+      let minDistantAirdrop = 10000;
+      for (const airdropData of airdropEntities) {
+        let distance = Math.max(
+          Math.abs(
+            airdropData.airdrop.position.x - entity.gameObject.position.x
+          ),
+          Math.abs(
+            airdropData.airdrop.position.z - entity.gameObject.position.z
+          )
+        );
+        if (distance < minDistantAirdrop && distance < 0.5) {
+          minDistantAirdrop = distance;
+          nearestAirdrop = airdropData;
+        }
+      }
+      // check remove old airdop
+      let isRemoveOldAir = false;
+      let isNewAir = false;
+      if (nearestAirdrop) {
+        if (nearestAirdrop.airdrop.rewardId !== entity.me.airdrop.rewardId) {
+          isRemoveOldAir = true;
+          isNewAir = true;
+        }
+      } else {
+        isRemoveOldAir = true;
+      }
+
+      if (isRemoveOldAir) {
+        // remove tag open airdrop
+      }
+      if (isNewAir) {
+        // add new tag open air
+      }
+    }, 1000);
+  }
+}
+function setInputEvent(entity: MeEntity) {
   entity.me.onMouseMove = (event: any) => {
     if (document.pointerLockElement === document.body) {
       const movementX =
@@ -355,38 +429,7 @@ async function onEntityAdded(entity: MeEntity) {
       myState.pause$.next(false);
     }
   };
-  myState.showActionWheel$.subscribe((val) => {
-    if (val) {
-      unbindInputEvent(entity);
-      entity.player = addPlayerState(PlayerState.Dance, entity.player);
-    } else {
-      bindInputEvent(entity);
-    }
-  });
-  myState.danceAnim$.subscribe((val) => {
-    entity.player.danceAnim = val;
-    G.getCurrentRoom().send("danceAnim", { danceAnim: val });
-  });
-
-  entity.player.serverObject.listen("isBeaten", (isBeaten: any) => {
-    if (isBeaten) {
-      entity.player = addPlayerState(PlayerState.Beaten, entity.player);
-    } else {
-      entity.player = removePlayerState(PlayerState.Beaten, entity.player);
-    }
-  });
-  entity.player.serverObject.listen("character", (character: any) => {
-    entity.player.character = character;
-    myState.reloadMaterial$.next(
-      Object.keys(myState.meshMaterial$.value[character]).map(
-        (key: any) => myState.meshMaterial$.value[character][key]
-      )
-    );
-  });
-  bindInputEvent(entity);
-  document.body.requestPointerLock();
 }
-
 function getSideVector(entity: MeEntity) {
   G.camera.getWorldDirection(entity.me.direction);
   entity.me.direction.y = 0;
@@ -394,14 +437,12 @@ function getSideVector(entity: MeEntity) {
   entity.me.direction.cross(G.camera.up);
   return entity.me.direction;
 }
-
 function getForwardVector(entity: MeEntity) {
   G.camera.getWorldDirection(entity.me.direction);
   entity.me.direction.y = 0;
   entity.me.direction.normalize();
   return entity.me.direction;
 }
-
 function bindInputEvent(entity: MeEntity) {
   document.addEventListener("mousemove", entity.me.onMouseMove);
   document.addEventListener("keydown", entity.me.onKeyDown);

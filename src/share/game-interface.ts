@@ -100,13 +100,13 @@ export interface AnimatorItem {
   hold?: number;
   arrAnimation: {
     anim: string;
-    loop: boolean;
-    canSwitchAnim: boolean;
+    canSwitchAnimInstantly: boolean;
+    duration?: number;
   }[];
   currentArrAnimationItem: {
     anim: string;
-    loop: boolean;
-    canSwitchAnim: boolean;
+    canSwitchAnimInstantly: boolean;
+    duration?: number;
   };
   currentClip: AnimationAction;
 }
@@ -154,6 +154,7 @@ export interface MeWorldType {
   viewPoint: Object3D;
   aimPoint: Object3D;
   defaultFollowCam: Object3D;
+  intervalCheckAirdrop?: any
 }
 
 export enum AdsType {
@@ -179,3 +180,14 @@ export type AdsConfig = {
 export type AdsBoard = {
   [key: string]: AdsConfig[];
 };
+
+export enum RewardType {
+  APT,
+  EGON,
+}
+
+export enum AirdropStatus {
+  Drop,
+  Ready,
+  Claimed,
+}

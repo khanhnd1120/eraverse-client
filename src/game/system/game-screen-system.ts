@@ -101,6 +101,12 @@ async function init(entity: GameEntity) {
   room.state.players.onRemove((player: any, key: any) => {
     world.remove(entity.gameScreen.keyEntities[key]);
   });
+  room.state.airdrops.onAdd((airdrop: any, key: any) => {
+    onAirdropAdded(entity, airdrop, key);
+  });
+  room.state.airdrops.onRemove((airdrop: any, key: any) => {
+    world.remove(entity.gameScreen.airdropEntities[key]);
+  });
   setTimeout(() => {
     myState.loadingGame$.next(false);
   }, 5000);
@@ -413,6 +419,36 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
     });
     entity.gameScreen.keyEntities[key] = playerE;
   }
+}
+
+function onAirdropAdded(entity: GameEntity, airdrop: any, key: string) {
+  let airdropObject = new Object3D<Object3DEventMap>();
+  airdropObject.position.set(
+    airdrop.position.x,
+    airdrop.position.y,
+    airdrop.position.z
+  );
+  G.physicalGroup.add(airdropObject);
+  let e = world.add({
+    gameObject: airdropObject,
+    position: airdropObject.position.clone(),
+    airdrop: {
+      serverObject: airdrop,
+      status: airdrop.status,
+      amount: airdrop.amount,
+      rewardType: airdrop.rewardType,
+      rewardId: airdrop.rewardId,
+      position: airdropObject.position.clone(),
+    },
+    model: {
+      name: "airdrop",
+      scale: new Vector3(0.01, 0.01, 0.01),
+      position: new Vector3(0, 0, 0),
+      parent: airdropObject,
+      modelReady$: new BehaviorSubject<boolean>(false),
+    },
+  });
+  entity.gameScreen.airdropEntities[key] = e;
 }
 
 function dispose(entity: GameEntity) {

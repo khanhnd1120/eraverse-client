@@ -8,6 +8,7 @@ import weaponSystem from "game/system/weapon-system";
 import { playerSystem } from "game/system/player-system";
 import { positionSystem } from "game/system/position-system";
 import { chatSystem } from "game/system/chat-system";
+import { airdropSystem } from "game/system/airdrop-system";
 
 initComponent();
 export function executeSystems(delta: number) {
@@ -19,5 +20,6 @@ export function executeSystems(delta: number) {
   positionSystem(delta);
   gameScreenSystem(delta);
   chatSystem(delta);
+  airdropSystem(delta);
   G.render();
 }

@@ -49,12 +49,17 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
         animatorItem.currentClip.getClip().duration -
         animatorItem.currentClip.time;
     }
+    let durationCheck = 0.3;
     if (animatorItem.currentArrAnimationItem) {
+      if (animatorItem.currentArrAnimationItem.duration) {
+        durationCheck = animatorItem.currentArrAnimationItem.duration;
+      }
       if (
-        !animatorItem.currentArrAnimationItem.canSwitchAnim &&
-        animatorItem.duration < 0.3 &&
+        !animatorItem.currentArrAnimationItem.canSwitchAnimInstantly &&
+        animatorItem.duration < durationCheck &&
         !animatorItem.arrAnimation.length
       ) {
+        // case play without loop last animation
         animatorItem.duration = 0;
         animatorItem.currentClip = null;
         animatorItem.currentArrAnimationItem = null;
@@ -79,8 +84,8 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
         animatorItem.duration = 0;
       }
       if (
-        animatorItem.duration < 0.3 ||
-        animatorItem.currentArrAnimationItem.canSwitchAnim
+        animatorItem.duration < durationCheck ||
+        animatorItem.currentArrAnimationItem.canSwitchAnimInstantly
       ) {
         if (animatorItem.arrAnimation.length > 0) {
           // array action not finish
@@ -93,7 +98,6 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
               (clipItem: AnimationClipItem) =>
                 clipItem.name === animatorItem.currentAnimation
             );
-
             if (nextAnim.anim == "stand") {
               e.model.object.position.set(0, 0, 0.35);
             }
@@ -149,7 +153,7 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
             if (fadeoutClip) {
               fadeoutClip.clip.fadeOut(transitionFadeOut);
             }
-            if (!nextAnim.canSwitchAnim) {
+            if (!nextAnim.canSwitchAnimInstantly) {
               animatorItem.duration = playClip.clip.getClip().duration;
               animatorItem.currentClip = playClip.clip;
             } else {
@@ -159,27 +163,8 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
             animatorItem.nextAnimation = nextAnim.anim;
             animatorItem.currentArrAnimationItem = nextAnim;
             animatorItem.currentAnimation = nextAnim.anim;
-            console.log("play anim", nextAnim.anim, animatorItem.nextAnimation);
             playClip.clip.reset().fadeIn(transitionFadeIn).play();
           }
-        } else {
-          if (
-            animatorItem.currentArrAnimationItem &&
-            !animatorItem.currentArrAnimationItem.loop
-          ) {
-            console.log("remove item");
-            animatorItem.currentArrAnimationItem = null;
-            let state = [e.player.stateTop, e.player.stateBottom][index];
-            e.player = removePlayerState(
-              state,
-              e.player,
-              [true, false][index],
-              [false, true][index]
-            );
-          }
-          console.log("hehe", animatorItem.arrAnimation.length);
-          animatorItem.duration = 0;
-          animatorItem.currentClip = null;
         }
       }
     }
@@ -189,11 +174,6 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
     // if (animatorItem.arrAnimation.length || animatorItem.duration > 0.3) {
     //   return;
     // }
-    // console.log(
-    //   "dmmmmm",
-    //   animatorItem.nextAnimation,
-    //   animatorItem.currentAnimation
-    // );
     // animatorItem.currentArrAnimationItem = null;
     // let transitionFadeIn = TRANSITION;
     // let transitionFadeOut = TRANSITION;
