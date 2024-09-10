@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Chat from "./chat";
 import Playing from "./playing";
 import myState from "share/my-state";
-import Dance from "./dance";
 import LoadingGame from "./loading-game";
 import ActionWheel from "./action-wheel";
 

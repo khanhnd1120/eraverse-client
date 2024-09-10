@@ -51,7 +51,7 @@ function animationDirectionMove(entity: PlayerEntity) {
     midleMove = "run_forward";
   }
   entity.animator.items.map((item, index) => {
-    switch (player.stateTop) {
+    switch ([player.stateTop, player.stateBottom][index]) {
       case PlayerState.Move:
         if (
           canSetArrAnimation(item) &&

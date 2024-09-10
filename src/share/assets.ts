@@ -113,7 +113,6 @@ function getSound(name: string): AudioBuffer {
   return buf;
 }
 function getModel(name: string) {
-  console.log(name)
   return MODELS[name].gltf;
 }
 function getTextures(): TextureConfigData {

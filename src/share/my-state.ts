@@ -18,6 +18,7 @@ const danceAnim$ = new BehaviorSubject<string>("");
 const loadingGame$ = new BehaviorSubject<boolean>(true);
 const loadVideoMaterial$ = new BehaviorSubject<string[]>([]);
 const isRun$ = new BehaviorSubject<boolean>(false);
+const keyStates$ = new BehaviorSubject<{ [key: string]: boolean }>({});
 
 const myState = {
   reloadMaterial$,
@@ -34,5 +35,6 @@ const myState = {
   loadingGame$,
   loadVideoMaterial$,
   isRun$,
+  keyStates$,
 };
 export default myState;

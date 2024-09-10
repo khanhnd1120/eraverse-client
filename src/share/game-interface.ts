@@ -156,6 +156,7 @@ export interface MeWorldType {
   defaultFollowCam: Object3D;
   intervalCheckAirdrop?: any;
   airdrop?: any;
+  tutorial?: { [key: string]: Object3D };
 }
 
 export enum AdsType {

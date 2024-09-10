@@ -1,6 +1,5 @@
 import Character from "ui/component/character";
 import AvatarPanel from "./avatar-panel";
-import BattleButton from "ui/component/battle-button";
 import { Link, useNavigate } from "react-router-dom";
 import { useGlobalContext } from "ui/context";
 import Constants from "share/game-constant";
@@ -9,6 +8,8 @@ import { useState } from "react";
 import Setting from "share/setting";
 import { ConfigKey } from "share/game-interface";
 import G from "share/G";
+import ClaimAirdropPanel from "screens/game/claim-airdrop";
+import CustomButton from "ui/component/custom-button";
 
 export default function Menu() {
   const { userInfo } = useGlobalContext();
@@ -32,7 +33,7 @@ export default function Menu() {
         />
       </div>
       <div className="absolute bottom-0 right-0 p-[50px]">
-        <BattleButton
+        <CustomButton
           onClick={() => {
             G.openGameScreen(
               "lobby",
@@ -41,7 +42,11 @@ export default function Menu() {
             );
             nav("/game");
           }}
-        />
+        >
+          <div className="bg-[#f17d00] w-[350px] h-[150px] text-8xl text-center flex justify-center items-center">
+            JOIN
+          </div>
+        </CustomButton>
       </div>
       <div className="absolute w-full top-0 left-0" style={{ padding: 40 }}>
         <div className="w-full h-full flex justify-between">
@@ -90,6 +95,7 @@ export default function Menu() {
           </div>
         </div>
       )}
+      <ClaimAirdropPanel />
     </div>
   );
 }

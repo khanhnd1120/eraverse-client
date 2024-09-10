@@ -16,7 +16,7 @@ import {
   AnimationMixer,
   LoopRepeat,
 } from "three";
-import { Easing, Tween } from "three/examples/jsm/libs/tween.module.js";
+import { Easing } from "three/examples/jsm/libs/tween.module.js";
 import TWEEN from "@tweenjs/tween.js";
 const TRANSITION = 0.3;
 let animatorEntities = world.with("animator", "model", "gameObject", "player");

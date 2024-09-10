@@ -1,7 +1,8 @@
+import utils from "game/help/utils";
 import { With } from "miniplex";
 import addPlayerState from "share/add-player-state";
 import G, { world } from "share/G";
-import { Direction, PlayerState } from "share/game-interface";
+import { AirdropStatus, Direction, PlayerState } from "share/game-interface";
 import myState from "share/my-state";
 import removePlayerState from "share/remove-player-state";
 import Setting from "share/setting";
@@ -273,6 +274,13 @@ function processClientEvent(entity: MeEntity) {
     entity.player.danceAnim = val;
     G.getCurrentRoom().send("danceAnim", { danceAnim: val });
   });
+  myState.keyStates$.subscribe((keyStates) => {
+    if (keyStates["KeyE"] && entity.me.airdrop?.rewardId) {
+      G.getCurrentRoom().send("claim_airdrop", {
+        id: entity.me.airdrop?.rewardId,
+      });
+    }
+  });
 }
 function cronjob(entity: MeEntity) {
   if (!entity.me.intervalCheckAirdrop) {
@@ -280,6 +288,9 @@ function cronjob(entity: MeEntity) {
       let nearestAirdrop: AirdropEntity = null;
       let minDistantAirdrop = 10000;
       for (const airdropData of airdropEntities) {
+        if (airdropData.airdrop.status !== AirdropStatus.Ready) {
+          return;
+        }
         let distance = Math.max(
           Math.abs(
             airdropData.airdrop.position.x - entity.gameObject.position.x
@@ -288,7 +299,7 @@ function cronjob(entity: MeEntity) {
             airdropData.airdrop.position.z - entity.gameObject.position.z
           )
         );
-        if (distance < minDistantAirdrop && distance < 0.5) {
+        if (distance < minDistantAirdrop && distance < 1) {
           minDistantAirdrop = distance;
           nearestAirdrop = airdropData;
         }
@@ -297,19 +308,40 @@ function cronjob(entity: MeEntity) {
       let isRemoveOldAir = false;
       let isNewAir = false;
       if (nearestAirdrop) {
-        if (nearestAirdrop.airdrop.rewardId !== entity.me.airdrop.rewardId) {
+        if (nearestAirdrop.airdrop.rewardId !== entity.me.airdrop?.rewardId) {
           isRemoveOldAir = true;
           isNewAir = true;
         }
       } else {
         isRemoveOldAir = true;
       }
-
+      if (!entity.me.tutorial) {
+        entity.me.tutorial = {};
+      }
       if (isRemoveOldAir) {
         // remove tag open airdrop
+        if (entity.me.tutorial["airdrop"]) {
+          entity.me.tutorial["airdrop"].visible = false;
+          entity.me.airdrop = null;
+        }
       }
       if (isNewAir) {
         // add new tag open air
+        if (!entity.me.tutorial["airdrop"]) {
+          entity.me.tutorial["airdrop"] = utils.createPanelText({
+            width: 0.05,
+          });
+          entity.me.tutorial["airdrop"].add(utils.createLineText3D("E"));
+          G.particleGroup.add(entity.me.tutorial["airdrop"]);
+        }
+        entity.me.tutorial["airdrop"].position.copy(
+          nearestAirdrop.airdrop.position
+        );
+        entity.me.tutorial["airdrop"].position.setY(
+          entity.me.tutorial["airdrop"].position.y + 0.5
+        );
+        entity.me.tutorial["airdrop"].visible = true;
+        entity.me.airdrop = nearestAirdrop.airdrop;
       }
     }, 1000);
   }
@@ -374,6 +406,7 @@ function setInputEvent(entity: MeEntity) {
         break;
     }
     entity.me.keyStates[event.code] = true;
+    myState.keyStates$.next(entity.me.keyStates);
     return false;
   };
   entity.me.onKeyUp = (event: any) => {
@@ -390,6 +423,7 @@ function setInputEvent(entity: MeEntity) {
         break;
     }
     entity.me.keyStates[event.code] = false;
+    myState.keyStates$.next(entity.me.keyStates);
   };
   entity.me.onMouseDown = (evt: any) => {
     if (myState.pause$.getValue()) {

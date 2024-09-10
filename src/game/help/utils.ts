@@ -44,7 +44,7 @@ function createPanelText(data?: { width: number }) {
   line.position.set(0, 0, 0);
   chatBox.add(line);
 
-  const contentGeometry = new BoxGeometry(0.6, 0.05, 0.01);
+  const contentGeometry = new BoxGeometry(data?.width ?? 0.6, 0.05, 0.01);
   const content = new Mesh(
     contentGeometry,
     new MeshStandardMaterial({
