@@ -1,3 +1,4 @@
+import utils from "game/help/utils";
 import { With } from "miniplex";
 import assets from "share/assets";
 import G, { world } from "share/G";
@@ -60,23 +61,10 @@ function chat(content: string, entity: PlayerEntity) {
     ctn.slice(0, maxLength - 3) + "...";
   }
 
-  const textGeometry = new TextGeometry(ctn, {
-    font: assets.getFont("agency"),
-    size: 0.02,
-    height: 0.005,
-    curveSegments: 1,
-    bevelThickness: 0,
-    bevelSize: 0,
-    bevelSegments: 0,
-  });
-  textGeometry.center();
-  const edges = new EdgesGeometry(textGeometry);
-  const line = new LineSegments(edges, assets.getNeonTextMaterial());
-
   if (entity.player.chatMessage) {
     entity.player.chatBox.remove(entity.player.chatMessage);
   }
-  entity.player.chatMessage = line;
+  entity.player.chatMessage = utils.createLineText3D(ctn);
   entity.player.chatBox.add(entity.player.chatMessage);
 
   if (entity.player.chatBox) {

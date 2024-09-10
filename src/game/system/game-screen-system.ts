@@ -32,6 +32,7 @@ import assets from "share/assets";
 import Constants from "share/game-constant";
 import _ from "lodash";
 import updateMaterialModel from "share/update-material-model";
+import utils from "game/help/utils";
 
 let gameScreenEntities = world.with("gameScreen");
 type GameEntity = With<Entity, "gameScreen">;
@@ -470,33 +471,8 @@ function createTextPlayer(player: any) {
   });
   name.center();
   nameObject.add(new Mesh(name, assets.getNeonTextMaterial()));
-
-  const chatBox = new Object3D();
-  chatBox.position.set(0, Setting.getSetting().PLAYER_VIEW + 0.2, 0);
-  const geometry = new BoxGeometry(0.6, 0.05, 0.01);
-  const edges = new EdgesGeometry(geometry);
-  const line = new LineSegments(edges, assets.getNeonTextMaterial());
-  line.position.set(0, 0, 0);
-  chatBox.add(line);
-
-  const contentGeometry = new BoxGeometry(0.6, 0.05, 0.01);
-  const content = new Mesh(
-    contentGeometry,
-    new MeshStandardMaterial({
-      color: 0x00ffff,
-      emissive: 0x00ffff,
-      emissiveIntensity: 1,
-      metalness: 0.5,
-      roughness: 0.1,
-      opacity: 0.2,
-      transparent: true,
-    })
-  );
-  chatBox.add(content);
-  chatBox.visible = false;
-
   return {
-    chatBox,
+    chatBox: utils.createPanelText(),
     nameObject,
   };
 }

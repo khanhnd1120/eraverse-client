@@ -154,7 +154,8 @@ export interface MeWorldType {
   viewPoint: Object3D;
   aimPoint: Object3D;
   defaultFollowCam: Object3D;
-  intervalCheckAirdrop?: any
+  intervalCheckAirdrop?: any;
+  airdrop?: any;
 }
 
 export enum AdsType {
