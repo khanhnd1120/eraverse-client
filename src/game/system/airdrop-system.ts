@@ -23,12 +23,26 @@ function onEntityAdded(entity: AirdropEntity) {
     if (status === AirdropStatus.Ready) {
       hideParachute(entity);
     }
+    if (status === AirdropStatus.Claimed) {
+      entity.gameObject.traverse((child: any) => {
+        if (child.material) {
+          child.material = child.material.clone();
+          child.material.transparent = true;
+          child.material.needsUpdate = true;
+          new TWEEN.Tween(child.material)
+            .to({ opacity: 0 }, 1000)
+            .easing(Easing.Quadratic.Out)
+            .start();
+        }
+      });
+    }
   });
 }
 
 function hideParachute(entity: AirdropEntity) {
   entity.gameObject.traverse((child: any) => {
     if (child.name === "parachute") {
+      child.material = child.material.clone();
       child.material.transparent = true;
       child.material.needsUpdate = true;
       setTimeout(() => {

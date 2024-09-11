@@ -1,7 +1,7 @@
 /** @format */
 
 import { BehaviorSubject } from "rxjs";
-import { Direction } from "./game-interface";
+import { AirdropClaimStatus, Direction } from "./game-interface";
 import { Euler, Vector3 } from "three";
 
 const reloadMaterial$ = new BehaviorSubject<string[]>([]);
@@ -19,6 +19,10 @@ const loadingGame$ = new BehaviorSubject<boolean>(true);
 const loadVideoMaterial$ = new BehaviorSubject<string[]>([]);
 const isRun$ = new BehaviorSubject<boolean>(false);
 const keyStates$ = new BehaviorSubject<{ [key: string]: boolean }>({});
+const claimAirdropNoti$ = new BehaviorSubject<{
+  airdropClaimStatus: AirdropClaimStatus;
+  airdropClaimed: any;
+}>(null);
 
 const myState = {
   reloadMaterial$,
@@ -36,5 +40,6 @@ const myState = {
   loadVideoMaterial$,
   isRun$,
   keyStates$,
+  claimAirdropNoti$,
 };
 export default myState;

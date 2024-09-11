@@ -1,6 +1,6 @@
 import Character from "ui/component/character";
 import AvatarPanel from "./avatar-panel";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useGlobalContext } from "ui/context";
 import Constants from "share/game-constant";
 import { twMerge } from "tailwind-merge";
@@ -8,7 +8,6 @@ import { useState } from "react";
 import Setting from "share/setting";
 import { ConfigKey } from "share/game-interface";
 import G from "share/G";
-import ClaimAirdropPanel from "screens/game/claim-airdrop";
 import CustomButton from "ui/component/custom-button";
 
 export default function Menu() {
@@ -95,7 +94,6 @@ export default function Menu() {
           </div>
         </div>
       )}
-      <ClaimAirdropPanel />
     </div>
   );
 }

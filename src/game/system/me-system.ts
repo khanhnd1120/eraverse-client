@@ -260,6 +260,21 @@ function processServerEvent(entity: MeEntity) {
       )
     );
   });
+  entity.player.serverObject.listen(
+    "airdropClaimStatus",
+    (airdropClaimStatus: any) => {
+      myState.claimAirdropNoti$.next({
+        ...myState.claimAirdropNoti$.value,
+        airdropClaimStatus,
+      });
+    }
+  );
+  entity.player.serverObject.listen("airdropClaimed", (airdropClaimed: any) => {
+    myState.claimAirdropNoti$.next({
+      ...myState.claimAirdropNoti$.value,
+      airdropClaimed,
+    });
+  });
 }
 function processClientEvent(entity: MeEntity) {
   myState.showActionWheel$.subscribe((val) => {

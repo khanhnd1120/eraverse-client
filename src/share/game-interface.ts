@@ -193,3 +193,10 @@ export enum AirdropStatus {
   Ready,
   Claimed,
 }
+
+export enum AirdropClaimStatus {
+  None,
+  Process,
+  Success,
+  Failed,
+}
