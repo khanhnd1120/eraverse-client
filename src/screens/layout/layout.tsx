@@ -4,6 +4,7 @@ import Game from "screens/game/game";
 import LoadingAsset from "screens/loading-assets/loading-assets";
 import Menu from "screens/menu/menu";
 import api from "share/api";
+import { fetchKeylessAccount } from "share/query-onchain";
 import { useGlobalContext } from "ui/context";
 
 const router = createMemoryRouter([
@@ -48,6 +49,7 @@ function Layout() {
       setUserInfo({
         name: rs.name,
       });
+      fetchKeylessAccount();
     }
     refreshToken();
   }, []);

@@ -2,7 +2,11 @@
 
 import { With } from "miniplex";
 import { world } from "share/G";
+import addPlayerState from "share/add-player-state";
 import assets from "share/assets";
+import Constants from "share/game-constant";
+import { PlayerState } from "share/game-interface";
+import myState from "share/my-state";
 import { Entity } from "share/world";
 import { SkeletonUtils } from "three/examples/jsm/Addons.js";
 let gameObjectEntities = world.with("gameObject");
@@ -25,6 +29,34 @@ function onGameObjectRemoved(entity: GameObjectEntity) {
   entity.gameObject.removeFromParent();
 }
 function onModelAdded(entity: ModelEntity) {
+  loadModel(entity);
+  if (entity.player) {
+    entity.player.serverObject.listen("character", (character: any) => {
+      if (entity.player.character !== character) {
+        entity.player.character = character;
+        let newModel = Constants.CharacterData[character].model;
+        if (newModel !== entity.model.name) {
+          entity.model.name = Constants.CharacterData[character].model;
+          if (entity.model.parent) {
+            entity.model.parent.remove(entity.model.object);
+          } else {
+            entity.gameObject.remove(entity.model.object);
+          }
+          loadModel(entity);
+        } else {
+          entity.player.character = character;
+          myState.reloadMaterial$.next(
+            Object.keys(myState.meshMaterial$.value[character]).map(
+              (key: any) => myState.meshMaterial$.value[character][key]
+            )
+          );
+        }
+        entity.player = addPlayerState(PlayerState.Jump, entity.player);
+      }
+    });
+  }
+}
+function loadModel(entity: ModelEntity) {
   entity.model.object = SkeletonUtils.clone(
     assets.getModel(entity.model.name).scene
   );

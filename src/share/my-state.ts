@@ -3,6 +3,7 @@
 import { BehaviorSubject } from "rxjs";
 import { AirdropClaimStatus, Direction } from "./game-interface";
 import { Euler, Vector3 } from "three";
+import { KeylessAccount } from "@aptos-labs/ts-sdk";
 
 const reloadMaterial$ = new BehaviorSubject<string[]>([]);
 const meshMaterial$ = new BehaviorSubject<{ [key: string]: string }>({});
@@ -23,6 +24,8 @@ const claimAirdropNoti$ = new BehaviorSubject<{
   airdropClaimStatus: AirdropClaimStatus;
   airdropClaimed: any;
 }>(null);
+const keylessAccountData$ = new BehaviorSubject<KeylessAccount>(null);
+const listSkin$ = new BehaviorSubject<string[]>([]);
 
 const myState = {
   reloadMaterial$,
@@ -41,5 +44,7 @@ const myState = {
   isRun$,
   keyStates$,
   claimAirdropNoti$,
+  keylessAccountData$,
+  listSkin$,
 };
 export default myState;

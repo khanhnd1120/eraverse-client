@@ -11,6 +11,7 @@ export default function ActionWheel() {
   const [activeMenu, setActiveMenu] = useState(null);
   const [moving, setIsMoving] = useState(false);
   const [activeAction, setActiveAction] = useState([]);
+  const [MainAction, setMainAction] = useState([]);
 
   const switchMenu = (menu: any) => {
     setActiveAction(menu);
@@ -53,7 +54,7 @@ export default function ActionWheel() {
         });
       }
       if (ind + 1 < arr.length / (MAX_ITEM - 2)) {
-        menu.unshift({
+        menu.push({
           text: "More",
           action: () => {
             switchMenu(paginateMenu(arr, backFirst, action, ind + 1));
@@ -74,52 +75,61 @@ export default function ActionWheel() {
     return menu;
   };
 
-  const DanceAction = paginateMenu(
-    Constants.DanceAnim,
-    () => {
-      switchMenu(MainAction);
-    },
-    (menu: any, activeMenu: any) => {
-      myState.danceAnim$.next(menu[activeMenu - 1].anim);
-      myState.showActionWheel$.next(false);
-    }
-  );
-
-  const SkinAction = paginateMenu(
-    Constants.CharacterCodes.map((item: string) => {
-      return { name: item };
-    }),
-    () => {
-      switchMenu(MainAction);
-    },
-    (menu: any, activeMenu: any) => {
-      G.getCurrentRoom().send("character", {
-        character: menu[activeMenu - 1].name,
-      });
-      myState.showActionWheel$.next(false);
-    }
-  );
-
-  const MainAction = [
-    {
-      text: "Chat",
-      action: () => {
-        myState.showChat$.next(true);
-      },
-    },
-    {
-      text: "Dance",
-      action: () => {
-        switchMenu(DanceAction);
-      },
-    },
-    {
-      text: "Skin",
-      action: () => {
-        switchMenu(SkinAction);
-      },
-    },
-  ];
+  useEffect(() => {
+    const listSkin = myState.listSkin$.subscribe((listSkin) => {
+      const DanceAction = paginateMenu(
+        Constants.DanceAnim,
+        () => {
+          switchMenu(action);
+        },
+        (menu: any, activeMenu: any) => {
+          myState.danceAnim$.next(menu[activeMenu].anim);
+          myState.showActionWheel$.next(false);
+          switchMenu(action);
+        }
+      );
+      const SkinAction = paginateMenu(
+        listSkin.map((item: string) => {
+          return { name: item };
+        }),
+        () => {
+          switchMenu(action);
+        },
+        (menu: any, activeMenu: any) => {
+          G.getCurrentRoom().send("character", {
+            character: menu[activeMenu].name,
+          });
+          myState.showActionWheel$.next(false);
+          switchMenu(action);
+        }
+      );
+      const action = [
+        {
+          text: "Chat",
+          action: () => {
+            myState.showChat$.next(true);
+          },
+        },
+        {
+          text: "Dance",
+          action: () => {
+            switchMenu(DanceAction);
+          },
+        },
+        {
+          text: "Skin",
+          action: () => {
+            switchMenu(SkinAction);
+          },
+        },
+      ];
+      setMainAction(action);
+      setActiveAction(action);
+    });
+    return () => {
+      listSkin.unsubscribe();
+    };
+  }, []);
   useEffect(() => {
     const convertPosMouse = (val: number) => {
       if (val < -20) return -20;
@@ -155,7 +165,7 @@ export default function ActionWheel() {
       document.removeEventListener("mousemove", handleInput);
       document.removeEventListener("mouseup", handleClick);
     };
-  }, [positionMouse, moving, activeAction]);
+  }, [positionMouse, moving, activeAction, MainAction]);
 
   useEffect(() => {
     let angleRadians = Math.atan2(positionMouse.y, positionMouse.x);
@@ -181,9 +191,9 @@ export default function ActionWheel() {
     });
   }, [positionMouse]);
 
-  useEffect(() => {
-    setActiveAction(MainAction);
-  }, []);
+  // useEffect(() => {
+  //   setActiveAction(MainAction);
+  // }, []);
 
   return (
     <div className="action-wheel">

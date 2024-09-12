@@ -43,12 +43,5 @@ function onEntityAdded(entity: PlayerEntity) {
       entity.player = removePlayerState(PlayerState.Beaten, entity.player);
     }
   });
-  entity.player.serverObject.listen("character", (character: any) => {
-    entity.player.character = character;
-    myState.reloadMaterial$.next(
-      Object.keys(myState.meshMaterial$.value[character]).map(
-        (key: any) => myState.meshMaterial$.value[character][key]
-      )
-    );
-  });
+
 }

@@ -252,14 +252,6 @@ function processServerEvent(entity: MeEntity) {
       entity.player = removePlayerState(PlayerState.Beaten, entity.player);
     }
   });
-  entity.player.serverObject.listen("character", (character: any) => {
-    entity.player.character = character;
-    myState.reloadMaterial$.next(
-      Object.keys(myState.meshMaterial$.value[character]).map(
-        (key: any) => myState.meshMaterial$.value[character][key]
-      )
-    );
-  });
   entity.player.serverObject.listen(
     "airdropClaimStatus",
     (airdropClaimStatus: any) => {
@@ -280,13 +272,13 @@ function processClientEvent(entity: MeEntity) {
   myState.showActionWheel$.subscribe((val) => {
     if (val) {
       unbindInputEvent(entity);
-      entity.player = addPlayerState(PlayerState.Dance, entity.player);
     } else {
       bindInputEvent(entity);
     }
   });
   myState.danceAnim$.subscribe((val) => {
     entity.player.danceAnim = val;
+    entity.player = addPlayerState(PlayerState.Dance, entity.player);
     G.getCurrentRoom().send("danceAnim", { danceAnim: val });
   });
   myState.keyStates$.subscribe((keyStates) => {

@@ -157,6 +157,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
           });
         })
     );
+    myState.listSkin$.next(player.characters);
     let meObject = new Object3D<Object3DEventMap>();
     meObject.add(nameObject);
     meObject.add(chatBox);
