@@ -9,6 +9,7 @@ import { playerSystem } from "game/system/player-system";
 import { positionSystem } from "game/system/position-system";
 import { chatSystem } from "game/system/chat-system";
 import { airdropSystem } from "game/system/airdrop-system";
+import { playerSoundSystem } from "game/system/player-sound-system";
 
 initComponent();
 export function executeSystems(delta: number) {
@@ -21,5 +22,6 @@ export function executeSystems(delta: number) {
   gameScreenSystem(delta);
   chatSystem(delta);
   airdropSystem(delta);
+  playerSoundSystem(delta);
   G.render();
 }

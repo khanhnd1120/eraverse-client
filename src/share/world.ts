@@ -6,6 +6,7 @@ import {
   Material,
   Object3D,
   Object3DEventMap,
+  PositionalAudio,
   Raycaster,
   Vector3,
 } from "three";
@@ -60,5 +61,9 @@ export type Entity = {
     amount: number;
     rewardType: RewardType;
     rewardId: number;
+  };
+  playerSound?: {
+    bodySoundTop: PositionalAudio;
+    bodySoundBottom: PositionalAudio;
   };
 };

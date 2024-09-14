@@ -5,7 +5,7 @@ export default function Playing() {
     <div
       onClick={() => {
         document.body.requestPointerLock();
-        myState.showChat$.next(false);
+        myState.activeChat$.next(false);
         myState.showActionWheel$.next(false);
       }}
     >

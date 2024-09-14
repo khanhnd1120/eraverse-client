@@ -150,7 +150,10 @@ function controls(entity: MeEntity, delta: number) {
     myState.isRun$.next(entity.player.isRun);
   }
   let vel = entity.me.velocity.clone();
-  if (entity.me.keyStates["KeyW"]) {
+  if (
+    entity.me.keyStates["KeyW"] &&
+    entity.player.stateBottom !== PlayerState.Beaten
+  ) {
     checkMove = true;
     vel.add(getForwardVector(entity).clone().multiplyScalar(ACCELERATOR));
     entity.me.moveForward += ACCELERATOR;
@@ -161,7 +164,10 @@ function controls(entity: MeEntity, delta: number) {
     entity.me.moveForward = 0;
   }
 
-  if (entity.me.keyStates["KeyS"]) {
+  if (
+    entity.me.keyStates["KeyS"] &&
+    entity.player.stateBottom !== PlayerState.Beaten
+  ) {
     checkMove = true;
     vel.add(getForwardVector(entity).clone().multiplyScalar(-ACCELERATOR));
     entity.me.moveBackward += ACCELERATOR;
@@ -172,7 +178,10 @@ function controls(entity: MeEntity, delta: number) {
     entity.me.moveBackward = 0;
   }
 
-  if (entity.me.keyStates["KeyA"]) {
+  if (
+    entity.me.keyStates["KeyA"] &&
+    entity.player.stateBottom !== PlayerState.Beaten
+  ) {
     checkMove = true;
     vel.add(getSideVector(entity).clone().multiplyScalar(-ACCELERATOR));
     entity.me.moveLeft += ACCELERATOR;
@@ -183,7 +192,10 @@ function controls(entity: MeEntity, delta: number) {
     entity.me.moveLeft = 0;
   }
 
-  if (entity.me.keyStates["KeyD"]) {
+  if (
+    entity.me.keyStates["KeyD"] &&
+    entity.player.stateBottom !== PlayerState.Beaten
+  ) {
     checkMove = true;
     vel.add(getSideVector(entity).clone().multiplyScalar(ACCELERATOR));
     entity.me.moveRight += ACCELERATOR;
@@ -409,7 +421,7 @@ function setInputEvent(entity: MeEntity) {
       case "KeyC":
         break;
       case "Enter":
-        myState.showChat$.next(true);
+        myState.activeChat$.next(true);
         break;
     }
     entity.me.keyStates[event.code] = true;
@@ -426,7 +438,7 @@ function setInputEvent(entity: MeEntity) {
       case "KeyC":
         break;
       case "Enter":
-        myState.showChat$.next(true);
+        myState.activeChat$.next(true);
         break;
     }
     entity.me.keyStates[event.code] = false;

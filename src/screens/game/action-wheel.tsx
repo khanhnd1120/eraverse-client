@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import G from "share/G";
 import Constants from "share/game-constant";
 import myState from "share/my-state";
+import SelectSkin from "./select-skin";
 
 const MAX_ITEM = 6;
 
@@ -11,7 +12,7 @@ export default function ActionWheel() {
   const [activeMenu, setActiveMenu] = useState(null);
   const [moving, setIsMoving] = useState(false);
   const [activeAction, setActiveAction] = useState([]);
-  const [MainAction, setMainAction] = useState([]);
+  const [chooseSkinMenu, setChooseSkinMenu] = useState<boolean>(false);
 
   const switchMenu = (menu: any) => {
     setActiveAction(menu);
@@ -75,61 +76,40 @@ export default function ActionWheel() {
     return menu;
   };
 
-  useEffect(() => {
-    const listSkin = myState.listSkin$.subscribe((listSkin) => {
-      const DanceAction = paginateMenu(
-        Constants.DanceAnim,
-        () => {
-          switchMenu(action);
-        },
-        (menu: any, activeMenu: any) => {
-          myState.danceAnim$.next(menu[activeMenu].anim);
-          myState.showActionWheel$.next(false);
-          switchMenu(action);
-        }
-      );
-      const SkinAction = paginateMenu(
-        listSkin.map((item: string) => {
-          return { name: item };
-        }),
-        () => {
-          switchMenu(action);
-        },
-        (menu: any, activeMenu: any) => {
-          G.getCurrentRoom().send("character", {
-            character: menu[activeMenu].name,
-          });
-          myState.showActionWheel$.next(false);
-          switchMenu(action);
-        }
-      );
-      const action = [
-        {
-          text: "Chat",
-          action: () => {
-            myState.showChat$.next(true);
-          },
-        },
-        {
-          text: "Dance",
-          action: () => {
-            switchMenu(DanceAction);
-          },
-        },
-        {
-          text: "Skin",
-          action: () => {
-            switchMenu(SkinAction);
-          },
-        },
-      ];
-      setMainAction(action);
-      setActiveAction(action);
-    });
-    return () => {
-      listSkin.unsubscribe();
-    };
-  }, []);
+  const DanceAction = paginateMenu(
+    Constants.DanceAnim,
+    () => {
+      switchMenu(MainAction);
+    },
+    (menu: any, activeMenu: any) => {
+      myState.danceAnim$.next(menu[activeMenu].anim);
+      myState.showActionWheel$.next(false);
+      switchMenu(MainAction);
+    }
+  );
+
+  const MainAction = [
+    {
+      text: "Chat",
+      action: () => {
+        myState.activeChat$.next(true);
+        myState.showActionWheel$.next(false);
+      },
+    },
+    {
+      text: "Dance",
+      action: () => {
+        switchMenu(DanceAction);
+      },
+    },
+    {
+      text: "Skin",
+      action: () => {
+        setChooseSkinMenu(true);
+        document.exitPointerLock();
+      },
+    },
+  ];
   useEffect(() => {
     const convertPosMouse = (val: number) => {
       if (val < -20) return -20;
@@ -165,7 +145,7 @@ export default function ActionWheel() {
       document.removeEventListener("mousemove", handleInput);
       document.removeEventListener("mouseup", handleClick);
     };
-  }, [positionMouse, moving, activeAction, MainAction]);
+  }, [positionMouse, moving, activeAction]);
 
   useEffect(() => {
     let angleRadians = Math.atan2(positionMouse.y, positionMouse.x);
@@ -191,28 +171,41 @@ export default function ActionWheel() {
     });
   }, [positionMouse]);
 
-  // useEffect(() => {
-  //   setActiveAction(MainAction);
-  // }, []);
+  useEffect(() => {
+    setActiveAction(MainAction);
+  }, []);
 
   return (
-    <div className="action-wheel">
-      {activeAction.map((action: any, ind: number) => {
-        let deg = (360 / activeAction.length) * (ind + 1);
-        return (
-          <div
-            className={`action-wheel-item  ${
-              activeMenu == ind ? "action-wheel-item-active" : ""
-            }`}
-            key={ind}
-            style={{
-              transform: `rotate(${deg}deg)`,
-            }}
-          >
-            <div className="action-wheel-text">{action.text}</div>
-          </div>
-        );
-      })}
+    <div>
+      {chooseSkinMenu && (
+        <SelectSkin
+          onClose={() => {
+            setChooseSkinMenu(false);
+            document.body.requestPointerLock();
+            myState.showActionWheel$.next(false);
+          }}
+        />
+      )}
+      {!chooseSkinMenu && (
+        <div className="action-wheel">
+          {activeAction.map((action: any, ind: number) => {
+            let deg = (360 / activeAction.length) * (ind + 1);
+            return (
+              <div
+                className={`action-wheel-item  ${
+                  activeMenu == ind ? "action-wheel-item-active" : ""
+                }`}
+                key={ind}
+                style={{
+                  transform: `rotate(${deg}deg)`,
+                }}
+              >
+                <div className="action-wheel-text">{action.text}</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

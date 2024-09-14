@@ -11,6 +11,7 @@ import {
   Object3DEventMap,
   Points,
   PointsMaterial,
+  PositionalAudio,
   Raycaster,
   Vector3,
 } from "three";
@@ -51,6 +52,17 @@ async function init(entity: GameEntity) {
     gltf.scene.traverse(async (child: any) => {
       updateMaterialModel(child, entity.gameScreen.map, names);
     });
+  });
+  // setup SFX
+  gltf.scene.traverse(async (child: any) => {
+    if (child.name === "Island001") {
+      let sound = new PositionalAudio(G.audioListener);
+      sound.setBuffer(assets.getSound("bg1"));
+      sound.setLoop(true);
+      // sound.play();
+      child.add(sound);
+      sound.position.set(0, 0, 0);
+    }
   });
   gltf.scene.scale.copy(new Vector3(10, 10, 10));
   G.physicalGroup.add(gltf.scene);
@@ -320,6 +332,10 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         ],
         ready$: new BehaviorSubject<boolean>(false),
       },
+      playerSound: {
+        bodySoundTop: new PositionalAudio(G.audioListener),
+        bodySoundBottom: new PositionalAudio(G.audioListener),
+      },
     });
     entity.gameScreen.keyEntities[key] = e;
   } else {
@@ -411,6 +427,10 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
           },
         ],
         ready$: new BehaviorSubject<boolean>(false),
+      },
+      playerSound: {
+        bodySoundTop: new PositionalAudio(G.audioListener),
+        bodySoundBottom: new PositionalAudio(G.audioListener),
       },
     });
     entity.gameScreen.keyEntities[key] = playerE;

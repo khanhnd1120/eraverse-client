@@ -17,6 +17,23 @@ export default function Chat() {
     }
     document.exitPointerLock();
   }, []);
+  useEffect(() => {
+    const chatMessage = myState.chatMessages$.subscribe((msgs: any) => {
+      setMessages(JSON.parse(JSON.stringify(msgs)));
+    });
+    const activeChat = myState.activeChat$.subscribe((v: boolean) => {
+      if (v) {
+        if (inputRef && inputRef.current) {
+          inputRef.current.focus();
+        }
+        document.exitPointerLock();
+      }
+    });
+    return () => {
+      activeChat.unsubscribe();
+      chatMessage.unsubscribe();
+    };
+  }, []);
   return (
     <div
       className="absolute w-[300px] h-[500px] bg-gray-800 bg-opacity-70 pl-5 py-3 rounded-md"

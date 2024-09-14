@@ -51,9 +51,15 @@ const MODELS: { [key: string]: { url: string; gltf?: GLTF } } = {
   },
   airdrop: {
     url: "character/eragon/airdrop.glb",
-  }
+  },
 };
-const SOUNDS: { [key: string]: { url: string; buffer?: any } } = {};
+const SOUNDS: { [key: string]: { url: string; buffer?: any } } = {
+  bg1: { url: "sfx/bg1.mp3" },
+  bg2: { url: "sfx/bg2.mp3" },
+  punch: { url: "sfx/punch.mp3" },
+  walk: { url: "sfx/walk.mp3" },
+  run: { url: "sfx/run.mp3" },
+};
 
 const FONTS: { [key: string]: { url: string; font?: any } } = {
   agency: { url: "font/helvetiker_bold.typeface.json" },
@@ -85,7 +91,7 @@ function loadSound(manager: LoadingManager) {
   const audioLoader = new AudioLoader(manager);
   Object.keys(SOUNDS).forEach((key: string) => {
     let sound = SOUNDS[key];
-    audioLoader.load(`sfx/${sound.url}`, (buffer: any) => {
+    audioLoader.load(`${sound.url}`, (buffer: any) => {
       SOUNDS[key].buffer = buffer;
     });
   });

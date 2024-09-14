@@ -11,7 +11,7 @@ const position$ = new BehaviorSubject<Vector3 | null>(null);
 const direction$ = new BehaviorSubject<Direction | null>(null);
 const cameraRotation$ = new BehaviorSubject<Euler | null>(null);
 const pause$ = new BehaviorSubject<boolean>(false);
-const showChat$ = new BehaviorSubject<boolean>(false);
+const activeChat$ = new BehaviorSubject<boolean>(false);
 const chatMessages$ = new BehaviorSubject<any>([]);
 const showActionWheel$ = new BehaviorSubject<boolean>(false);
 const loadingTexture$ = new BehaviorSubject<boolean>(false);
@@ -34,7 +34,7 @@ const myState = {
   direction$,
   cameraRotation$,
   pause$,
-  showChat$,
+  activeChat$,
   chatMessages$,
   showActionWheel$,
   loadingTexture$,

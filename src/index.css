@@ -169,3 +169,7 @@ body {
     opacity: 0.5;
   }
 }
+
+.skin-menu-item:hover .battle-button-border {
+  display: block !important;
+}

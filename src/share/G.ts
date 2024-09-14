@@ -66,9 +66,6 @@ function setupEnvironment() {
   scene.add(particleGroup);
   scene.add(physicalGroup);
 
-  const axesHelper = new AxesHelper(100);
-  scene.add(axesHelper);
-
   // setup renderer
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);

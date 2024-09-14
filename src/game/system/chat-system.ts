@@ -29,12 +29,14 @@ export function chatSystem(delta: number) {
       entity.player.nameObject.lookAt(camPosition);
     }
     if (entity.player.chatBox) {
+      return;
       entity.player.chatBox.lookAt(camPosition);
     }
   }
 }
 
 function onEntityAdded(entity: PlayerEntity) {
+  return;
   entity.player.serverObject.listen("lastMessage", (message: any) => {
     if (new Date().getTime() - Number(message.time) <= 2000) {
       chat(message.content, entity);

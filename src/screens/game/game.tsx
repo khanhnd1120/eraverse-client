@@ -7,14 +7,10 @@ import ActionWheel from "./action-wheel";
 import ClaimAirdropPanel from "./claim-airdrop";
 
 export default function Game() {
-  const [showChat, setShowChat] = useState(false);
   const [showDance, setShowDance] = useState(false);
   const [showLoadingGame, setShowLoadingGame] = useState(true);
 
   useEffect(() => {
-    const showChat = myState.showChat$.subscribe((v: boolean) => {
-      setShowChat(v);
-    });
     const actionWheel = myState.showActionWheel$.subscribe((v: boolean) => {
       setShowDance(v);
     });
@@ -24,13 +20,12 @@ export default function Game() {
     return () => {
       loadingGame.unsubscribe();
       actionWheel.unsubscribe();
-      showChat.unsubscribe();
     };
   }, []);
   return (
     <div className="text-white w-screen h-screen flex justify-center items-center">
       <Playing />
-      {showChat && <Chat />}
+      <Chat />
       {showDance && <ActionWheel />}
       {showLoadingGame && <LoadingGame />}
       <ClaimAirdropPanel />
