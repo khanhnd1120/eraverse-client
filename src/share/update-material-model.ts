@@ -32,6 +32,7 @@ export default function updateMaterialModel(
     }
 
     let materialId = myState.meshMaterial$.value[name]?.[child.name];
+    let defaulMaterialId = myState.meshMaterial$.value[name]?.[child.name];
     let adsIndex = -1;
     let nextAdsIndex = -1;
     let isAds = false;
@@ -81,9 +82,16 @@ export default function updateMaterialModel(
               assets.setMaterialData(materialId, {
                 uuid: materialId,
                 map: matData.src,
+                emissiveMap: matData.src,
                 isShader: adsBoard[child.name][adsIndex].isShader,
                 typeShader: adsBoard[child.name][adsIndex].typeShader,
                 colorShader: adsBoard[child.name][adsIndex].colorShader,
+                metalnessMap: defaulMaterialId
+                  ? assets.getMaterials()[defaulMaterialId].data.metalnessMap
+                  : "",
+                roughnessMap: defaulMaterialId
+                  ? assets.getMaterials()[defaulMaterialId].data.roughnessMap
+                  : "",
               });
               assets.setTextureData(matData.src, {
                 url: matData.src,
