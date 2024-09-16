@@ -1,4 +1,4 @@
-import { Color, MeshBasicMaterial, VideoTexture } from "three";
+import { Color, LinearFilter, MeshBasicMaterial, VideoTexture } from "three";
 import myState from "./my-state";
 import assets from "./assets";
 import createMaterialShader from "./create-material-shader";
@@ -41,7 +41,12 @@ export default function createVideoMaterial(data: {
   vidElement.play();
   const matVid = new VideoTexture(vidElement);
   matVid.flipY = false;
-
+  vidElement.requestVideoFrameCallback(() => {
+    matVid.needsUpdate = true; // Update the texture only when a new video frame is available
+  });
+  matVid.generateMipmaps = false;
+  matVid.minFilter = LinearFilter;
+  matVid.magFilter  = LinearFilter;
   const material = new MeshBasicMaterial({
     transparent: true,
     map: matVid,

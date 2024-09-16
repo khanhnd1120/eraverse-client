@@ -169,7 +169,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
     let dataSubscription = [];
     dataSubscription.push(
       myState.position$
-        .pipe(throttleTime(50, asyncScheduler, { trailing: true }))
+        .pipe(throttleTime(200, asyncScheduler, { trailing: true }))
         .subscribe((newPosition: Vector3 | null) => {
           if (newPosition === null) {
             return;
@@ -181,7 +181,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
     );
     dataSubscription.push(
       myState.direction$
-        .pipe(throttleTime(50, asyncScheduler, { trailing: true }))
+        .pipe(throttleTime(500, asyncScheduler, { trailing: true }))
         .subscribe((newDirection: Direction | null) => {
           G.getCurrentRoom().send("direction", {
             direction: newDirection,
@@ -190,7 +190,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
     );
     dataSubscription.push(
       myState.cameraRotation$
-        .pipe(throttleTime(100, asyncScheduler, { trailing: true }))
+        .pipe(throttleTime(200, asyncScheduler, { trailing: true }))
         .subscribe((newRotation: Euler | null) => {
           if (newRotation === null) {
             return;

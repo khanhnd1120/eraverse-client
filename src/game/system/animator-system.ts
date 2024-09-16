@@ -2,7 +2,7 @@
 
 import { With } from "miniplex";
 import assets from "share/assets";
-import { world } from "share/G";
+import G, { world } from "share/G";
 import {
   AnimationClipItem,
   AnimatorItem,
@@ -64,12 +64,14 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
         animatorItem.currentClip = null;
         animatorItem.currentArrAnimationItem = null;
         let state = [e.player.stateTop, e.player.stateBottom][index];
-        e.player = removePlayerState(
-          state,
-          e.player,
-          [true, false][index],
-          [false, true][index]
-        );
+        if (e.player.id === G.mePlayer?.player?.id) {
+          e.player = removePlayerState(
+            state,
+            e.player,
+            [true, false][index],
+            [false, true][index]
+          );
+        }
       }
     }
     if (animatorItem.arrAnimation.length) {

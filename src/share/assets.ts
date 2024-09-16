@@ -177,6 +177,7 @@ function requestMaterial(name: string) {
     return;
   }
   const bitmapLoader = new ImageBitmapLoader(textureManager);
+  bitmapLoader.setCrossOrigin('anonymous');
   textureIds.map((key) => {
     if (!TEXTURES[key]) {
       return;

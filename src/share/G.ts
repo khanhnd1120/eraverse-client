@@ -33,7 +33,9 @@ let audioListener: AudioListener = new AudioListener();
 let scene: Scene = new Scene();
 const directionalLight = new DirectionalLight(0xffffff, 1); // Color and intensity
 const ambientLight = new AmbientLight(0xffffff, 1); // Color and intensity
-const renderer: WebGLRenderer = new WebGLRenderer({ antialias: true });
+const renderer: WebGLRenderer = new WebGLRenderer({
+  antialias: true,
+});
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 let composer = new EffectComposer(renderer);

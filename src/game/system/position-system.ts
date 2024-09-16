@@ -25,7 +25,14 @@ function onPositionUpdate(e: PositionEntity, delta: number) {
   if (distance < SMALL_NUMBER) {
     e.gameObject.position.copy(e.position);
   } else {
-    e.gameObject.position.lerp(e.position, 0.2);
+    // let old = e.gameObject.position.clone();
+    // e.gameObject.position.clone().lerp(e.position, 0.05).x
+    e.gameObject.position.set(
+      e.gameObject.position.clone().lerp(e.position, 0.05).x,
+      e.gameObject.position.clone().lerp(e.position, 0.2).y,
+      e.gameObject.position.clone().lerp(e.position, 0.05).z
+    );
+    // e.gameObject.position.lerp(e.position, 0.05);
   }
 }
 function onPositionAdded(e: PositionEntity) {}
