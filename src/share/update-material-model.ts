@@ -28,7 +28,7 @@ export default function updateMaterialModel(
       rotateMeshData[name] &&
       rotateMeshData[name][child.name]
     ) {
-      rotateMesh(child);
+      rotateMesh(child, rotateMeshData[name][child.name]);
     }
 
     let materialId = myState.meshMaterial$.value[name]?.[child.name];

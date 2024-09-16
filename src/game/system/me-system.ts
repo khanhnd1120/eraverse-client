@@ -445,7 +445,6 @@ function setInputEvent(entity: MeEntity) {
       case "KeyC":
         break;
       case "Enter":
-        myState.activeChat$.next(true);
         break;
     }
     entity.me.keyStates[event.code] = false;

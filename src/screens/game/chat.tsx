@@ -12,10 +12,6 @@ export default function Chat() {
     myState.chatMessages$.subscribe((msgs: any) => {
       setMessages(JSON.parse(JSON.stringify(msgs)));
     });
-    if (inputRef && inputRef.current) {
-      inputRef.current.focus();
-    }
-    document.exitPointerLock();
   }, []);
   useEffect(() => {
     const chatMessage = myState.chatMessages$.subscribe((msgs: any) => {
@@ -55,8 +51,10 @@ export default function Chat() {
           onFinish={(val: any) => {
             if (val.content) {
               G.getCurrentRoom().send("message", val);
-              inputRef.current.focus();
+              inputRef.current.blur();
               form.setFieldValue("content", "");
+              document.body.requestPointerLock();
+              myState.activeChat$.next(false);
             }
           }}
           form={form}

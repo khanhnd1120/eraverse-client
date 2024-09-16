@@ -26,6 +26,7 @@ const claimAirdropNoti$ = new BehaviorSubject<{
 }>(null);
 const keylessAccountData$ = new BehaviorSubject<KeylessAccount>(null);
 const listSkin$ = new BehaviorSubject<string[]>([]);
+const reloadSound$ = new BehaviorSubject<string>("");
 
 const myState = {
   reloadMaterial$,
@@ -46,5 +47,6 @@ const myState = {
   claimAirdropNoti$,
   keylessAccountData$,
   listSkin$,
+  reloadSound$,
 };
 export default myState;

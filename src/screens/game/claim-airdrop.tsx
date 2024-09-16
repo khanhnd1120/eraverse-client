@@ -26,7 +26,7 @@ export default function ClaimAirdropPanel() {
     ) {
       document.exitPointerLock();
     }
-  });
+  }, [claimAirdropNoti]);
   useEffect(() => {
     const airdropNoti = myState.claimAirdropNoti$.subscribe((v) => {
       setClaimAirdropNoti(v);

@@ -93,6 +93,7 @@ function loadSound(manager: LoadingManager) {
     let sound = SOUNDS[key];
     audioLoader.load(`${sound.url}`, (buffer: any) => {
       SOUNDS[key].buffer = buffer;
+      myState.reloadSound$.next(key);
     });
   });
 }

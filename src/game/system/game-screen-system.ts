@@ -62,12 +62,17 @@ async function init(entity: GameEntity) {
   // setup SFX
   gltf.scene.traverse(async (child: any) => {
     if (child.name === "Island001") {
-      let sound = new PositionalAudio(G.audioListener);
-      sound.setBuffer(assets.getSound("bg1"));
-      sound.setLoop(true);
-      // sound.play();
-      child.add(sound);
-      sound.position.set(0, 0, 0);
+      myState.reloadSound$.subscribe((name: string) => {
+        if (name !== "bg1") return;
+        if (assets.getSound("bg1")) {
+          let sound = new PositionalAudio(G.audioListener);
+          sound.setBuffer(assets.getSound("bg1"));
+          sound.setLoop(true);
+          sound.play();
+          child.add(sound);
+          sound.position.set(0, 0, 0);
+        }
+      });
     }
   });
   gltf.scene.scale.copy(new Vector3(10, 10, 10));
@@ -112,14 +117,12 @@ async function init(entity: GameEntity) {
   let fpsInterval = 1000 / 30;
   let lastFrameTime = performance.now();
   function loop(currentTime: number) {
-    // Calculate time since last frame
     let elapsedTime = currentTime - lastFrameTime;
 
-    // If enough time has passed, update the frame
     if (elapsedTime > fpsInterval) {
-      lastFrameTime = currentTime - (elapsedTime % fpsInterval); // Correct for potential drift
+      lastFrameTime = currentTime - (elapsedTime % fpsInterval);
       parent.rotation.y += 0.01;
-      mixer.update(1 / 60); // Run the animation frame logic
+      mixer.update(1 / 60);
     }
     requestAnimationFrame(loop);
   }

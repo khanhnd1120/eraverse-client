@@ -29,7 +29,7 @@ export function chatSystem(delta: number) {
       entity.player.nameObject.lookAt(camPosition);
     }
     if (entity.player.chatBox) {
-      return;
+      continue;
       entity.player.chatBox.lookAt(camPosition);
     }
   }
