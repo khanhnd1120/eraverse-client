@@ -137,16 +137,20 @@ function setMaterial(name: string, mat: Material) {
   };
 }
 function setMaterialData(name: string, data: any) {
-  MATERIALS[name] = {
-    data: data,
-    mat: null,
-  };
+  if (!MATERIALS[name]) {
+    MATERIALS[name] = {
+      data: data,
+      mat: null,
+    };
+  }
 }
 function setTextureData(name: string, data: any) {
-  TEXTURES[name] = {
-    data,
-    texture: null,
-  };
+  if (!TEXTURES[name]) {
+    TEXTURES[name] = {
+      data,
+      texture: null,
+    };
+  }
 }
 function requestMaterial(name: string) {
   if (MATERIALS[name] && MATERIALS[name].mat) {

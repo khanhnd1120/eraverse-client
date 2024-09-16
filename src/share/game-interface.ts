@@ -172,6 +172,7 @@ export enum ShaderType {
 export type AdsConfig = {
   type: AdsType;
   src: string;
+  emission?: string;
   isShader?: boolean;
   id: string;
   time: number;

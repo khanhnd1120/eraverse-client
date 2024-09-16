@@ -368,6 +368,13 @@ function cronjob(entity: MeEntity) {
 function setInputEvent(entity: MeEntity) {
   entity.me.onMouseMove = (event: any) => {
     if (document.pointerLockElement === document.body) {
+      if (
+        entity.player.stateTop === PlayerState.Dance &&
+        !entity.me.keyStates["RIGHTMOUSE"]
+      ) {
+        // when dance not rotate
+        return;
+      }
       const movementX =
         event.movementX || event.mozMovementX || event.webkitMovementX || 0;
       const movementY =

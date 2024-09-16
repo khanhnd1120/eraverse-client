@@ -2,6 +2,7 @@ import G, { world } from "share/G";
 import { With } from "miniplex";
 import { Entity } from "share/world";
 import {
+  AnimationMixer,
   BufferAttribute,
   BufferGeometry,
   EquirectangularReflectionMapping,
@@ -16,7 +17,12 @@ import {
   Vector3,
 } from "three";
 import { loadTexture } from "game/help/loader";
-import { Capsule, GLTF, TextGeometry } from "three/examples/jsm/Addons.js";
+import {
+  Capsule,
+  GLTF,
+  SkeletonUtils,
+  TextGeometry,
+} from "three/examples/jsm/Addons.js";
 import * as Colyseus from "colyseus.js";
 import api from "share/api";
 import myState from "share/my-state";
@@ -70,21 +76,57 @@ async function init(entity: GameEntity) {
   pos.forEach((child) => gltf.scene.remove(child));
 
   // load characters
-  const character: GLTF = assets.getModel("model_female_premium");
-  const positions = combineBuffer(character.scene, "position");
+  let code = "FEMALE_02";
+  let anim = "idle";
+  const character = SkeletonUtils.clone(
+    assets.getModel(Constants.CharacterData[code].model).scene
+  );
+  character.scale.set(0.5, 0.5, 0.5);
+  myState.reloadMaterial$.subscribe((names: string[]) => {
+    character.traverse((child: any) => {
+      updateMaterialModel(child, code, names);
+    });
+  });
+  myState.reloadMaterial$.next(
+    Object.keys(myState.meshMaterial$.value[code]).map(
+      (key: any) => myState.meshMaterial$.value[code][key]
+    )
+  );
+  let animBottom = assets.getModel(Constants.CharacterData[code].anim_top);
+  let animTop = assets.getModel(Constants.CharacterData[code].anim_bottom);
+  const mixer = new AnimationMixer(character);
+  let idleBottom = mixer.clipAction(
+    animBottom.animations.find((a) => a.name == anim)
+  );
+  let idleTop = mixer.clipAction(
+    animTop.animations.find((a) => a.name == anim)
+  );
+  idleBottom.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).play();
+  idleTop.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).play();
   let parent = new Object3D();
+  parent.add(character);
   parent.position.set(-8.9, 3.2, -2.5);
   G.scene.add(parent);
-  createMesh(parent, positions, 0.5, 0, 0, 0, "#B1008D");
-  const animate = () => {
-    requestAnimationFrame(animate);
-    // Apply rotation to the target mesh
-    parent.rotation.y += 0.01; // Rotate around the Y-axis
-  };
-  animate();
+  // const positions = combineBuffer(character.scene, "position");
+  // createMesh(parent, positions, 0.5, 0, 0, 0, "#B1008D");
+  let fpsInterval = 1000 / 30;
+  let lastFrameTime = performance.now();
+  function loop(currentTime: number) {
+    // Calculate time since last frame
+    let elapsedTime = currentTime - lastFrameTime;
+
+    // If enough time has passed, update the frame
+    if (elapsedTime > fpsInterval) {
+      lastFrameTime = currentTime - (elapsedTime % fpsInterval); // Correct for potential drift
+      parent.rotation.y += 0.01;
+      mixer.update(1/60); // Run the animation frame logic
+    }
+    requestAnimationFrame(loop);
+  }
+
+  requestAnimationFrame(loop);
 
   // load enviroment
-  let texture = await loadTexture("textures/png/skybox.jpg");
   let environment = await loadTexture("textures/png/V4.png");
   environment.mapping = EquirectangularReflectionMapping;
   G.scene.background = environment;

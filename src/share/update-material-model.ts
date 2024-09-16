@@ -82,7 +82,7 @@ export default function updateMaterialModel(
               assets.setMaterialData(materialId, {
                 uuid: materialId,
                 map: matData.src,
-                emissiveMap: matData.src,
+                emissiveMap: matData.emission ? matData.emission : matData.src,
                 isShader: adsBoard[child.name][adsIndex].isShader,
                 typeShader: adsBoard[child.name][adsIndex].typeShader,
                 colorShader: adsBoard[child.name][adsIndex].colorShader,
@@ -96,6 +96,11 @@ export default function updateMaterialModel(
               assets.setTextureData(matData.src, {
                 url: matData.src,
               });
+              if (matData.emission) {
+                assets.setTextureData(matData.emission, {
+                  url: matData.emission,
+                });
+              }
               material = assets.requestMaterial(materialId);
             }
             break;
