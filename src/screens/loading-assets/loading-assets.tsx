@@ -3,17 +3,20 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import assets from "share/assets";
+import G from "share/G";
+import { ConfigKey } from "share/game-interface";
+import Setting from "share/setting";
 
 export default function LoadingAsset() {
   const [progress, setProgress] = useState<number>(0);
   const nav = useNavigate();
   useEffect(() => {
     assets.loadAssets().then((manager) => {
-      manager.onStart = function (url, itemsLoaded, itemsTotal) {
-      };
+      manager.onStart = function (url, itemsLoaded, itemsTotal) {};
 
       manager.onLoad = function () {
-        nav("/menu");
+        G.openGameScreen("lobby", Setting.getConfig(ConfigKey.LOBBY_ROOM));
+        nav("/game");
       };
 
       manager.onProgress = function (url, itemsLoaded, itemsTotal) {

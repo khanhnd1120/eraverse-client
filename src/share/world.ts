@@ -52,7 +52,6 @@ export type Entity = {
     points: any;
     roomName: string;
     server: ServerConfigItem;
-    character: string;
   };
   airdrop?: {
     position?: Vector3;

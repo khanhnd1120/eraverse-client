@@ -31,7 +31,7 @@ export const world = new World<Entity>();
 let camera: PerspectiveCamera = new PerspectiveCamera();
 let audioListener: AudioListener = new AudioListener();
 let scene: Scene = new Scene();
-const directionalLight = new DirectionalLight(0xffffff, 2); // Color and intensity
+const directionalLight = new DirectionalLight(0xffffff, 1); // Color and intensity
 const ambientLight = new AmbientLight(0xffffff, 1); // Color and intensity
 const renderer: WebGLRenderer = new WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -60,7 +60,7 @@ function setupEnvironment() {
   directionalLight.shadow.mapSize.height = 1024;
   directionalLight.shadow.camera.near = 0.5;
   directionalLight.shadow.camera.far = 500;
-  scene.add(directionalLight);
+  // scene.add(directionalLight);
   scene.add(ambientLight);
   // setup group
   scene.add(particleGroup);
@@ -120,11 +120,7 @@ function cleanAll() {
   world.clear();
 }
 
-function openGameScreen(
-  roomName: string,
-  server: ServerConfigItem,
-  character: string
-) {
+function openGameScreen(roomName: string, server: ServerConfigItem) {
   cleanAll();
   setupEnvironment();
   world.add({
@@ -135,7 +131,6 @@ function openGameScreen(
       points: {},
       roomName,
       server,
-      character,
     },
   });
 }

@@ -119,7 +119,7 @@ async function init(entity: GameEntity) {
     if (elapsedTime > fpsInterval) {
       lastFrameTime = currentTime - (elapsedTime % fpsInterval); // Correct for potential drift
       parent.rotation.y += 0.01;
-      mixer.update(1/60); // Run the animation frame logic
+      mixer.update(1 / 60); // Run the animation frame logic
     }
     requestAnimationFrame(loop);
   }
@@ -138,9 +138,7 @@ async function init(entity: GameEntity) {
   // setup colyseus
   G.client = new Colyseus.Client(entity.gameScreen.server.url);
   G.client.auth.token = api.getToken() || "anonymous";
-  let room: any = await G.client.joinOrCreate(entity.gameScreen.roomName, {
-    character: entity.gameScreen.character,
-  });
+  let room: any = await G.client.joinOrCreate(entity.gameScreen.roomName, {});
   G.setCurrentRoom(room);
   entity.gameScreen.room = room;
 

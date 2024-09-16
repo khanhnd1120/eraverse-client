@@ -34,11 +34,7 @@ export default function Menu() {
       <div className="absolute bottom-0 right-0 p-[50px]">
         <CustomButton
           onClick={() => {
-            G.openGameScreen(
-              "lobby",
-              Setting.getConfig(ConfigKey.LOBBY_ROOM),
-              activeCharacterCode
-            );
+            G.openGameScreen("lobby", Setting.getConfig(ConfigKey.LOBBY_ROOM));
             nav("/game");
           }}
         >
