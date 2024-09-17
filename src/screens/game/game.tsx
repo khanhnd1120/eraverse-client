@@ -5,6 +5,7 @@ import myState from "share/my-state";
 import LoadingGame from "./loading-game";
 import ActionWheel from "./action-wheel";
 import ClaimAirdropPanel from "./claim-airdrop";
+import Notification from "./notification";
 
 export default function Game() {
   const [showDance, setShowDance] = useState(false);
@@ -29,6 +30,7 @@ export default function Game() {
       {showDance && <ActionWheel />}
       {showLoadingGame && <LoadingGame />}
       <ClaimAirdropPanel />
+      <Notification />
     </div>
   );
 }

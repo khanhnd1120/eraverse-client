@@ -27,7 +27,7 @@ import * as Colyseus from "colyseus.js";
 import api from "share/api";
 import myState from "share/my-state";
 import { asyncScheduler, BehaviorSubject, throttleTime } from "rxjs";
-import { Direction } from "share/game-interface";
+import { Direction, NotificationType } from "share/game-interface";
 import Setting from "share/setting";
 import assets from "share/assets";
 import Constants from "share/game-constant";
@@ -145,6 +145,13 @@ async function init(entity: GameEntity) {
   G.setCurrentRoom(room);
   entity.gameScreen.room = room;
 
+  room.onLeave((code: any) => {
+    myState.notification$.next({
+      type: NotificationType.Disconnect,
+    });
+    G.setCurrentRoom(null);
+  });
+
   room.state.players.onAdd((player: any, key: any) => {
     onPlayerAdded(entity, player, key);
   });
@@ -159,6 +166,16 @@ async function init(entity: GameEntity) {
   });
   setTimeout(() => {
     myState.loadingGame$.next(false);
+    G.getCurrentRoom()?.send("analytic", {
+      fps: G.getFps(),
+      numberModel: assets.getCountModel(),
+    });
+    setInterval(() => {
+      G.getCurrentRoom()?.send("analytic", {
+        fps: G.getFps(),
+        numberModel: assets.getCountModel(),
+      });
+    }, 300000);
   }, 5000);
 }
 function onPlayerAdded(entity: GameEntity, player: any, key: string) {
@@ -174,7 +191,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
           if (newPosition === null) {
             return;
           }
-          G.getCurrentRoom().send("position", {
+          G.getCurrentRoom()?.send("position", {
             pos: newPosition,
           });
         })
@@ -183,7 +200,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       myState.direction$
         .pipe(throttleTime(500, asyncScheduler, { trailing: true }))
         .subscribe((newDirection: Direction | null) => {
-          G.getCurrentRoom().send("direction", {
+          G.getCurrentRoom()?.send("direction", {
             direction: newDirection,
           });
         })
@@ -195,7 +212,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
           if (newRotation === null) {
             return;
           }
-          G.getCurrentRoom().send("rotate", {
+          G.getCurrentRoom()?.send("rotate", {
             rotation: { x: newRotation.x, y: newRotation.y, z: newRotation.z },
           });
         })

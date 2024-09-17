@@ -47,6 +47,9 @@ let currentRoom: any;
 let stats = new Stats();
 let messages: any = [];
 let mePlayer: any = null;
+let fps = 0;
+let frames = 0,
+  prevTime = performance.now();
 
 function setupEnvironment() {
   // setup camera
@@ -97,9 +100,25 @@ function setupEnvironment() {
   composer.addPass(bloomPass);
   composer.addPass(outputPass);
 }
+function setFps(val: number) {
+  fps = val;
+}
+function getFps() {
+  return fps;
+}
+function calFps() {
+  frames++;
+  const time = performance.now();
+  if (time >= prevTime + 1000) {
+    G.setFps(Math.round((frames * 1000) / (time - prevTime)));
+    frames = 0;
+    prevTime = time;
+  }
+}
 
 function render() {
   composer.render();
+  calFps();
   if (stats) {
     stats.update();
     TWEEN.update();
@@ -173,5 +192,9 @@ const G = {
   composer,
   renderer,
   mePlayer,
+  fps,
+  calFps,
+  setFps,
+  getFps,
 };
 export default G;

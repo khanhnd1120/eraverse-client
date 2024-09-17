@@ -7,6 +7,7 @@ export default function Chat() {
   const [form] = Form.useForm();
   const inputRef = useRef(null);
   const [messages, setMessages] = useState([]);
+  const [showInput, setShowInput] = useState(true);
 
   useEffect(() => {
     myState.chatMessages$.subscribe((msgs: any) => {
@@ -19,10 +20,13 @@ export default function Chat() {
     });
     const activeChat = myState.activeChat$.subscribe((v: boolean) => {
       if (v) {
+        setShowInput(true);
         if (inputRef && inputRef.current) {
           inputRef.current.focus();
         }
         document.exitPointerLock();
+      } else {
+        setShowInput(false);
       }
     });
     return () => {
@@ -30,9 +34,16 @@ export default function Chat() {
       chatMessage.unsubscribe();
     };
   }, []);
+  useEffect(() => {
+    if (showInput) {
+      if (inputRef && inputRef.current) {
+        inputRef.current.focus();
+      }
+    }
+  }, [showInput]);
   return (
     <div
-      className="absolute w-[300px] h-[500px] bg-gray-800 bg-opacity-70 pl-5 py-3 rounded-md"
+      className="absolute w-[300px] h-[500px] bg-gray-800 bg-opacity-50 pl-5 py-3 rounded-md"
       style={{ top: "calc(100vh - 510px)", left: "calc(100vw - 310px)" }}
     >
       <div className="overflow-y-scroll w-full h-[430px]">
@@ -59,7 +70,7 @@ export default function Chat() {
           }}
           form={form}
         >
-          <Form.Item name="content">
+          <Form.Item name="content" className={`${showInput ? "" : "hidden"}`}>
             <Input
               ref={inputRef}
               className="hover:bg-gray-950 focus:bg-gray-950 bg-gray-950 bg-opacity-40 text-white"

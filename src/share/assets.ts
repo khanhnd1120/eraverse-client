@@ -66,6 +66,7 @@ const FONTS: { [key: string]: { url: string; font?: any } } = {
 };
 let TEXTURES: TextureConfigData = {};
 let MATERIALS: MaterialConfigData = {};
+let countModel: number = 0;
 
 function loadFont(manager: LoadingManager) {
   const fontLoader = new FontLoader(manager);
@@ -120,7 +121,11 @@ function getSound(name: string): AudioBuffer {
   return buf;
 }
 function getModel(name: string) {
+  countModel++;
   return MODELS[name].gltf;
+}
+function getCountModel() {
+  return countModel;
 }
 function getTextures(): TextureConfigData {
   return TEXTURES;
@@ -177,7 +182,7 @@ function requestMaterial(name: string) {
     return;
   }
   const bitmapLoader = new ImageBitmapLoader(textureManager);
-  bitmapLoader.setCrossOrigin('anonymous');
+  bitmapLoader.setCrossOrigin("anonymous");
   textureIds.map((key) => {
     if (!TEXTURES[key]) {
       return;
@@ -461,5 +466,6 @@ const assets = {
   createNeonLightText,
   getNeonTextMaterial,
   getMeshNameByCode,
+  getCountModel,
 };
 export default assets;
