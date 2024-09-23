@@ -294,9 +294,9 @@ function processClientEvent(entity: MeEntity) {
     G.getCurrentRoom().send("danceAnim", { danceAnim: val });
   });
   myState.keyStates$.subscribe((keyStates) => {
-    if (keyStates["KeyE"] && entity.me.airdrop?.rewardId) {
+    if (keyStates["KeyE"] && entity.me.airdrop?.id) {
       G.getCurrentRoom().send("claim_airdrop", {
-        id: entity.me.airdrop?.rewardId,
+        id: entity.me.airdrop?.id,
       });
     }
   });
@@ -327,7 +327,7 @@ function cronjob(entity: MeEntity) {
       let isRemoveOldAir = false;
       let isNewAir = false;
       if (nearestAirdrop) {
-        if (nearestAirdrop.airdrop.rewardId !== entity.me.airdrop?.rewardId) {
+        if (nearestAirdrop.airdrop.id !== entity.me.airdrop?.id) {
           isRemoveOldAir = true;
           isNewAir = true;
         }

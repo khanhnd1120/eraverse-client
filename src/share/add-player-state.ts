@@ -43,7 +43,7 @@ export default function addPlayerState(
       stateTop,
       stateBottom,
     };
-    G.getCurrentRoom().send("state", {
+    G.getCurrentRoom()?.send("state", {
       stateBottom: player.stateBottom,
       stateTop: player.stateTop,
     });

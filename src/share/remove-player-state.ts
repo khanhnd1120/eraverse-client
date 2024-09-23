@@ -44,7 +44,7 @@ export default function removePlayerState(
       ...player,
       ...changeData,
     };
-    G.getCurrentRoom().send("state", {
+    G.getCurrentRoom()?.send("state", {
       stateBottom: player.stateBottom,
       stateTop: player.stateTop,
     });

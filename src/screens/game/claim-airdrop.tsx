@@ -60,28 +60,30 @@ export default function ClaimAirdropPanel() {
               <div className="text-xs mt-2">
                 Your reward will be sent shortly. Please stay tuned!
               </div>
-              <div className="flex items-center justify-center gap-3 mt-10">
-                <div className="text-4xl">
-                  {Math.floor(
-                    claimAirdropNoti?.airdropClaimed?.amount * 1000000
-                  ) / 1000000}
-                </div>
-                {claimAirdropNoti?.airdropClaimed?.rewardType ===
-                  RewardType.APT && (
-                  <img
-                    src="ui/icon/iconApt.png"
-                    alt="icon"
-                    className="w-[60px]"
-                  />
-                )}
-                {claimAirdropNoti?.airdropClaimed?.rewardType ===
-                  RewardType.EGON && (
-                  <img
-                    src="ui/icon/ERA3_Logo.png"
-                    alt="icon"
-                    className="w-[60px]"
-                  />
-                )}
+              <div className="flex items-center justify-center gap-3 mt-3">
+                {claimAirdropNoti.airdropClaimed.rewards.map((reward: any) => {
+                  return (
+                    <div>
+                      {reward?.rewardType === RewardType.APT && (
+                        <img
+                          src="ui/icon/iconApt.png"
+                          alt="icon"
+                          className="w-[60px] h-[60px]"
+                        />
+                      )}
+                      {reward?.rewardType === RewardType.EGON && (
+                        <img
+                          src="ui/icon/ERA3_Logo.png"
+                          alt="icon"
+                          className="w-[60px] h-[60px]"
+                        />
+                      )}
+                      <div className="text-4xl">
+                        {Math.floor(reward?.amount * 1000000) / 1000000}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
               <CustomButton onClick={close} className="w-[100px] m-auto mt-5">
                 <div className="bg-[#f17d00] text-3xl text-center flex justify-center items-center py-1">

@@ -513,7 +513,7 @@ function onAirdropAdded(entity: GameEntity, airdrop: any, key: string) {
       status: airdrop.status,
       amount: airdrop.amount,
       rewardType: airdrop.rewardType,
-      rewardId: airdrop.rewardId,
+      id: airdrop.id,
       position: airdropObject.position.clone(),
     },
     model: {

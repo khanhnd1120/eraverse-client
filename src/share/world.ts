@@ -59,7 +59,7 @@ export type Entity = {
     status: AirdropStatus;
     amount: number;
     rewardType: RewardType;
-    rewardId: number;
+    id: number;
   };
   playerSound?: {
     bodySoundTop: PositionalAudio;
