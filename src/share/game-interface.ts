@@ -187,6 +187,7 @@ export type AdsBoard = {
 export enum RewardType {
   APT,
   EGON,
+  GIFT_CODE,
 }
 
 export enum AirdropStatus {

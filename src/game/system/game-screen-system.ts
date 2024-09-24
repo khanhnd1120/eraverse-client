@@ -522,6 +522,20 @@ function onAirdropAdded(entity: GameEntity, airdrop: any, key: string) {
       position: new Vector3(0, 0, 0),
       parent: airdropObject,
       modelReady$: new BehaviorSubject<boolean>(false),
+      traverse: (child: any) => {
+        updateMaterialModel(
+          child,
+          "airdrop",
+          assets.getMeshNameByCode("airdrop")
+        );
+        myState.reloadMaterial$.subscribe((names: string[]) => {
+          updateMaterialModel(
+            child,
+            "airdrop",
+            assets.getMeshNameByCode("airdrop")
+          );
+        });
+      },
     },
   });
   entity.gameScreen.airdropEntities[key] = e;

@@ -27,12 +27,15 @@ function onPositionUpdate(e: PositionEntity, delta: number) {
   } else {
     // let old = e.gameObject.position.clone();
     // e.gameObject.position.clone().lerp(e.position, 0.05).x
-    e.gameObject.position.set(
-      e.gameObject.position.clone().lerp(e.position, 0.05).x,
-      e.gameObject.position.clone().lerp(e.position, 0.2).y,
-      e.gameObject.position.clone().lerp(e.position, 0.05).z
-    );
-    // e.gameObject.position.lerp(e.position, 0.05);
+    if (e.airdrop) {
+      e.gameObject.position.lerp(e.position, 0.2);
+    } else {
+      e.gameObject.position.set(
+        e.gameObject.position.clone().lerp(e.position, 0.05).x,
+        e.gameObject.position.clone().lerp(e.position, 0.2).y,
+        e.gameObject.position.clone().lerp(e.position, 0.05).z
+      );
+    }
   }
 }
 function onPositionAdded(e: PositionEntity) {}

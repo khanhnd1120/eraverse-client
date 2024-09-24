@@ -1,3 +1,4 @@
+import { Tooltip } from "antd";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { AirdropClaimStatus, RewardType } from "share/game-interface";
@@ -49,10 +50,10 @@ export default function ClaimAirdropPanel() {
   }
   return (
     <div className="bg-black bg-opacity-60 w-full h-full absolute flex item-center align-middle z-[10000]">
-      <div className="w-1/2 h-[300px] max-w-[500px] m-auto">
+      <div className="w-1/2 min-h-[300px] max-w-[500px] m-auto">
         <div className="bg-black p-2">Claim Airdrop</div>
 
-        <div className="h-full w-full bg-gray-500 bg-opacity-50 text-center pt-9">
+        <div className="h-full w-full bg-gray-500 bg-opacity-50 text-center pt-9 pb-10">
           {claimAirdropNoti.airdropClaimStatus ===
             AirdropClaimStatus.Success && (
             <div>
@@ -60,7 +61,7 @@ export default function ClaimAirdropPanel() {
               <div className="text-xs mt-2">
                 Your reward will be sent shortly. Please stay tuned!
               </div>
-              <div className="flex items-center justify-center gap-3 mt-3">
+              <div className="flex items-center justify-center gap-3 mt-5">
                 {claimAirdropNoti.airdropClaimed.rewards.map((reward: any) => {
                   return (
                     <div>
@@ -78,9 +79,36 @@ export default function ClaimAirdropPanel() {
                           className="w-[60px] h-[60px]"
                         />
                       )}
-                      <div className="text-4xl">
-                        {Math.floor(reward?.amount * 1000000) / 1000000}
-                      </div>
+                      {[RewardType.EGON, RewardType.APT].includes(
+                        reward?.rewardType
+                      ) && (
+                        <div className="text-4xl">
+                          {Math.floor(reward?.amount * 1000000) / 1000000}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-5">
+                {claimAirdropNoti.airdropClaimed.rewards.map((reward: any) => {
+                  return (
+                    <div>
+                      {reward?.rewardType === RewardType.GIFT_CODE && (
+                        <div className="flex gap-2 items-center justify-center">
+                          <div> {`${reward?.content} ${reward?.giftCode}`}</div>
+                          <Tooltip title="Copied" trigger={"click"}>
+                            <img
+                              src="ui/icon/copy.png"
+                              alt="icon"
+                              className="cursor-pointer"
+                              onClick={() => {
+                                navigator.clipboard.writeText(reward?.giftCode);
+                              }}
+                            />
+                          </Tooltip>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
