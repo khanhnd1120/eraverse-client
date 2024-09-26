@@ -4,6 +4,7 @@ import Environment from "environment";
 import { ConfigKey, SettingData } from "./game-interface";
 let settingData: SettingData = null;
 let config: { [key: string]: string } = {};
+let airdropScheduleInfo: any = {};
 
 async function loadSetting() {
   let data = await (
@@ -12,6 +13,7 @@ async function loadSetting() {
   settingData = data.GAME_SETTING;
   config = data.CONFIG;
   settingData = data.GAME_SETTING;
+  airdropScheduleInfo = data.airdropScheduleInfo;
 }
 function getConfig(key: ConfigKey): any {
   return config[key];
@@ -19,10 +21,14 @@ function getConfig(key: ConfigKey): any {
 function getSetting(): SettingData {
   return settingData;
 }
+function getLastestAirdropSchedule() {
+  return airdropScheduleInfo;
+}
 const Setting = {
   loadSetting,
   getConfig,
   getSetting,
+  getLastestAirdropSchedule,
 };
 
 export default Setting;

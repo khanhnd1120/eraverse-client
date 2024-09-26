@@ -7,7 +7,7 @@ import myState from "share/my-state";
 import removePlayerState from "share/remove-player-state";
 import Setting from "share/setting";
 import { Entity } from "share/world";
-import { Euler, MathUtils, Vector3 } from "three";
+import { Euler, Line3, MathUtils, Vector3 } from "three";
 import { Capsule } from "three/examples/jsm/Addons.js";
 
 const _PI_2 = Math.PI / 2;
@@ -75,9 +75,11 @@ function updatePlayerRigidBodyStep(entity: MeEntity, deltaTime: number) {
 
   entity.me.velocity.addScaledVector(entity.me.velocity, damping);
 
+  // logic move
   const deltaPosition = entity.me.velocity.clone().multiplyScalar(deltaTime);
   entity.me.collider.translate(deltaPosition);
 
+  // check collision with map
   const result = G.worldOctree.capsuleIntersect(entity.me.collider);
 
   entity.player.isOnFloor = false;
@@ -92,6 +94,45 @@ function updatePlayerRigidBodyStep(entity: MeEntity, deltaTime: number) {
       );
     }
     entity.me.collider.translate(result.normal.multiplyScalar(result.depth));
+  }
+
+  // check collision with airdrop
+  for (const airdropData of airdropEntities) {
+    if (airdropData.airdrop?.status === AirdropStatus.Ready) {
+      let closestPoint = new Vector3();
+      airdropData.airdrop.collider.clampPoint(
+        entity.me.collider.start.clone(),
+        closestPoint
+      );
+      let capsuleSegment = new Line3(
+        entity.me.collider.start.clone(),
+        entity.me.collider.end.clone()
+      );
+      let closestOnCapsule = capsuleSegment.closestPointToPoint(
+        closestPoint,
+        true,
+        new Vector3()
+      );
+      let distance = closestOnCapsule.distanceTo(closestPoint);
+      if (distance <= 1.2) {
+        // Calculate the direction to move the capsule or the box
+        let closestPoint = new Vector3();
+        airdropData.airdrop.collider.clampPoint(
+          entity.me.collider.start.clone(),
+          closestPoint
+        );
+
+        let displacement = new Vector3().subVectors(
+          entity.me.collider.start.clone(),
+          closestPoint
+        );
+        displacement.normalize().multiplyScalar(0.04); // Move by radius
+        displacement.y = 0;
+
+        // Apply the displacement to the object (capsule or box)
+        entity.me.collider.translate(displacement);
+      }
+    }
   }
   let camPosition = entity.me.followCamera.getWorldPosition(new Vector3());
   let viewPointPosition = entity.me.viewPoint.getWorldPosition(new Vector3());
@@ -298,6 +339,8 @@ function processClientEvent(entity: MeEntity) {
       G.getCurrentRoom().send("claim_airdrop", {
         id: entity.me.airdrop?.id,
       });
+      entity.me.keyStates["KeyE"] = false;
+      myState.keyStates$.next(entity.me.keyStates);
     }
   });
 }
@@ -412,6 +455,9 @@ function setInputEvent(entity: MeEntity) {
           viewPointPosition.z
         )
       );
+      if (entity.me.tutorial["airdrop"]) {
+        entity.me.tutorial["airdrop"].lookAt(camPosition);
+      }
     }
   };
   entity.me.onKeyDown = (event: any) => {
@@ -426,6 +472,11 @@ function setInputEvent(entity: MeEntity) {
         myState.showActionWheel$.next(!myState.showActionWheel$.value);
         break;
       case "KeyC":
+        console.log(
+          Math.round(entity.gameObject.position.x),
+          Math.round(entity.gameObject.position.y),
+          Math.round(entity.gameObject.position.z)
+        );
         break;
       case "Enter":
         myState.activeChat$.next(true);

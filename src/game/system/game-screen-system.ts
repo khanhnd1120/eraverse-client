@@ -3,6 +3,7 @@ import { With } from "miniplex";
 import { Entity } from "share/world";
 import {
   AnimationMixer,
+  Box3,
   BufferAttribute,
   BufferGeometry,
   EquirectangularReflectionMapping,
@@ -515,6 +516,10 @@ function onAirdropAdded(entity: GameEntity, airdrop: any, key: string) {
       rewardType: airdrop.rewardType,
       id: airdrop.id,
       position: airdropObject.position.clone(),
+      collider: new Box3(
+        airdropObject.position.clone().add(new Vector3(-0.4, -1.2, -0.3)),
+        airdropObject.position.clone().add(new Vector3(0.4, -0.8, 0.3))
+      ),
     },
     model: {
       name: "airdrop",

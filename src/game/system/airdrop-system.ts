@@ -4,7 +4,7 @@ import { AirdropStatus } from "share/game-interface";
 import { Entity } from "share/world";
 import TWEEN from "@tweenjs/tween.js";
 import { Easing } from "three/examples/jsm/libs/tween.module.js";
-import myState from "share/my-state";
+import { Vector3 } from "three";
 
 let airdropEntities = world.with("airdrop", "position");
 type AirdropEntity = With<Entity, "airdrop" | "position">;
@@ -15,6 +15,12 @@ export function airdropSystem(delta: number) {}
 
 function onEntityAdded(entity: AirdropEntity) {
   entity.airdrop.serverObject.listen("position", (position: any) => {
+    // translate collider
+    entity.airdrop.collider.translate(
+      new Vector3(position.x, position.y, position.z).sub(
+        entity.position.clone()
+      )
+    );
     entity.position.set(position.x, position.y, position.z);
     entity.airdrop.position.set(position.x, position.y, position.z);
   });

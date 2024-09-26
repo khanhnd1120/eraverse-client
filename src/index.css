@@ -173,3 +173,16 @@ body {
 .skin-menu-item:hover .battle-button-border {
   display: block !important;
 }
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.marqueue {
+  animation: marquee 40s linear infinite;
+}

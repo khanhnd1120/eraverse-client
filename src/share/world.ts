@@ -2,6 +2,7 @@ import { BehaviorSubject } from "rxjs";
 import * as Colyseus from "colyseus.js";
 import {
   AnimationMixer,
+  Box3,
   Euler,
   Material,
   Object3D,
@@ -60,6 +61,7 @@ export type Entity = {
     amount: number;
     rewardType: RewardType;
     id: number;
+    collider: Box3;
   };
   playerSound?: {
     bodySoundTop: PositionalAudio;
