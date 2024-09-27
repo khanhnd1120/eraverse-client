@@ -4,7 +4,8 @@ import { AirdropStatus } from "share/game-interface";
 import { Entity } from "share/world";
 import TWEEN from "@tweenjs/tween.js";
 import { Easing } from "three/examples/jsm/libs/tween.module.js";
-import { Vector3 } from "three";
+import { Mesh, RingGeometry, TorusGeometry, Vector3 } from "three";
+import assets from "share/assets";
 
 let airdropEntities = world.with("airdrop", "position");
 type AirdropEntity = With<Entity, "airdrop" | "position">;
@@ -28,6 +29,20 @@ function onEntityAdded(entity: AirdropEntity) {
     entity.airdrop.status = status;
     if (status === AirdropStatus.Ready) {
       hideParachute(entity);
+    }
+    if (status === AirdropStatus.Drop) {
+      const airPosGeo = new TorusGeometry(0.7, 0.1);
+      const airPosMesh = new Mesh(airPosGeo, assets.getAirdropPosMaterial());
+      const worldPos = entity.gameObject.getWorldPosition(new Vector3());
+      airPosMesh.position.set(worldPos.x, 1.2, worldPos.z);
+      airPosMesh.rotateX(Math.PI / 2);
+      G.particleGroup.add(airPosMesh);
+      new TWEEN.Tween(airPosMesh.scale)
+        .to({ x: 0.1, y: 0.1, z: 0.1 }, 10000)
+        .onComplete(() => {
+          G.particleGroup.remove(airPosMesh);
+        })
+        .start();
     }
     if (status === AirdropStatus.Claimed) {
       entity.gameObject.traverse((child: any) => {

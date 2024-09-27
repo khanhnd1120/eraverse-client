@@ -455,7 +455,7 @@ function setInputEvent(entity: MeEntity) {
           viewPointPosition.z
         )
       );
-      if (entity.me.tutorial["airdrop"]) {
+      if (entity.me.tutorial && entity.me.tutorial["airdrop"]) {
         entity.me.tutorial["airdrop"].lookAt(camPosition);
       }
     }

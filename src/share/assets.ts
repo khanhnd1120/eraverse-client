@@ -5,6 +5,7 @@ import {
   AudioLoader,
   CanvasTexture,
   Color,
+  DoubleSide,
   Euler,
   Float32BufferAttribute,
   ImageBitmapLoader,
@@ -12,6 +13,7 @@ import {
   LoadingManager,
   Material,
   Mesh,
+  MeshBasicMaterial,
   MeshPhysicalMaterial,
   MeshStandardMaterial,
   ShaderMaterial,
@@ -451,6 +453,20 @@ function getMeshNameByCode(code: string) {
     (key: any) => myState.meshMaterial$.value[code][key]
   );
 }
+function getAirdropPosMaterial() {
+  if (!MATERIALS["airdropPosition"]) {
+    MATERIALS["airdropPosition"] = {
+      data: {},
+      mat: new MeshBasicMaterial({
+        color: "#00fbf9",
+        transparent: true,
+        opacity: 0.5,
+        side: DoubleSide
+      }),
+    };
+  }
+  return MATERIALS["airdropPosition"].mat;
+}
 const assets = {
   loadAssets,
   getModel,
@@ -467,5 +483,6 @@ const assets = {
   getNeonTextMaterial,
   getMeshNameByCode,
   getCountModel,
+  getAirdropPosMaterial,
 };
 export default assets;
