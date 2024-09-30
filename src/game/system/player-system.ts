@@ -35,13 +35,5 @@ function onEntityAdded(entity: PlayerEntity) {
   });
   entity.player.serverObject.listen("isRun", (isRun: any) => {
     entity.player.isRun = isRun;
-  });
-  entity.player.serverObject.listen("isBeaten", (isBeaten: any) => {
-    if (isBeaten) {
-      entity.player = addPlayerState(PlayerState.Beaten, entity.player);
-    } else {
-      entity.player = removePlayerState(PlayerState.Beaten, entity.player);
-    }
-  });
-
+  });  
 }

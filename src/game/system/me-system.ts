@@ -412,7 +412,7 @@ function setInputEvent(entity: MeEntity) {
   entity.me.onMouseMove = (event: any) => {
     if (document.pointerLockElement === document.body) {
       if (
-        entity.player.stateTop === PlayerState.Dance &&
+        [PlayerState.Dance, PlayerState.Beaten].includes(entity.player.stateTop) &&
         !entity.me.keyStates["RIGHTMOUSE"]
       ) {
         // when dance not rotate
