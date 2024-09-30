@@ -23,6 +23,7 @@ const keyStates$ = new BehaviorSubject<{ [key: string]: boolean }>({});
 const claimAirdropNoti$ = new BehaviorSubject<{
   airdropClaimStatus: AirdropClaimStatus;
   airdropClaimed: any;
+  airdropClaimError: any;
 }>(null);
 const keylessAccountData$ = new BehaviorSubject<KeylessAccount>(null);
 const listSkin$ = new BehaviorSubject<string[]>([]);

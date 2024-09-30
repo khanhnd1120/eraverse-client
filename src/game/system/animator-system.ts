@@ -15,6 +15,7 @@ import {
   AnimationClip,
   AnimationMixer,
   LoopRepeat,
+  Vector3,
 } from "three";
 import { Easing } from "three/examples/jsm/libs/tween.module.js";
 import TWEEN from "@tweenjs/tween.js";
@@ -101,7 +102,11 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
                 clipItem.name === animatorItem.currentAnimation
             );
             if (nextAnim.anim == "stand") {
-              e.model.object.position.set(0, 0, 0.35);
+              const newPos = new Vector3(0, 0, 0.35).applyAxisAngle(
+                new Vector3(0, 1, 0),
+                e.model.object.rotation.y
+              );
+              e.model.object.position.copy(newPos);
             }
             if (nextAnim.anim == "die") {
               e.model.object.traverse((child: any) => {
@@ -116,18 +121,20 @@ function updateAnimator(e: AnimatorEntity, delta: number) {
                     )
                       .to(
                         { opacity: 0 },
-                        playClip.clip.getClip().duration * 1000
+                        playClip.clip.getClip().duration * 1000 - 1000
                       )
                       .easing(Easing.Quadratic.Out)
                       .onComplete(() => {
-                        new TWEEN.Tween(child.material)
-                          .to({ opacity: 1 }, 1000)
-                          .easing(Easing.Quadratic.Out)
-                          .start()
-                          .onComplete(() => {
-                            child.material = child.userData.oldMaterial;
-                            child.userData.tweenOpacity = null;
-                          });
+                        setTimeout(() => {
+                          new TWEEN.Tween(child.material)
+                            .to({ opacity: 1 }, 1000)
+                            .easing(Easing.Quadratic.Out)
+                            .start()
+                            .onComplete(() => {
+                              child.material = child.userData.oldMaterial;
+                              child.userData.tweenOpacity = null;
+                            });
+                        }, 500);
                       })
                       .start();
                   }

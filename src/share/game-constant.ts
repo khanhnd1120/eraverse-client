@@ -1,3 +1,5 @@
+import { LoopOnce } from "three";
+
 const Constants: any = {
   CharacterCodes: [
     "FEMALE_02",
@@ -77,18 +79,18 @@ const Constants: any = {
     },
     BASIC_01: {
       model: "model_basic",
-      anim_top: "female_anim_top",
-      anim_bottom: "female_anim_bottom",
+      anim_top: "basic_anim_top",
+      anim_bottom: "basic_anim_bottom",
     },
     BASIC_02: {
       model: "model_basic",
-      anim_top: "female_anim_top",
-      anim_bottom: "female_anim_bottom",
+      anim_top: "basic_anim_top",
+      anim_bottom: "basic_anim_bottom",
     },
     BASIC_03: {
       model: "model_basic",
-      anim_top: "female_anim_top",
-      anim_bottom: "female_anim_bottom",
+      anim_top: "basic_anim_top",
+      anim_bottom: "basic_anim_bottom",
     },
     FEMALE_10: {
       model: "model_female_premium",
@@ -183,8 +185,8 @@ const Constants: any = {
     { name: "punch", timeScale: 2 },
     { name: "fall_idle", timeScale: 1.5 },
     { name: "fall_to_landing", timeScale: 1 },
-    { name: "die", timeScale: 1 },
-    { name: "stand", timeScale: 1 },
+    { name: "die", timeScale: 1.2 },
+    { name: "stand", timeScale: 2, loop: LoopOnce },
   ],
   SkinAvatarImgs: {
     FEMALE_02: "ui/Female/2.png",

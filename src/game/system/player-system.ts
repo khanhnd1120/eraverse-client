@@ -1,9 +1,5 @@
 import { With } from "miniplex";
-import addPlayerState from "share/add-player-state";
 import { world } from "share/G";
-import { PlayerState } from "share/game-interface";
-import myState from "share/my-state";
-import removePlayerState from "share/remove-player-state";
 import { Entity } from "share/world";
 
 let playerEntities = world.with("player", "position");

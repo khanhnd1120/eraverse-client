@@ -9,6 +9,7 @@ export default function ClaimAirdropPanel() {
   const [claimAirdropNoti, setClaimAirdropNoti] = useState<{
     airdropClaimStatus: AirdropClaimStatus;
     airdropClaimed: any;
+    airdropClaimError: any;
   }>(null);
 
   function close() {
@@ -86,9 +87,11 @@ export default function ClaimAirdropPanel() {
                           className="w-[60px] h-[60px]"
                         />
                       )}
-                      {[RewardType.EGON, RewardType.APT, RewardType.PEGON].includes(
-                        reward?.rewardType
-                      ) && (
+                      {[
+                        RewardType.EGON,
+                        RewardType.APT,
+                        RewardType.PEGON,
+                      ].includes(reward?.rewardType) && (
                         <div className="text-4xl">
                           {Math.floor(reward?.amount * 1000000) / 1000000}
                         </div>
@@ -143,8 +146,7 @@ export default function ClaimAirdropPanel() {
             <div className=" justify-center gap-2 mt-10">
               <div className="text-4xl">Oops!</div>
               <div className="text-xs mt-2">
-                Missed it! The reward has already been claimed by another
-                player.
+                {claimAirdropNoti.airdropClaimError}
               </div>
               <CustomButton onClick={close} className="w-[100px] m-auto mt-12">
                 <div className="bg-[#f17d00] text-3xl text-center flex justify-center items-center py-1">

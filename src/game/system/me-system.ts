@@ -320,6 +320,12 @@ function processServerEvent(entity: MeEntity) {
       airdropClaimed,
     });
   });
+  entity.player.serverObject.listen("airdropClaimError", (airdropClaimError: any) => {
+    myState.claimAirdropNoti$.next({
+      ...myState.claimAirdropNoti$.value,
+      airdropClaimError,
+    });
+  });
 }
 function processClientEvent(entity: MeEntity) {
   myState.showActionWheel$.subscribe((val) => {

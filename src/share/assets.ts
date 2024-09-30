@@ -45,6 +45,12 @@ const MODELS: { [key: string]: { url: string; gltf?: GLTF } } = {
   female_anim_top: {
     url: "character/eragon/female_anim_top.glb",
   },
+  basic_anim_bottom: {
+    url: "character/eragon/basic_anim_bottom.glb",
+  },
+  basic_anim_top: {
+    url: "character/eragon/basic_anim_top.glb",
+  },
   model_basic: {
     url: "character/eragon/model_basic.glb",
   },
@@ -458,7 +464,7 @@ function getAirdropPosMaterial() {
     MATERIALS["airdropPosition"] = {
       data: {},
       mat: new MeshBasicMaterial({
-        color: "#00fbf9",
+        color: "#ffff00",
         transparent: true,
         opacity: 0.5,
         side: DoubleSide

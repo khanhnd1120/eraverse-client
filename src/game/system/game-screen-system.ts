@@ -143,6 +143,12 @@ async function init(entity: GameEntity) {
   G.client = new Colyseus.Client(entity.gameScreen.server.url);
   G.client.auth.token = api.getToken() || "anonymous";
   let room: any = await G.client.joinOrCreate(entity.gameScreen.roomName, {});
+  room.onMessage("notification", (mess: any) => {
+    myState.notification$.next({
+      type: NotificationType.Default,
+      ...mess,
+    });
+  });
   G.setCurrentRoom(room);
   entity.gameScreen.room = room;
 
@@ -348,7 +354,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       },
       model: {
         name: Constants.CharacterData[player.character].model,
-        scale: new Vector3(0.1, 0.1, 0.1),
+        scale: new Vector3(0.015, 0.015, 0.015),
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
           updateMaterialModel(
@@ -414,7 +420,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       position: playerObject.position.clone(),
       model: {
         name: Constants.CharacterData[player.character].model,
-        scale: new Vector3(0.1, 0.1, 0.1),
+        scale: new Vector3(0.015, 0.015, 0.015),
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
           updateMaterialModel(
@@ -427,22 +433,20 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             }
           );
           myState.reloadMaterial$.subscribe((names: string[]) => {
-            myState.reloadMaterial$.subscribe((names: string[]) => {
-              const playerData = world
-                .with("player")
-                .entities.filter((entity) => entity.player.id === player.id);
-              if (playerData && playerData[0]) {
-                updateMaterialModel(
-                  child,
-                  playerData[0].player.character,
-                  names,
-                  {
-                    type: "enemy",
-                    id: key,
-                  }
-                );
-              }
-            });
+            const playerData = world
+              .with("player")
+              .entities.filter((entity) => entity.player.id === player.id);
+            if (playerData && playerData[0]) {
+              updateMaterialModel(
+                child,
+                playerData[0].player.character,
+                names,
+                {
+                  type: "enemy",
+                  id: key,
+                }
+              );
+            }
           });
         },
         parent: playerObject,
@@ -530,15 +534,11 @@ function onAirdropAdded(entity: GameEntity, airdrop: any, key: string) {
       traverse: (child: any) => {
         updateMaterialModel(
           child,
-          "airdrop",
-          assets.getMeshNameByCode("airdrop")
+          airdrop.model,
+          assets.getMeshNameByCode(airdrop.model)
         );
         myState.reloadMaterial$.subscribe((names: string[]) => {
-          updateMaterialModel(
-            child,
-            "airdrop",
-            assets.getMeshNameByCode("airdrop")
-          );
+          updateMaterialModel(child, airdrop.model, names);
         });
       },
     },

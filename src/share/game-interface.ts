@@ -205,5 +205,6 @@ export enum AirdropClaimStatus {
 }
 
 export enum NotificationType {
+  Default,
   Disconnect,
 }

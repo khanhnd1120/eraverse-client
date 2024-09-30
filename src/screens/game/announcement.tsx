@@ -20,6 +20,7 @@ export default function Announcement() {
   const [airdropInfo, setAirdropInfo] = useState(null);
   const [serverTz, setServerTz] = useState("");
   const [countDownAirdrop, setCountDownAirdrop] = useState("");
+  const [isInAirdrop, setIsInAirdrop] = useState(false);
 
   useEffect(() => {
     setAirdropInfo(Setting.getLastestAirdropSchedule());
@@ -39,6 +40,13 @@ export default function Announcement() {
           )
         );
       }
+      if (
+        dayjs(airdropInfo.start) < dayjs().tz(serverTz) &&
+        dayjs(airdropInfo.end) > dayjs().tz(serverTz)
+      ) {
+        setIsInAirdrop(true);
+        clearInterval(interval);
+      }
     }, 1000);
     return () => {
       clearInterval(interval);
@@ -53,6 +61,12 @@ export default function Announcement() {
               🚨 Exciting news! Our airdrop will begin in just{" "}
               {countDownAirdrop} ! Get ready to receive your rewards—stay tuned
               and be prepared!
+            </div>
+          )}
+          {isInAirdrop && (
+            <div className="inline-block mr-[50px] text-xl">
+              Airdrop Season is here! Collect your rewards while it lasts. Stay
+              active and don't miss out on this limited opportunity!
             </div>
           )}
         </div>
