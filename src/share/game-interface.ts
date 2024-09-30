@@ -188,6 +188,7 @@ export enum RewardType {
   APT,
   EGON,
   GIFT_CODE,
+  PEGON,
 }
 
 export enum AirdropStatus {

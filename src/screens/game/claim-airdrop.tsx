@@ -79,7 +79,14 @@ export default function ClaimAirdropPanel() {
                           className="w-[60px] h-[60px]"
                         />
                       )}
-                      {[RewardType.EGON, RewardType.APT].includes(
+                      {reward?.rewardType === RewardType.PEGON && (
+                        <img
+                          src="ui/icon/pegon.svg"
+                          alt="icon"
+                          className="w-[60px] h-[60px]"
+                        />
+                      )}
+                      {[RewardType.EGON, RewardType.APT, RewardType.PEGON].includes(
                         reward?.rewardType
                       ) && (
                         <div className="text-4xl">
