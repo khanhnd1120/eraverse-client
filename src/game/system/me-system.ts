@@ -1,5 +1,6 @@
 import utils from "game/help/utils";
 import { With } from "miniplex";
+import { combineLatest } from "rxjs";
 import addPlayerState from "share/add-player-state";
 import G, { world } from "share/G";
 import { AirdropStatus, Direction, PlayerState } from "share/game-interface";
@@ -315,26 +316,36 @@ function processServerEvent(entity: MeEntity) {
     }
   );
   entity.player.serverObject.listen("airdropClaimed", (airdropClaimed: any) => {
+    // remove tag open airdrop
+    if (entity.me.tutorial["airdrop"]) {
+      entity.me.tutorial["airdrop"].visible = false;
+      entity.me.airdrop = null;
+    }
     myState.claimAirdropNoti$.next({
       ...myState.claimAirdropNoti$.value,
       airdropClaimed,
     });
   });
-  entity.player.serverObject.listen("airdropClaimError", (airdropClaimError: any) => {
-    myState.claimAirdropNoti$.next({
-      ...myState.claimAirdropNoti$.value,
-      airdropClaimError,
-    });
-  });
+  entity.player.serverObject.listen(
+    "airdropClaimError",
+    (airdropClaimError: any) => {
+      myState.claimAirdropNoti$.next({
+        ...myState.claimAirdropNoti$.value,
+        airdropClaimError,
+      });
+    }
+  );
 }
 function processClientEvent(entity: MeEntity) {
-  myState.showActionWheel$.subscribe((val) => {
-    if (val) {
-      unbindInputEvent(entity);
-    } else {
-      bindInputEvent(entity);
+  combineLatest([myState.showActionWheel$, myState.activeChat$]).subscribe(
+    ([showActionWheel, activeChat]) => {
+      if (activeChat || showActionWheel) {
+        unbindInputEvent(entity);
+      } else {
+        bindInputEvent(entity);
+      }
     }
-  });
+  );
   myState.danceAnim$.subscribe((val) => {
     entity.player.danceAnim = val;
     entity.player = addPlayerState(PlayerState.Dance, entity.player);
@@ -397,9 +408,9 @@ function cronjob(entity: MeEntity) {
         // add new tag open air
         if (!entity.me.tutorial["airdrop"]) {
           entity.me.tutorial["airdrop"] = utils.createPanelText({
-            width: 0.05,
+            width: 0.2,
           });
-          entity.me.tutorial["airdrop"].add(utils.createLineText3D("E"));
+          entity.me.tutorial["airdrop"].add(utils.createLineText3D("PRESS E"));
           G.particleGroup.add(entity.me.tutorial["airdrop"]);
         }
         entity.me.tutorial["airdrop"].position.copy(
@@ -409,6 +420,15 @@ function cronjob(entity: MeEntity) {
           entity.me.tutorial["airdrop"].position.y + 0.5
         );
         entity.me.tutorial["airdrop"].visible = true;
+        let camPosition = entity.me.followCamera.getWorldPosition(
+          new Vector3()
+        );
+        if (entity.me.keyStates["RIGHTMOUSE"]) {
+          camPosition = entity.me.secondaryCamera.getWorldPosition(
+            new Vector3()
+          );
+        }
+        entity.me.tutorial["airdrop"].lookAt(camPosition);
         entity.me.airdrop = nearestAirdrop.airdrop;
       }
     }, 1000);
@@ -418,7 +438,9 @@ function setInputEvent(entity: MeEntity) {
   entity.me.onMouseMove = (event: any) => {
     if (document.pointerLockElement === document.body) {
       if (
-        [PlayerState.Dance, PlayerState.Beaten].includes(entity.player.stateTop) &&
+        [PlayerState.Dance, PlayerState.Beaten].includes(
+          entity.player.stateTop
+        ) &&
         !entity.me.keyStates["RIGHTMOUSE"]
       ) {
         // when dance not rotate
@@ -534,15 +556,6 @@ function setInputEvent(entity: MeEntity) {
           entity.me.mainObject.quaternion
         );
         break;
-    }
-  };
-  entity.me.onPointerLockChange = (evt: any) => {
-    if (!document.pointerLockElement) {
-      unbindInputEvent(entity);
-      myState.pause$.next(true);
-    } else {
-      bindInputEvent(entity);
-      myState.pause$.next(false);
     }
   };
 }

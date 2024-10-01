@@ -53,18 +53,18 @@ export default function Announcement() {
     };
   }, [airdropInfo, serverTz]);
   return (
-    <div className="absolute w-full h-[30px] bg-opacity-50 bg-gray-700 top-0 z-[10000]">
+    <div className="absolute w-full h-[90px] bg-opacity-50 bg-gray-700 top-0 z-[10000]">
       <div className="w-full overflow-hidden whitespace-nowrap">
         <div className="inline-block marqueue w-full">
           {countDownAirdrop && (
-            <div className="inline-block mr-[50px] text-xl">
+            <div className="inline-block mr-[50px] text-6xl mt-1">
               🚨 Exciting news! Our airdrop will begin in just{" "}
               {countDownAirdrop} ! Get ready to receive your rewards—stay tuned
               and be prepared!
             </div>
           )}
           {isInAirdrop && (
-            <div className="inline-block mr-[50px] text-xl">
+            <div className="inline-block mr-[50px] text-6xl mt-1">
               Airdrop Season is here! Collect your rewards while it lasts. Stay
               active and don't miss out on this limited opportunity!
             </div>

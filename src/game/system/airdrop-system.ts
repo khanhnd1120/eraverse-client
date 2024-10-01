@@ -70,7 +70,11 @@ function hideParachute(entity: AirdropEntity) {
         new TWEEN.Tween(child.material)
           .to({ opacity: 0 }, 1000)
           .easing(Easing.Quadratic.Out)
-          .start();
+          .start()
+          .onComplete(() => {
+            delete child.material;
+            child.visible = false;
+          });
         new TWEEN.Tween(child.scale)
           .to({ x: 18, z: 18 }, 1000)
           .easing(Easing.Quadratic.Out)
