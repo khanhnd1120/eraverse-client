@@ -11,9 +11,9 @@ function convertTimeDiff(totalMinutes: number) {
   const hours = Math.floor((totalMinutes % (24 * 60)) / 60); // Get the number of hours
   const minutes = totalMinutes % 60; // Get the remaining minutes
 
-  return `${days > 0 ? days + " days," : ""} ${
-    hours > 0 ? hours + " hours," : ""
-  } ${minutes} minutes`;
+  return `${days > 0 ? days + " days, " : ""}${
+    hours > 0 ? hours + " hours, " : ""
+  }${minutes > 0 ? minutes + " minutes" : ""}`;
 }
 
 export default function Announcement() {
@@ -45,7 +45,8 @@ export default function Announcement() {
         dayjs(airdropInfo.end) > dayjs().tz(serverTz)
       ) {
         setIsInAirdrop(true);
-        clearInterval(interval);
+      } else {
+        setIsInAirdrop(false);
       }
     }, 1000);
     return () => {
@@ -53,18 +54,18 @@ export default function Announcement() {
     };
   }, [airdropInfo, serverTz]);
   return (
-    <div className="absolute w-full h-[90px] bg-opacity-50 bg-gray-700 top-0 z-[10000]">
+    <div className="absolute w-full h-[60px] bg-opacity-50 bg-gray-700 top-0 z-[10000]">
       <div className="w-full overflow-hidden whitespace-nowrap">
         <div className="inline-block marqueue w-full">
           {countDownAirdrop && (
-            <div className="inline-block mr-[50px] text-6xl mt-1">
+            <div className="inline-block mr-[50px] text-3xl mt-1">
               🚨 Exciting news! Our airdrop will begin in just{" "}
               {countDownAirdrop} ! Get ready to receive your rewards—stay tuned
               and be prepared!
             </div>
           )}
           {isInAirdrop && (
-            <div className="inline-block mr-[50px] text-6xl mt-1">
+            <div className="inline-block mr-[50px] text-3xl mt-1">
               Airdrop Season is here! Collect your rewards while it lasts. Stay
               active and don't miss out on this limited opportunity!
             </div>

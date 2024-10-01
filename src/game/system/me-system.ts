@@ -368,7 +368,7 @@ function cronjob(entity: MeEntity) {
       let minDistantAirdrop = 10000;
       for (const airdropData of airdropEntities) {
         if (airdropData.airdrop.status !== AirdropStatus.Ready) {
-          return;
+          continue;
         }
         let distance = Math.max(
           Math.abs(
@@ -431,7 +431,7 @@ function cronjob(entity: MeEntity) {
         entity.me.tutorial["airdrop"].lookAt(camPosition);
         entity.me.airdrop = nearestAirdrop.airdrop;
       }
-    }, 1000);
+    }, 500);
   }
 }
 function setInputEvent(entity: MeEntity) {
