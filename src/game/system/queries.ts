@@ -31,7 +31,8 @@ function onGameObjectRemoved(entity: GameObjectEntity) {
 function onModelAdded(entity: ModelEntity) {
   loadModel(entity);
   if (entity.player) {
-    entity.player.serverObject.listen("character", (character: any) => {
+    entity.player.serverObject.listen("character", (characterData: any) => {
+      let character = characterData.model;
       if (entity.player.character !== character) {
         entity.player.character = character;
         let newModel = Constants.CharacterData[character].model;

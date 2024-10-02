@@ -33,11 +33,11 @@ export default function SelectSkin({ onClose }: { onClose: any }) {
           {listSkin.map((skin) => {
             return (
               <div
-                key={skin}
+                key={skin.nftId}
                 className="w-[135px] h-[135px] relative skin-menu-item cursor-pointer"
                 onClick={() => {
                   G.getCurrentRoom().send("character", {
-                    character: skin,
+                    nftId: skin.nftId,
                   });
                   myState.showActionWheel$.next(false);
                   if (onClose) {
@@ -47,7 +47,7 @@ export default function SelectSkin({ onClose }: { onClose: any }) {
               >
                 <div className="hidden absolute top-0 left-0 w-full border-[#f17d00] border-4 h-full battle-button-border"></div>
                 <img
-                  src={Constants.SkinAvatarImgs[skin]}
+                  src={Constants.SkinAvatarImgs[skin.model]}
                   alt="icon"
                   className="w-[135px] h-[135px] border-4 border-solid border-gray-600"
                 />

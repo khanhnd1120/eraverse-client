@@ -27,6 +27,7 @@ export default function Announcement() {
     setServerTz(Setting.getAllConfig().timeZone);
   }, []);
   useEffect(() => {
+    if (!airdropInfo) return;
     const interval = setInterval(() => {
       if (
         airdropInfo &&

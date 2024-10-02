@@ -8,6 +8,7 @@ export default function Chat() {
   const inputRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [showInput, setShowInput] = useState(true);
+  const bottomRef = useRef(null);
 
   useEffect(() => {
     myState.chatMessages$.subscribe((msgs: any) => {
@@ -41,6 +42,10 @@ export default function Chat() {
       }
     }
   }, [showInput]);
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
     <div
       className="absolute w-[300px] h-[500px] bg-gray-800 bg-opacity-50 pl-5 py-3 rounded-md"
@@ -55,6 +60,7 @@ export default function Chat() {
             </div>
           );
         })}
+        <div ref={bottomRef} />
       </div>
       <div className="pr-5">
         <Form

@@ -240,6 +240,7 @@ const Constants: any = {
     FEMALE_04: "ui/Female/4.png",
     FEMALE_03: "ui/Female/3.png",
     FEMALE_01: "ui/Female/1.png",
+    MALE_MONSTERRA: "ui/Male/monsterra.jpg",
     MALE_10: "ui/Male/10.png",
     MALE_09: "ui/Male/9.png",
     MALE_08: "ui/Male/8.png",
@@ -253,6 +254,8 @@ const Constants: any = {
     BASIC_01: "ui/Basic/Basic1.png",
     BASIC_02: "ui/Basic/Basic2.png",
     BASIC_03: "ui/Basic/Basic3.png",
+    BASIC_MONSTERRA: "ui/Basic/monsterra.jpg",
+    BASIC_GUEST: "ui/Basic/guest.jpg",
   },
 };
 export default Constants;

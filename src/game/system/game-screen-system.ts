@@ -187,6 +187,7 @@ async function init(entity: GameEntity) {
 }
 function onPlayerAdded(entity: GameEntity, player: any, key: string) {
   let room = G.getCurrentRoom();
+  let model = player.character.model;
   const { nameObject, chatBox } = createTextPlayer(player);
   if (key === room.sessionId) {
     //collect event and send to server
@@ -349,18 +350,18 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         nameObject,
         chatBox,
         isOnFloor: false,
-        character: player.character,
+        character: model,
         id: player.id,
       },
       model: {
-        name: Constants.CharacterData[player.character].model,
-        scale: Constants.CharacterData[player.character].scale,
+        name: Constants.CharacterData[model].model,
+        scale: Constants.CharacterData[model].scale,
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
           updateMaterialModel(
             child,
-            player.character,
-            assets.getMeshNameByCode(player.character)
+            model,
+            assets.getMeshNameByCode(model)
           );
           myState.reloadMaterial$.subscribe((names: string[]) => {
             const playerData = world
@@ -377,7 +378,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       animator: {
         items: [
           {
-            model: Constants.CharacterData[player.character].anim_top,
+            model: Constants.CharacterData[model].anim_top,
             currentAnimation: "",
             nextAnimation: "idle",
             clips: _.cloneDeep(Constants.AnimClipModel),
@@ -387,7 +388,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             currentArrAnimationItem: null,
           },
           {
-            model: Constants.CharacterData[player.character].anim_bottom,
+            model: Constants.CharacterData[model].anim_bottom,
             currentAnimation: "",
             nextAnimation: "idle",
             clips: _.cloneDeep(Constants.AnimClipModel),
@@ -419,14 +420,14 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       gameObject: playerObject,
       position: playerObject.position.clone(),
       model: {
-        name: Constants.CharacterData[player.character].model,
-        scale: Constants.CharacterData[player.character].scale,
+        name: Constants.CharacterData[model].model,
+        scale: Constants.CharacterData[model].scale,
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
           updateMaterialModel(
             child,
-            player.character,
-            assets.getMeshNameByCode(player.character),
+            model,
+            assets.getMeshNameByCode(model),
             {
               type: "enemy",
               id: key,
@@ -465,13 +466,13 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         nameObject,
         chatBox,
         isOnFloor: false,
-        character: player.character,
+        character: model,
         id: player.id,
       },
       animator: {
         items: [
           {
-            model: Constants.CharacterData[player.character].anim_top,
+            model: Constants.CharacterData[model].anim_top,
             currentAnimation: "",
             nextAnimation: "idle",
             clips: _.cloneDeep(Constants.AnimClipModel),
@@ -481,7 +482,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             currentArrAnimationItem: null,
           },
           {
-            model: Constants.CharacterData[player.character].anim_bottom,
+            model: Constants.CharacterData[model].anim_bottom,
             currentAnimation: "",
             nextAnimation: "idle",
             clips: _.cloneDeep(Constants.AnimClipModel),
