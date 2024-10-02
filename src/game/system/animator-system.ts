@@ -240,6 +240,7 @@ async function onEntityAdded(e: AnimatorEntity) {
           clipItem.clip.clampWhenFinished = clipItem.clampWhenFinished || false;
           clipItem.clip.loop = clipItem.loop || LoopRepeat;
           clipItem.clip.setEffectiveTimeScale(clipItem.timeScale ?? 1);
+          clipItem.clip.repetitions = clipItem.repetitions || Infinity;
         });
       });
       if (e.animator.ready$) {

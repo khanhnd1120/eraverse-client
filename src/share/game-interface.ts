@@ -116,6 +116,7 @@ export interface AnimationClipItem {
   loop?: AnimationActionLoopStyles;
   clip?: AnimationAction;
   timeScale?: number;
+  repetitions?: number;
 }
 export interface PlayerWorldType {
   serverObject: any;

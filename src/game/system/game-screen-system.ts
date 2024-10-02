@@ -354,7 +354,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       },
       model: {
         name: Constants.CharacterData[player.character].model,
-        scale: new Vector3(0.015, 0.015, 0.015),
+        scale: Constants.CharacterData[player.character].scale,
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
           updateMaterialModel(
@@ -420,7 +420,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
       position: playerObject.position.clone(),
       model: {
         name: Constants.CharacterData[player.character].model,
-        scale: new Vector3(0.015, 0.015, 0.015),
+        scale: Constants.CharacterData[player.character].scale,
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
           updateMaterialModel(

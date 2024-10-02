@@ -1,4 +1,4 @@
-import { LoopOnce } from "three";
+import { LoopOnce, LoopPingPong, Vector2, Vector3 } from "three";
 
 const Constants: any = {
   CharacterCodes: [
@@ -27,120 +27,161 @@ const Constants: any = {
     "BASIC_03",
   ],
   CharacterData: {
+    MALE_MONSTERRA: {
+      model: "model_male_premium",
+      anim_top: "female_anim_top",
+      anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
+    },
     MALE_10: {
       model: "model_male_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     MALE_09: {
       model: "model_male_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     MALE_08: {
       model: "model_male_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     MALE_07: {
       model: "model_male_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     MALE_06: {
       model: "model_male_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     MALE_05: {
       model: "model_male_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     MALE_04: {
       model: "model_male_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     MALE_03: {
       model: "model_male_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     MALE_02: {
       model: "model_male_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     MALE_01: {
       model: "model_male_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     BASIC_01: {
       model: "model_basic",
       anim_top: "basic_anim_top",
       anim_bottom: "basic_anim_bottom",
+      scale: new Vector3(0.015, 0.015, 0.015),
     },
     BASIC_02: {
       model: "model_basic",
       anim_top: "basic_anim_top",
       anim_bottom: "basic_anim_bottom",
+      scale: new Vector3(0.015, 0.015, 0.015),
+    },
+    BASIC_MONSTERRA: {
+      model: "model_basic",
+      anim_top: "basic_anim_top",
+      anim_bottom: "basic_anim_bottom",
+      scale: new Vector3(0.015, 0.015, 0.015),
+    },
+    BASIC_GUEST: {
+      model: "model_basic",
+      anim_top: "basic_anim_top",
+      anim_bottom: "basic_anim_bottom",
+      scale: new Vector3(0.015, 0.015, 0.015),
     },
     BASIC_03: {
       model: "model_basic",
       anim_top: "basic_anim_top",
       anim_bottom: "basic_anim_bottom",
+      scale: new Vector3(0.015, 0.015, 0.015),
     },
     FEMALE_10: {
       model: "model_female_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     FEMALE_09: {
       model: "model_female_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     FEMALE_08: {
       model: "model_female_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     FEMALE_07: {
       model: "model_female_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     FEMALE_06: {
       model: "model_female_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     FEMALE_05: {
       model: "model_female_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     FEMALE_04: {
       model: "model_female_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     FEMALE_03: {
       model: "model_female_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     FEMALE_02: {
       model: "model_female_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
     FEMALE_01: {
       model: "model_female_premium",
       anim_top: "female_anim_top",
       anim_bottom: "female_anim_bottom",
+      scale: new Vector3(0.1, 0.1, 0.1),
     },
   },
   // right - bottom - left - top
@@ -182,7 +223,7 @@ const Constants: any = {
     { name: "gangnam_style" },
     { name: "hiphop" },
     { name: "ninja_idle" },
-    { name: "punch", timeScale: 2, loop: LoopOnce },
+    { name: "punch", timeScale: 2, loop: LoopPingPong, repetitions: 1.1 },
     { name: "fall_idle", timeScale: 1.5 },
     { name: "fall_to_landing", timeScale: 1, loop: LoopOnce },
     { name: "die", timeScale: 1.2 },
