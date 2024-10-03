@@ -19,7 +19,9 @@ export default function updateMaterialModel(
     };
     child.castShadow = true;
     child.receiveShadow = true;
-    child.material.needsUpdate = true;
+    if(child.material) {
+      child.material.needsUpdate = true;
+    }
     const adsBoard = Setting.getConfig(ConfigKey.ADS_BOARD) as AdsBoard;
     const rotateMeshData = Setting.getConfig(ConfigKey.ROTATE_MESH);
 

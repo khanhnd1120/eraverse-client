@@ -31,13 +31,12 @@ function onGameObjectRemoved(entity: GameObjectEntity) {
 function onModelAdded(entity: ModelEntity) {
   loadModel(entity);
   if (entity.player) {
-    entity.player.serverObject.listen("character", (characterData: any) => {
-      let character = characterData.model;
-      if (entity.player.character !== character) {
+    entity.player.serverObject.listen("character", (character: any) => {
+      if (entity.player.character.nftId !== character.nftId) {
         entity.player.character = character;
-        let newModel = Constants.CharacterData[character].model;
+        let newModel = Constants.CharacterData[character.model].model;
         if (newModel !== entity.model.name) {
-          entity.model.name = Constants.CharacterData[character].model;
+          entity.model.name = Constants.CharacterData[character.model].model;
           if (entity.model.parent) {
             entity.model.parent.remove(entity.model.object);
           } else {
@@ -47,8 +46,8 @@ function onModelAdded(entity: ModelEntity) {
         } else {
           entity.player.character = character;
           myState.reloadMaterial$.next(
-            Object.keys(myState.meshMaterial$.value[character]).map(
-              (key: any) => myState.meshMaterial$.value[character][key]
+            Object.keys(myState.meshMaterial$.value[character.model]).map(
+              (key: any) => myState.meshMaterial$.value[character.model][key]
             )
           );
         }

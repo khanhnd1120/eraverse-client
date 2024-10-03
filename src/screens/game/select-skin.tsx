@@ -45,12 +45,15 @@ export default function SelectSkin({ onClose }: { onClose: any }) {
                   }
                 }}
               >
+                <div className="absolute top-1 left-2">{skin.name}</div>
                 <div className="hidden absolute top-0 left-0 w-full border-[#f17d00] border-4 h-full battle-button-border"></div>
                 <img
                   src={Constants.SkinAvatarImgs[skin.model]}
                   alt="icon"
                   className={`w-[135px] h-[135px] border-4 border-solid ${
-                    skin.isActive ? "border-blue-600" : "border-gray-600"
+                    G.mePlayer.player.character.nftId === skin.nftId
+                      ? "border-blue-600"
+                      : "border-gray-600"
                   }`}
                 />
                 {skin.isInAirdrop && (

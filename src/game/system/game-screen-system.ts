@@ -350,7 +350,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         nameObject,
         chatBox,
         isOnFloor: false,
-        character: model,
+        character: player.character,
         id: player.id,
       },
       model: {
@@ -358,17 +358,17 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         scale: Constants.CharacterData[model].scale,
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
-          updateMaterialModel(
-            child,
-            model,
-            assets.getMeshNameByCode(model)
-          );
+          updateMaterialModel(child, model, assets.getMeshNameByCode(model));
           myState.reloadMaterial$.subscribe((names: string[]) => {
             const playerData = world
               .with("player")
               .entities.filter((entity) => entity.player.id === player.id);
             if (playerData && playerData[0]) {
-              updateMaterialModel(child, playerData[0].player.character, names);
+              updateMaterialModel(
+                child,
+                playerData[0].player.character.model,
+                names
+              );
             }
           });
         },
@@ -424,15 +424,10 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         scale: Constants.CharacterData[model].scale,
         position: new Vector3(0, 0, 0),
         traverse: (child: any) => {
-          updateMaterialModel(
-            child,
-            model,
-            assets.getMeshNameByCode(model),
-            {
-              type: "enemy",
-              id: key,
-            }
-          );
+          updateMaterialModel(child, model, assets.getMeshNameByCode(model), {
+            type: "enemy",
+            id: key,
+          });
           myState.reloadMaterial$.subscribe((names: string[]) => {
             const playerData = world
               .with("player")
@@ -440,7 +435,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
             if (playerData && playerData[0]) {
               updateMaterialModel(
                 child,
-                playerData[0].player.character,
+                playerData[0].player.character.model,
                 names,
                 {
                   type: "enemy",
@@ -466,7 +461,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
         nameObject,
         chatBox,
         isOnFloor: false,
-        character: model,
+        character: player.character,
         id: player.id,
       },
       animator: {

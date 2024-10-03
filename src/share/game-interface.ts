@@ -131,7 +131,7 @@ export interface PlayerWorldType {
   isOnFloor: boolean;
   isRun?: boolean;
   id?: string;
-  character?: string;
+  character?: { model: string; nftId: string };
 }
 export interface MeWorldType {
   onMouseMove: EventListener;

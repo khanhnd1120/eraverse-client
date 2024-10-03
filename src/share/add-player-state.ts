@@ -43,10 +43,12 @@ export default function addPlayerState(
       stateTop,
       stateBottom,
     };
-    G.getCurrentRoom()?.send("state", {
-      stateBottom: player.stateBottom,
-      stateTop: player.stateTop,
-    });
+    if (G.mePlayer.player.id === player.id) {
+      G.getCurrentRoom()?.send("state", {
+        stateBottom: player.stateBottom,
+        stateTop: player.stateTop,
+      });
+    }
   }
   return player;
 }

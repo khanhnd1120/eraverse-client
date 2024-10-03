@@ -26,7 +26,7 @@ const claimAirdropNoti$ = new BehaviorSubject<{
   airdropClaimError: any;
 }>(null);
 const keylessAccountData$ = new BehaviorSubject<KeylessAccount>(null);
-const listSkin$ = new BehaviorSubject<string[]>([]);
+const listSkin$ = new BehaviorSubject<any[]>([]);
 const reloadSound$ = new BehaviorSubject<string>("");
 const notification$ = new BehaviorSubject<any>({});
 
