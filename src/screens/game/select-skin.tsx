@@ -49,8 +49,15 @@ export default function SelectSkin({ onClose }: { onClose: any }) {
                 <img
                   src={Constants.SkinAvatarImgs[skin.model]}
                   alt="icon"
-                  className="w-[135px] h-[135px] border-4 border-solid border-gray-600"
+                  className={`w-[135px] h-[135px] border-4 border-solid ${
+                    skin.isActive ? "border-blue-600" : "border-gray-600"
+                  }`}
                 />
+                {skin.isInAirdrop && (
+                  <div className="absolute w-[127px] bottom-1 left-1 bg-slate-900 bg-opacity-60 p-2">
+                    {skin.numberCanClaim} / {skin.maxClaim}
+                  </div>
+                )}
               </div>
             );
           })}
