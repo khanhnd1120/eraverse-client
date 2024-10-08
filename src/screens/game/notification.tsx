@@ -34,7 +34,7 @@ export default function Notification() {
           )}
           {notification?.type === NotificationType.Default && (
             <div>
-              <div className="text-xl mt-4">{notification.content}</div>
+              <div className="text-2xl mt-4">{notification.content}</div>
             </div>
           )}
         </div>
