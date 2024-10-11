@@ -55,8 +55,13 @@ async function init(entity: GameEntity) {
 
   // load map
   let gltf: GLTF = assets.getModel(entity.gameScreen.map);
+  G.mapScene = gltf.scene;
   myState.reloadMaterial$.subscribe((names: string[]) => {
     gltf.scene.traverse(async (child: any) => {
+      child.userData = {
+        ...child.userData,
+        worldPosition: child.getWorldPosition(new Vector3()),
+      };
       updateMaterialModel(child, entity.gameScreen.map, names);
     });
   });

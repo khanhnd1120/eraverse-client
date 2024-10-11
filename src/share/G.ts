@@ -47,6 +47,7 @@ let currentRoom: any;
 let stats = new Stats();
 let messages: any = [];
 let mePlayer: any = null;
+let mapScene: any = null;
 let fps = 0;
 let frames = 0,
   prevTime = performance.now();
@@ -196,5 +197,6 @@ const G = {
   calFps,
   setFps,
   getFps,
+  mapScene,
 };
 export default G;

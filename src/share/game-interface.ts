@@ -155,8 +155,8 @@ export interface MeWorldType {
   viewPoint: Object3D;
   aimPoint: Object3D;
   defaultFollowCam: Object3D;
-  intervalCheckAirdrop?: any;
-  airdrop?: any;
+  meIntervalCronjob?: any;
+  tutorialData?: any;
   tutorial?: { [key: string]: Object3D };
 }
 
@@ -179,6 +179,8 @@ export type AdsConfig = {
   time: number;
   typeShader?: ShaderType;
   colorShader?: string;
+  actions?: string;
+  url?: string;
 };
 
 export type AdsBoard = {

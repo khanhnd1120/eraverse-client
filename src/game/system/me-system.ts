@@ -1,4 +1,3 @@
-import utils from "game/help/utils";
 import { With } from "miniplex";
 import { combineLatest } from "rxjs";
 import addPlayerState from "share/add-player-state";
@@ -10,6 +9,7 @@ import Setting from "share/setting";
 import { Entity } from "share/world";
 import { Euler, Line3, MathUtils, Vector3 } from "three";
 import { Capsule } from "three/examples/jsm/Addons.js";
+import { getAdsAction, getNearAirdrop } from "./me";
 
 const _PI_2 = Math.PI / 2;
 const STEPS_PER_FRAME = 5;
@@ -319,7 +319,7 @@ function processServerEvent(entity: MeEntity) {
     // remove tag open airdrop
     if (entity.me.tutorial["airdrop"]) {
       entity.me.tutorial["airdrop"].visible = false;
-      entity.me.airdrop = null;
+      entity.me.tutorialData["airdrop"] = null;
     }
     myState.claimAirdropNoti$.next({
       ...myState.claimAirdropNoti$.value,
@@ -352,9 +352,9 @@ function processClientEvent(entity: MeEntity) {
     G.getCurrentRoom().send("danceAnim", { danceAnim: val });
   });
   myState.keyStates$.subscribe((keyStates) => {
-    if (keyStates["KeyE"] && entity.me.airdrop?.id) {
+    if (keyStates["KeyE"] && entity.me.tutorialData["airdrop"]?.id) {
       G.getCurrentRoom().send("claim_airdrop", {
-        id: entity.me.airdrop?.id,
+        id: entity.me.tutorialData["airdrop"]?.id,
       });
       entity.me.keyStates["KeyE"] = false;
       myState.keyStates$.next(entity.me.keyStates);
@@ -362,75 +362,10 @@ function processClientEvent(entity: MeEntity) {
   });
 }
 function cronjob(entity: MeEntity) {
-  if (!entity.me.intervalCheckAirdrop) {
-    entity.me.intervalCheckAirdrop = setInterval(() => {
-      let nearestAirdrop: AirdropEntity = null;
-      let minDistantAirdrop = 10000;
-      for (const airdropData of airdropEntities) {
-        if (airdropData.airdrop.status !== AirdropStatus.Ready) {
-          continue;
-        }
-        let distance = Math.max(
-          Math.abs(
-            airdropData.airdrop.position.x - entity.gameObject.position.x
-          ),
-          Math.abs(
-            airdropData.airdrop.position.z - entity.gameObject.position.z
-          )
-        );
-        if (distance < minDistantAirdrop && distance < 1) {
-          minDistantAirdrop = distance;
-          nearestAirdrop = airdropData;
-        }
-      }
-      // check remove old airdop
-      let isRemoveOldAir = false;
-      let isNewAir = false;
-      if (nearestAirdrop) {
-        if (nearestAirdrop.airdrop.id !== entity.me.airdrop?.id) {
-          isRemoveOldAir = true;
-          isNewAir = true;
-        }
-      } else {
-        isRemoveOldAir = true;
-      }
-      if (!entity.me.tutorial) {
-        entity.me.tutorial = {};
-      }
-      if (isRemoveOldAir) {
-        // remove tag open airdrop
-        if (entity.me.tutorial["airdrop"]) {
-          entity.me.tutorial["airdrop"].visible = false;
-          entity.me.airdrop = null;
-        }
-      }
-      if (isNewAir) {
-        // add new tag open air
-        if (!entity.me.tutorial["airdrop"]) {
-          entity.me.tutorial["airdrop"] = utils.createPanelText({
-            width: 0.2,
-          });
-          entity.me.tutorial["airdrop"].add(utils.createLineText3D("PRESS E"));
-          G.particleGroup.add(entity.me.tutorial["airdrop"]);
-        }
-        entity.me.tutorial["airdrop"].position.copy(
-          nearestAirdrop.airdrop.position
-        );
-        entity.me.tutorial["airdrop"].position.setY(
-          entity.me.tutorial["airdrop"].position.y + 0.5
-        );
-        entity.me.tutorial["airdrop"].visible = true;
-        let camPosition = entity.me.followCamera.getWorldPosition(
-          new Vector3()
-        );
-        if (entity.me.keyStates["RIGHTMOUSE"]) {
-          camPosition = entity.me.secondaryCamera.getWorldPosition(
-            new Vector3()
-          );
-        }
-        entity.me.tutorial["airdrop"].lookAt(camPosition);
-        entity.me.airdrop = nearestAirdrop.airdrop;
-      }
+  if (!entity.me.meIntervalCronjob) {
+    entity.me.meIntervalCronjob = setInterval(() => {
+      getNearAirdrop(entity);
+      getAdsAction(entity);
     }, 500);
   }
 }

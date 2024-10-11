@@ -60,9 +60,10 @@ export default function Announcement() {
         <div className="inline-block marqueue w-full">
           {countDownAirdrop && (
             <div className="inline-block mr-[50px] text-3xl mt-1">
-              🚨 Exciting news! Our airdrop will begin in just{" "}
-              {countDownAirdrop} ! Get ready to receive your rewards—stay tuned
-              and be prepared!
+              🚨 Our airdrop will begin in just {countDownAirdrop}! At the
+              start, look for the yellow circle areas where the airdrop boxes
+              will be dropped. To receive the airdrop, get close to the airdrop
+              box and press the E button as fast as possible. Good luck!
             </div>
           )}
           {isInAirdrop && (
