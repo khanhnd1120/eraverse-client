@@ -43,7 +43,6 @@ export default function getAdsAction(entity: MeEntity) {
   let isRemoveOldAir = false;
   let isNewAir = false;
   if (nearestAds) {
-    console.log(nearestAds)
     if (nearestAds.id !== entity.me.tutorialData["ads"]?.id) {
       isRemoveOldAir = true;
       isNewAir = true;

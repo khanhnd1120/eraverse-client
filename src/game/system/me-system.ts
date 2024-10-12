@@ -2,7 +2,12 @@ import { With } from "miniplex";
 import { combineLatest } from "rxjs";
 import addPlayerState from "share/add-player-state";
 import G, { world } from "share/G";
-import { AirdropStatus, Direction, PlayerState } from "share/game-interface";
+import {
+  AdsActionType,
+  AirdropStatus,
+  Direction,
+  PlayerState,
+} from "share/game-interface";
 import myState from "share/my-state";
 import removePlayerState from "share/remove-player-state";
 import Setting from "share/setting";
@@ -359,6 +364,16 @@ function processClientEvent(entity: MeEntity) {
       entity.me.keyStates["KeyE"] = false;
       myState.keyStates$.next(entity.me.keyStates);
     }
+    if (keyStates["KeyE"] && entity.me.tutorialData["ads"]?.id) {
+      const adsData = entity.me.tutorialData["ads"];
+      switch (adsData.actions) {
+        case AdsActionType.Link:
+          window.open(adsData.url, "_black");
+          break;
+      }
+      entity.me.keyStates["KeyE"] = false;
+      myState.keyStates$.next(entity.me.keyStates);
+    }
   });
 }
 function cronjob(entity: MeEntity) {
@@ -420,6 +435,9 @@ function setInputEvent(entity: MeEntity) {
       );
       if (entity.me.tutorial && entity.me.tutorial["airdrop"]) {
         entity.me.tutorial["airdrop"].lookAt(camPosition);
+      }
+      if (entity.me.tutorial && entity.me.tutorial["ads"]) {
+        entity.me.tutorial["ads"].lookAt(camPosition);
       }
     }
   };

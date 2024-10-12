@@ -211,3 +211,7 @@ export enum NotificationType {
   Default,
   Disconnect,
 }
+
+export enum AdsActionType {
+  Link = "link",
+}
