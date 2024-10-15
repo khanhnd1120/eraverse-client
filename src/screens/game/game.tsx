@@ -7,6 +7,7 @@ import ActionWheel from "./action-wheel";
 import ClaimAirdropPanel from "./claim-airdrop";
 import Notification from "./notification";
 import Announcement from "./announcement";
+import Recoil from "./recoil";
 
 export default function Game() {
   const [showDance, setShowDance] = useState(false);
@@ -26,6 +27,7 @@ export default function Game() {
   }, []);
   return (
     <div className="text-white w-screen h-screen flex justify-center items-center">
+      <Recoil />
       <Playing />
       <Chat />
       {showDance && <ActionWheel />}

@@ -29,6 +29,7 @@ const keylessAccountData$ = new BehaviorSubject<KeylessAccount>(null);
 const listSkin$ = new BehaviorSubject<any[]>([]);
 const reloadSound$ = new BehaviorSubject<string>("");
 const notification$ = new BehaviorSubject<any>({});
+const tutorialAction$ = new BehaviorSubject<any>({});
 
 const myState = {
   reloadMaterial$,
@@ -51,5 +52,6 @@ const myState = {
   listSkin$,
   reloadSound$,
   notification$,
+  tutorialAction$,
 };
 export default myState;

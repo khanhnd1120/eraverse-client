@@ -5,78 +5,80 @@ import { AdsBoard, ConfigKey } from "share/game-interface";
 import Setting from "share/setting";
 import { Entity } from "share/world";
 import { Vector3 } from "three";
+import myRaycast from "./my-raycast";
+import myState from "share/my-state";
 
 type MeEntity = With<Entity, "me" | "player">;
 export default function getAdsAction(entity: MeEntity) {
   if (!G.mapScene) {
     return;
   }
-  let nearestAds: any = null;
-  let minDistantAds = 10000;
-  const adsBoard = Setting.getConfig(ConfigKey.ADS_BOARD) as AdsBoard;
-
-  G.mapScene.traverse((child: any) => {
-    const adsData = adsBoard[child.name];
-    const adsIndex = child.userData.adsIndex;
-    if (
-      child.userData &&
-      child.userData.worldPosition &&
-      adsData &&
-      adsData[adsIndex] &&
-      adsData[adsIndex].actions
-    ) {
-      let distance = Math.max(
-        Math.abs(child.userData.worldPosition.x - entity.gameObject.position.x),
-        Math.abs(child.userData.worldPosition.z - entity.gameObject.position.z)
-      );
-      if (distance < minDistantAds && distance < 1) {
-        minDistantAds = distance;
-        nearestAds = {
-          ...adsData[adsIndex],
-          id: `${child.name}_${adsIndex}`,
-          position: child.userData.worldPosition,
-        };
-      }
-    }
-  });
-
-  let isRemoveOldAir = false;
-  let isNewAir = false;
-  if (nearestAds) {
-    if (nearestAds.id !== entity.me.tutorialData["ads"]?.id) {
-      isRemoveOldAir = true;
-      isNewAir = true;
-    }
-  } else {
-    isRemoveOldAir = true;
-  }
-
-  if (isRemoveOldAir) {
-    // remove tag open ads
-    if (entity.me.tutorial["ads"]) {
-      entity.me.tutorial["ads"].visible = false;
-      entity.me.tutorialData["ads"] = null;
-    }
-  }
-  if (isNewAir) {
-    // add new tag open air
-    if (!entity.me.tutorial["ads"]) {
-      entity.me.tutorial["ads"] = utils.createPanelText({
-        width: 0.2,
+  if (entity.me.tutorialData["airdrop"]) {
+    if (myState.tutorialAction$.value?.ads) {
+      myState.tutorialAction$.next({
+        ...myState.tutorialAction$.value,
+        ads: false,
       });
-      entity.me.tutorial["ads"].add(utils.createLineText3D("PRESS E"));
-      G.particleGroup.add(entity.me.tutorial["ads"]);
     }
-    entity.me.tutorial["ads"].position.copy(nearestAds.position);
-    entity.me.tutorial["ads"].position.setY(
-      entity.me.tutorial["ads"].position.y + 0.5
-    );
-    entity.me.tutorial["ads"].visible = true;
-    let camPosition = entity.me.followCamera.getWorldPosition(new Vector3());
-    if (entity.me.keyStates["RIGHTMOUSE"]) {
-      camPosition = entity.me.secondaryCamera.getWorldPosition(new Vector3());
-    }
-    entity.me.tutorial["ads"].lookAt(camPosition);
-    entity.me.tutorialData["ads"] = nearestAds;
+    return;
   }
+  let viewPointPosition = entity.me.viewPoint.getWorldPosition(new Vector3());
+  if (!entity.me.tutorialData["ads"]) {
+    entity.me.tutorialData["ads"] = {
+      viewPointPosition,
+      isCal: false,
+    };
+    return;
+  }
+  const oldViewPos = entity.me.tutorialData["ads"].viewPointPosition;
+  if (
+    Math.abs(viewPointPosition.x - oldViewPos.x) < 0.01 &&
+    Math.abs(viewPointPosition.y - oldViewPos.y) < 0.01 &&
+    Math.abs(viewPointPosition.z - oldViewPos.z) < 0.01
+  ) {
+    if (entity.me.tutorialData["ads"].isCal) {
+      return;
+    }
+    if (new Date().getTime() - entity.me.tutorialData["ads"].time < 2600) {
+      return;
+    }
+    // calculate raycast
+    const { hit } = myRaycast(entity);
+    let target = hit.object;
+    const adsBoard = Setting.getConfig(ConfigKey.ADS_BOARD) as AdsBoard;
+    const adsData = adsBoard[target.name];
+    const adsIndex = target.userData.adsIndex;
+
+    if (adsData && adsData[adsIndex] && adsData[adsIndex].actions) {
+      const id = `${target.name}_${adsIndex}`;
+      entity.me.tutorialData["ads"] = {
+        viewPointPosition,
+        isCal: true,
+        ...adsData[adsIndex],
+        id,
+        time: new Date().getTime(),
+      };
+      myState.tutorialAction$.next({
+        ...myState.tutorialAction$.value,
+        ads: true,
+      });
+    } else {
+      myState.tutorialAction$.next({
+        ...myState.tutorialAction$.value,
+        ads: false,
+      });
+    }
+    entity.me.tutorialData["ads"].isCal = true;
+    return;
+  }
+  if (myState.tutorialAction$.value?.ads) {
+    myState.tutorialAction$.next({
+      ...myState.tutorialAction$.value,
+      ads: false,
+    });
+  }
+  entity.me.tutorialData["ads"] = {
+    viewPointPosition,
+    isCal: false,
+  };
 }

@@ -284,7 +284,7 @@ function onPlayerAdded(entity: GameEntity, player: any, key: string) {
     );
     secondaryObject.add(secondaryCamera);
 
-    const viewPointPosition = new Vector3(0, 0.1, 2);
+    const viewPointPosition = new Vector3(-0.3, 0.4, 2);
     let viewPoint = new Object3D();
     viewPoint.position.set(
       viewPointPosition.x,
